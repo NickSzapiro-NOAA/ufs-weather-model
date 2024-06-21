@@ -1,2 +1,4 @@
-control_wam intel
-control_wam_debug intel
+hafs_regional_docn intel
+hafs_regional_docn_oisst intel
+hafs_regional_datm_cdeps intel
+regional_atmaq_debug intel

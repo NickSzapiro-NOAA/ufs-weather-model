@@ -301,8 +301,8 @@ PASS -- TEST 'atmaero_control_p8_intel' [06:58, 04:20](3208 MB)
 PASS -- TEST 'atmaero_control_p8_rad_intel' [07:02, 04:55](3099 MB)
 PASS -- TEST 'atmaero_control_p8_rad_micro_intel' [06:46, 05:00](3107 MB)
 
-PASS -- COMPILE 'atmaq_debug_intel' [12:12, 04:05] ( 884 warnings 6 remarks )
-FAILED: TEST TIMED OUT -- TEST 'regional_atmaq_debug_intel' [, ]( MB)
+PASS -- COMPILE 'atmaq_debug_intel' [05:10, 04:14] ( 884 warnings 6 remarks )
+PASS -- TEST 'regional_atmaq_debug_intel' [40:05, 36:48](4452 MB)
 
 PASS -- COMPILE 'atm_gnu' [09:11, 04:41]
 PASS -- TEST 'control_c48_gnu' [12:47, 11:21](1538 MB)

@@ -25,6 +25,7 @@ ATM_attributes::
   DumpFields = @[DumpFields]
   ProfileMemory = false
   OverwriteSlice = true
+  restart_fh = 2,6,8,12,17,21
 ::
 
 # OCN #
@@ -38,6 +39,7 @@ OCN_attributes::
   mesh_ocn = @[MESH_OCN]
   use_coldstart = @[use_coldstart]
   use_mommesh = @[use_mommesh]
+  restart_fh = 2,6,8,12,17,21
 ::
 
 # ICE #
@@ -53,6 +55,7 @@ ICE_attributes::
   stop_n = @[RESTART_N]
   stop_option = nhours
   stop_ymd = -999
+  restart_fh = 2,6,8,12,17,21
 ::
 
 # WAV #

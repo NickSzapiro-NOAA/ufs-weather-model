@@ -419,6 +419,7 @@ export CMP_DATAONLY=false
 
 # Defaults for ufs.configure
 export esmf_logkind="ESMF_LOGKIND_MULTI"
+export ESMF_THREADING=true
 export DumpFields="false"
 export MED_history_n=1000000
 
@@ -504,7 +505,7 @@ else
 fi
 
 # ufs.configure defaults
-export UFS_CONFIGURE=ufs.configure.atm_esmf.IN
+export UFS_CONFIGURE=ufs.configure.atm.IN
 export MODEL_CONFIGURE=model_configure.IN
 export atm_model=fv3
 
@@ -1342,7 +1343,7 @@ export_fire_behavior() {
 
 # Defaults for the coupled 5-component
 export_cmeps() {
-  export UFS_CONFIGURE=ufs.configure.s2swa_fast_esmf.IN
+  export UFS_CONFIGURE=ufs.configure.s2swa_fast.IN
   export med_model=cmeps
   export atm_model=fv3
   export chm_model=gocart

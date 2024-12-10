@@ -114,3 +114,5 @@ export N_SPLIT=5
 # HR4 GFSv17 GWD update
 export DO_GWD_OPT_PSL=.true.
 export DO_GSL_DRAG_SS=.false.
+
+export histaux_enabled=.true.

@@ -99,14 +99,14 @@ MED_attributes::
       ocean_albedo_limit = @[ocean_albedo_limit]
       histaux_ice2med_file1_auxname = ice.1h.aux
       histaux_ice2med_file1_doavg = .false.
-      histaux_ice2med_file1_enabled = .true.
+      histaux_ice2med_file1_enabled = @[histaux_enabled]
       histaux_ice2med_file1_flds = all
       histaux_ice2med_file1_history_n = @[MED_history_n]
       histaux_ice2med_file1_history_option = nhours
       histaux_ice2med_file1_ntperfile = 9999
       histaux_ocn2med_file1_auxname = ocn.1h.aux
       histaux_ocn2med_file1_doavg = .false.
-      histaux_ocn2med_file1_enabled = .true.
+      histaux_ocn2med_file1_enabled = @[histaux_enabled]
       histaux_ocn2med_file1_flds = all
       histaux_ocn2med_file1_history_n = @[MED_history_n]
       histaux_ocn2med_file1_history_option = nhours

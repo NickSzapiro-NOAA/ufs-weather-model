@@ -736,7 +736,7 @@ case ${MACHINE_ID} in
     PARTITION=c5
     dprefix=${dprefix:-/gpfs/f5/${ACCNR}/scratch/${USER}}
     STMP=${STMP:-${dprefix}/RT_BASELINE}
-    PTMP=${PTMP:-${dprefix}/RT_RUNDIRS} 
+    PTMP=${PTMP:-${dprefix}/RT_RUNDIRS}
 
     SCHEDULER="slurm"
     ;;
@@ -1017,7 +1017,8 @@ if [[ "${CREATE_BASELINE}" == false ]] ; then
   fi
 fi
 
-INPUTDATA_ROOT=${INPUTDATA_ROOT:-${DISKNM}/NEMSfv3gfs/input-data-20240501}
+#INPUTDATA_ROOT=${INPUTDATA_ROOT:-${DISKNM}/NEMSfv3gfs/input-data-20240501}
+INPUTDATA_ROOT=/scratch2/NCEPDEV/stmp3/Denise.Worthen/input-data-20240501
 INPUTDATA_ROOT_WW3=${INPUTDATA_ROOT}/WW3_input_data_20240214
 INPUTDATA_ROOT_BMIC=${INPUTDATA_ROOT_BMIC:-${DISKNM}/NEMSfv3gfs/BM_IC-20220207}
 INPUTDATA_LM4=${INPUTDATA_LM4:-${INPUTDATA_ROOT}/LM4_input_data}
@@ -1121,7 +1122,7 @@ if [[ ${ECFLOW} == true ]]; then
   # Default maximum number of compile and run jobs
   MAX_BUILDS=10 #Max build jobs
   MAX_JOBS=30   #Max test/run jobs
-  ECF_TRIES=2   #Tries before failure
+  ECF_TRIES=1   #Tries before failure
 
   # Reduce maximum number of compile jobs on jet and s4 because of licensing issues
   if [[ ${MACHINE_ID} = jet ]]; then

@@ -154,7 +154,7 @@ export CPLCHM=.false.
 export CPLWAV=.false.
 export CPLWAV2ATM=.false.
 export MOM6_USE_WAVES=False
-export eps_imesh=4.0e-1
+export eps_imesh=1.0e0
 
 export DIAG_TABLE=diag_table_template
 export FIELD_TABLE=field_table_thompson_noaero_tke

@@ -1,10 +1,10 @@
 #
-#  cpld_control GFSv17 restart test with IAU
+#  cpld_control GFSv17 restart test
 #
 
-source ${PATHRT}/tests/cpld_control_gfsv17_iau
+source ${PATHRT}/tests/cpld_restart_gfsv17
 
-export TEST_DESCR="Fully coupled FV3-CCPP-MOM6-CICE-CMEPS-WW3 system - C96MX100 with IAU - restart"
+export TEST_DESCR="Fully coupled FV3-CCPP-MOM6-CICE-CMEPS-WW3 system - C96MX100 - restart"
 
 export FHROT=18 #restart after any IAU
 export RESTART_N=3
@@ -29,14 +29,3 @@ export CICE_DIAGFREQ=`expr $((FHMAX-FHROT)) \* 3600 / $DT_CICE`
 
 #Warm start settings already from base test
 
-#No increments/IAU in restart
-#export READ_INCREMENT=.false.
-#export IAU_INC_FILES="''"
-#export IAU_DELTHRS=0
-#export IAUFHRS=-1
-#export IAU_OFFSET=0
-export ODA_INCUPD="False"
-export ODA_INCUPD_UV="False"
-
-# debug
-export WRITE_DOPOST=.false.

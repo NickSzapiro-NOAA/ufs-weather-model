@@ -415,18 +415,6 @@ elif [[ ${MACHINE_ID} = noaacloud ]] ; then
     export ICE_tasks_cpl_thrd=10
     export WAV_tasks_cpl_thrd=12
 
-elif [[ ${MACHINE_ID} = expanse ]]; then
-
-  echo "Unknown MACHINE_ID ${MACHINE_ID}. Please update tasks configurations in default_vars.sh"
-  exit 1
-
-  # TPN_dflt=64 ; INPES_dflt=3 ; JNPES_dflt=8
-  # TPN_thrd=64 ; INPES_thrd=3 ; JNPES_thrd=4
-  # TPN_stretch=12 ; INPES_stretch=2 ; JNPES_stretch=4
-
-  # TPN_cpl_atmw_gdas=12; INPES_cpl_atmw_gdas=6; JNPES_cpl_atmw_gdas=8
-  # THRD_cpl_atmw_gdas=2; WPG_cpl_atmw_gdas=24; APB_cpl_atmw_gdas="0 311"; WPB_cpl_atmw_gdas="312 559"
-
 else
 
   echo "Unknown MACHINE_ID ${MACHINE_ID}"

@@ -81,14 +81,6 @@ elif [[ ${MACHINE_ID} = gaeac6 ]]; then
         source /opt/cray/pe/lmod/lmod/init/bash
     fi
     module reset
-    
-elif [[ ${MACHINE_ID} = expanse ]]; then
-    # We are on SDSC Expanse
-    if ( ! eval module help > /dev/null 2>&1 ) ; then
-        source /etc/profile.d/modules.sh
-    fi
-    module purge
-    module load slurm/expanse/20.02.3
 
 elif [[ ${MACHINE_ID} = noaacloud ]] ; then
     # We are on NOAA Cloud

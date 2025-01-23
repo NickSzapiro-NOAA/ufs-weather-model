@@ -964,22 +964,6 @@ case ${MACHINE_ID} in
     export MPIEXEC="ibrun"
     export MPIEXECOPTS=
     ;;
-  expanse)
-    echo "rt.sh: Setting up expanse..."
-    export PYTHONPATH=
-
-    if [[ "${ECFLOW:-false}" == true ]] ; then
-      export ECFLOW_START=
-    fi
-    QUEUE="compute"
-    COMPILE_QUEUE="shared"
-    PARTITION=
-    dprefix="/expanse/lustre/scratch/${USER}/temp_project/run"
-    DISKNM="/expanse/lustre/scratch/domh/temp_project/RT"
-    STMP="${dprefix}"
-    PTMP="${dprefix}"
-    SCHEDULER="slurm"
-    ;;
   noaacloud)
     echo "rt.sh: Setting up noaacloud..."
     export PATH="/contrib/EPIC/bin:${PATH}"
@@ -1093,7 +1077,7 @@ if [[ ${ROCOTO} == true ]]; then
   echo "rt.sh: Verifying ROCOTO support..."
 
   case ${MACHINE_ID} in
-    wcoss2|acorn|expanse|stampede)
+    wcoss2|acorn|stampede)
       die "Rocoto not supported on this machine, please do not use '-r'."
       ;;
     *)
@@ -1135,7 +1119,7 @@ fi
 if [[ ${ECFLOW} == true ]]; then
   echo "Verifying ECFLOW support..."
   case ${MACHINE_ID} in
-    expanse|stampede|noaacloud)
+    stampede|noaacloud)
       die "ECFLOW not supported on this machine, please do not use '-e'."
       ;;
     *)

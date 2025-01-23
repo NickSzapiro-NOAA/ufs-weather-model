@@ -48,8 +48,6 @@ case $(hostname -f) in
   derecho7.hsn.de.hpc.ucar.edu) MACHINE_ID=derecho ;; ### derecho7
   derecho8.hsn.de.hpc.ucar.edu) MACHINE_ID=derecho ;; ### derecho8
   
-  login[1-4].stampede2.tacc.utexas.edu) MACHINE_ID=stampede ;; ### stampede1-4
-
   login[1-4].frontera.tacc.utexas.edu) MACHINE_ID=frontera ;; ### frontera1-4
   c*.frontera.tacc.utexas.edu) MACHINE_ID=frontera ;; ### frontera compute 
 

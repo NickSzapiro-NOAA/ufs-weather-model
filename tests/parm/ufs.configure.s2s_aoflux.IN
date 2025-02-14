@@ -96,7 +96,7 @@ MED_attributes::
       ICE_model = @[ice_model]
       OCN_model = @[ocn_model]
       coupling_mode = @[CPLMODE]
-      aoflux_grid = 'agrid'
+      aoflux_grid = @[AOFLUX_GRID]
       aoflux_code = 'ccpp'
       aoflux_ccpp_suite = 'FV3_sfc_ocean'
       ccpp_restart_interval = @[RESTART_N_SEC]

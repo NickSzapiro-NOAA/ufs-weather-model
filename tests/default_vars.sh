@@ -1363,6 +1363,7 @@ export_cmeps() {
   export MESH_ICE=mesh.mx${OCNRES}.nc
   export MESH_WAV=mesh.${WW3_DOMAIN}.nc
   export CPLMODE=ufs.frac
+  export AOFLUX_GRID='agrid'
   export pio_rearranger=box
   export RUNTYPE=startup
   export RESTART_N=${FHMAX}

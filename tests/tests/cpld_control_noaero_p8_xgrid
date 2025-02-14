@@ -1,0 +1,6 @@
+source ${PATHRT}/tests/cpld_control_noaero_p8_agrid
+
+export TEST_DESCR+=" xgrid"
+export CNTL_DIR=cpld_control_noaero_p8_xgrid
+
+export AOFLUX_GRID='xgrid'

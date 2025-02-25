@@ -1,0 +1,14 @@
+
+#
+#  threading on/off test
+#
+
+source ${PATHRT}/tests/cpld_control_noaero_p8_xgrid
+
+export TEST_DESCR+=" thr test"
+
+#tasks with no threads
+export THRD=2
+#export INPES=$(( INPES * 2 ))
+#export JNPES=$(( JNPES * 2 ))
+#export WRTTASK_PER_GROUP=$(( WPG_cpl_bmrk * THRD_cpl_bmrk ))

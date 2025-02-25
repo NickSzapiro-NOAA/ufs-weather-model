@@ -1,0 +1,22 @@
+
+#
+#  decomposition test
+#
+
+source ${PATHRT}/tests/cpld_control_noaero_p8_xgrid
+
+export TEST_DESCR+=" dcp test"
+
+#export INPES=$((INPES/2))
+#export JNPES=$((JNPES*2))
+export INPES=4
+export JNPES=6
+
+export OCN_tasks=$((OCN_tasks+10))
+export ICE_tasks=$((ICE_tasks+12))
+#export WAV_tasks=$((WAV_tasks+10))
+
+export CICE_NPROC=$ICE_tasks
+export np2=`expr $CICE_NPROC / 2`
+export CICE_BLCKX=`expr $NX_GLB / $np2`
+export CICE_BLCKY=`expr $NY_GLB / 2`

@@ -1,0 +1,35 @@
+
+On WCOSS2
+If `+WAV_tasks=$((WAV_tasks+10)); +# export OCN_tasks=$((OCN_tasks+10)), get reproducible outputs.
+
+Split ESMF_MeshCreate "quick fix" from Denise:
+```
+diff --git a/model/src/wav_comp_nuopc.F90 b/model/src/wav_comp_nuopc.F90
+index 544b4081..f5cbf53a 100644
+--- a/model/src/wav_comp_nuopc.F90
++++ b/model/src/wav_comp_nuopc.F90
+@@ -490,6 +490,8 @@ contains
+     character(ESMF_MAXSTR)         :: preamb = './'
+     character(ESMF_MAXSTR)         :: ifname = 'ww3_multi.inp'
+     character(len=*), parameter    :: subname = '(wav_comp_nuopc:InitializeRealize)'
++    ! debug
++    type(ESMF_Mesh)                :: EmeshTemp
+     ! -------------------------------------------------------------------
+
+     rc = ESMF_SUCCESS
+@@ -894,9 +896,11 @@ contains
+     ! get the mesh file name
+     call NUOPC_CompAttributeGet(gcomp, name='mesh_wav', value=cvalue, rc=rc)
+     if (ChkErr(rc,__LINE__,u_FILE_u)) return
+-    ! read in the mesh with the the DistGrid
+-    EMesh = ESMF_MeshCreate(filename=trim(cvalue), fileformat=ESMF_FILEFORMAT_ESMFMESH, &
+-         elementDistgrid=Distgrid,rc=rc)
++    ! read in the mesh with an auto-generated distgrid
++    EMeshTemp = ESMF_MeshCreate(filename=trim(cvalue), fileformat=ESMF_FILEFORMAT_ESMFMESH, rc=rc)
++    if (ChkErr(rc,__LINE__,u_FILE_u)) return
++    ! recreate the mesh using the above distGrid
++    EMesh = ESMF_MeshCreate(EMeshTemp, elementDistgrid=Distgrid, rc=rc)
+     if (ChkErr(rc,__LINE__,u_FILE_u)) return
+```
+
+With +10 wave tasks on wcoss2, and is reproducible if I comment out changes in the number of OCN tasks. Changing the number of ICE tasks is fine.

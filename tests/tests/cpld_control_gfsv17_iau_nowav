@@ -1,0 +1,17 @@
+#
+#  cpld_control GFSv17 restart test nowav
+#
+
+source ${PATHRT}/tests/cpld_control_gfsv17_iau
+
+export CNTL_DIR=cpld_control_gfsv17_iau_nowav
+
+export TEST_DESCR="Fully coupled FV3-CCPP-MOM6-CICE-CMEPS system - C96MX100 "
+
+export WAV_tasks=0
+export CPLWAV=.false.
+export CPLWAV2ATM=.false.
+export MOM6_USE_WAVES=False
+
+export UFS_CONFIGURE=ufs.configure.s2s.IN
+

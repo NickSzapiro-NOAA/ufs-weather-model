@@ -63,6 +63,10 @@ list(APPEND cdeps_dlnd_files
   CDEPS/dlnd/lnd_comp_nuopc.F90
 )
 
+list(APPEND cdeps_demis_files
+  CDEPS/demis/emis_comp_nuopc.F90
+)
+
 list(APPEND cdeps_docn_files
   CDEPS/docn/docn_datamode_aquaplanet_mod.F90
   CDEPS/docn/docn_datamode_copyall_mod.F90

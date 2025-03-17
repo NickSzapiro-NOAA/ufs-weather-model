@@ -103,6 +103,14 @@ target_include_directories(dglc PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY
 target_link_libraries(dglc PRIVATE dshr share streams)
 target_link_libraries(dglc PRIVATE esmf PIO::PIO_Fortran)
 
+# CDEPS/demis
+add_library(demis OBJECT ${cdeps_demis_files})
+add_dependencies(demis share streams dshr)
+set_target_properties(demis PROPERTIES Fortran_MODULE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mod)
+target_include_directories(demis PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/mod>)
+target_link_libraries(demis PRIVATE dshr share streams)
+target_link_libraries(demis PRIVATE esmf)
+
 # CDEPS
 add_library(cdeps STATIC $<TARGET_OBJECTS:share>
                          $<TARGET_OBJECTS:streams>
@@ -113,7 +121,8 @@ add_library(cdeps STATIC $<TARGET_OBJECTS:share>
                          $<TARGET_OBJECTS:docn>
                          $<TARGET_OBJECTS:drof>
                          $<TARGET_OBJECTS:dwav>
-                         $<TARGET_OBJECTS:dglc>)
+                         $<TARGET_OBJECTS:dglc>
+                         $<TARGET_OBJECTS:demis>)
 add_library(cdeps::cdeps ALIAS cdeps)
 target_include_directories(cdeps PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/mod>
                                         $<INSTALL_INTERFACE:mod>)

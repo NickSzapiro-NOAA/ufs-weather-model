@@ -48,12 +48,13 @@ export LIST_FILES="sfcf024.nc \
                    RESTART/iced.2021-03-23-43200.nc \
                    RESTART/ufs.cpld.cpl.r.2021-03-23-43200.nc \
                    MOM6_OUTPUT/ocn_2021_03_23_09.nc \
-                   history/iceh_06h.2021-03-23-43200.nc \
-                   history/iceh.2021-03-23-21600.nc "
+                   history/iceh_06h.2021-03-23-43200.nc "
 
 export WAV_tasks=0
 export CPLWAV=.false.
 export CPLWAV2ATM=.false.
 export MOM6_USE_WAVES=False
+
+export FHZERO=3
 
 export UFS_CONFIGURE=ufs.configure.s2s.IN

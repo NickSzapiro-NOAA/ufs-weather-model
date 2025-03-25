@@ -413,6 +413,7 @@ export WLCLK_dflt=30
 
 export WLCLK=${WLCLK_dflt}
 export CMP_DATAONLY=false
+export nccmp_exclude=""
 
 # Defaults for ufs.configure
 export esmf_logkind="ESMF_LOGKIND_MULTI"

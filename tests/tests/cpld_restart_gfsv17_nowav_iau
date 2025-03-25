@@ -4,7 +4,7 @@
 
 source ${PATHRT}/tests/cpld_control_gfsv17_nowav_iau
 
-export TEST_DESCR="Coupled FV3-CCPP-MOM6-CICE-CMEPS system - C96MX100 with IAU - restart"
+export TEST_DESCR+=" restart"
 
 export FHROT=18 #restart after any IAU
 export RESTART_N=3
@@ -37,6 +37,4 @@ export CICE_DIAGFREQ=`expr $((FHMAX-FHROT)) \* 3600 / $DT_CICE`
 #export IAU_OFFSET=0
 export ODA_INCUPD="False"
 export ODA_INCUPD_UV="False"
-
-# debug
-export WRITE_DOPOST=.false.
+export nccmp_exclude="--exclude=oda_incupd_ncount"

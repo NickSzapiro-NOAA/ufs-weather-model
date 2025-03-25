@@ -495,9 +495,9 @@ if [[ ${skip_check_results} == false ]]; then
             printf "USING NCCMP.." >> "${RT_LOG}"
             printf "USING NCCMP.."
               if [[ ${CMP_DATAONLY} == false ]]; then
-                nccmp -d -S -q -f -g -B --Attribute=checksum --warn=format ${nccmp_exclude} "${RTPWD}/${CNTL_DIR}_${RT_COMPILER}/${i}" "${RUNDIR}/${i}" > "${i}_nccmp.log" 2>&1 && d=$? || d=$?
+                nccmp -d -S -q -f -g -B --Attribute=checksum --warn=format "${nccmp_exclude}" "${RTPWD}/${CNTL_DIR}_${RT_COMPILER}/${i}" "${RUNDIR}/${i}" > "${i}_nccmp.log" 2>&1 && d=$? || d=$?
               else
-                nccmp -d -S -q -f -B --Attribute=checksum --warn=format ${nccmp_exclude} "${RTPWD}/${CNTL_DIR}_${RT_COMPILER}/${i}" "${RUNDIR}/${i}" > "${i}_nccmp.log" 2>&1 && d=$? || d=$?
+                nccmp -d -S -q -f -B --Attribute=checksum --warn=format "${nccmp_exclude}" "${RTPWD}/${CNTL_DIR}_${RT_COMPILER}/${i}" "${RUNDIR}/${i}" > "${i}_nccmp.log" 2>&1 && d=$? || d=$?
               fi
               if [[ ${d} -ne 0 && ${d} -ne 1 ]]; then
                 printf "....ERROR" >> "${RT_LOG}"

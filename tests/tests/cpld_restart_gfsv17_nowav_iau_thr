@@ -1,0 +1,17 @@
+
+#
+#  threading on/off test
+#
+
+source ${PATHRT}/tests/cpld_restart_gfsv17_nowav_iau
+
+export TEST_DESCR+=" thr test"
+
+#nthreads was 1, make 2
+export JNPES=$(( JNPES / 2 ))
+export WRTTASK_PER_GROUP=$(( WRTTASK_PER_GROUP * 2 ))
+
+export atm_omp_num_threads=2
+export chm_omp_num_threads=$atm_omp_num_threads
+export med_omp_num_threads=$atm_omp_num_threads
+

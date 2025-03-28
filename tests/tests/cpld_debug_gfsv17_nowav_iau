@@ -1,0 +1,4 @@
+source ${PATHRT}/tests/cpld_control_gfsv17_nowav_iau
+export TEST_DESCR+=" debug"
+export CNTL_DIR=cpld_debug_gfsv17_nowav_iau
+export WLCLK=120

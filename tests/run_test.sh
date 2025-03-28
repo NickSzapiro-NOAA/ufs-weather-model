@@ -494,10 +494,10 @@ if [[ ${skip_check_results} == false ]]; then
           if [[ " orion hercules hera wcoss2 acorn derecho gaeac5 gaeac6 jet s4 noaacloud frontera" =~ ${MACHINE_ID} ]]; then
             printf "USING NCCMP.." >> "${RT_LOG}"
             printf "USING NCCMP.."
-              args=(-d -S -q -f -B --Attribute=checksum --warn=format)
-              if [[ ${CMP_DATAONLY} == false ]];; then args+=("-g"); fi
-              if [[ ! -z "${nccmp_exclude// }" ]]; then args+=("${nccmp_exclude}"); fi
-              nccmp "${args[@]}" "${RTPWD}/${CNTL_DIR}_${RT_COMPILER}/${i}" "${RUNDIR}/${i}" > "${i}_nccmp.log" 2>&1 && d=$? || d=$?
+              nccmp_args=(-d -S -q -f -B --Attribute=checksum --warn=format)
+              if [[ ${CMP_DATAONLY} == false ]]; then nccmp_args+=("-g"); fi
+              if [[ ! -z "${nccmp_exclude// }" ]]; then nccmp_args+=("${nccmp_exclude}"); fi
+              nccmp "${nccmp_args[@]}" "${RTPWD}/${CNTL_DIR}_${RT_COMPILER}/${i}" "${RUNDIR}/${i}" > "${i}_nccmp.log" 2>&1 && d=$? || d=$?
               if [[ ${d} -ne 0 && ${d} -ne 1 ]]; then
                 printf "....ERROR" >> "${RT_LOG}"
                 printf "....ERROR"

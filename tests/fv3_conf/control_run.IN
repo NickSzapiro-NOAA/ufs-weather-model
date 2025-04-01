@@ -167,3 +167,12 @@ if [ $CPLCHM = .true. ]; then
   cp      ${PATHRT}/parm/gocart/*.rc .
   ln -sf  @[INPUTDATA_ROOT]/GOCART/p8/ExtData .
 fi
+
+if [[ ${BMIC} == .true. ]]; then
+  FV3_IC=@[INPUTDATA_ROOT]/GEFS/${SYEAR}${SMONTH}${SDAY}${SHOUR}/
+  cp ${FV3_IC}/fv*.nc ./INPUT
+  cp ${FV3_IC}/sfc_data*.nc ./INPUT
+  cp ${FV3_IC}/phy_data*.nc ./INPUT
+  cp ${FV3_IC}/*stoch*nc ./INPUT
+  cp ${FV3_IC}/ca_data*nc ./INPUT
+fi

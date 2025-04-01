@@ -1,0 +1,2 @@
+source ${PATHRT}/tests/cpld_restart_gfsv17_nowav_iau
+export WRITE_DOPOST=.true.

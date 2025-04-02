@@ -1,2 +1,2 @@
-source tests/tests/cpld_control_gfsv17_nowav_iau
+source ${PATHRT}/tests/cpld_control_gfsv17_nowav_iau
 export WRITE_DOPOST=.true.

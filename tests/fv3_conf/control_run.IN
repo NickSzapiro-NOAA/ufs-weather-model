@@ -152,6 +152,8 @@ fi
 #ugwpv1
 if [ $DO_UGWP_V1 = .true. ]; then
   cp    @[INPUTDATA_ROOT]/FV3_input_data/ugwp_c384_tau.nc ./ugwp_limb_tau.nc
+  cp @[INPUTDATA_ROOT]/${inputdir}/INPUT_L127_gfsv17/oro_data_ls* ./INPUT
+  cp @[INPUTDATA_ROOT]/${inputdir}/INPUT_L127_gfsv17/oro_data_ss* ./INPUT
 fi
 
 #Thompson
@@ -176,5 +178,5 @@ if [[ ${BMIC} == .true. ]]; then
   cp ${FV3_IC}/*stoch*nc ./INPUT
   cp ${FV3_IC}/ca_data*nc ./INPUT
   #cp ${FV3_IC}/coupler.res ./INPUT
-  cp /scratch1/NCEPDEV/nems/Nick.Szapiro/tasks/gefs/atm/uwm_fix/tests/coupler.res ./INPUT
+  cp ${PATHRT}/coupler.res ./INPUT
 fi

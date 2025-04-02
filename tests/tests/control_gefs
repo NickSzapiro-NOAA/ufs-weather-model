@@ -8,8 +8,8 @@ export TEST_DESCR="Compare global control C384L127 results with previous trunk v
 
 export CNTL_DIR=control_gefs
 
-export LIST_FILES="sfcf012.nc \
-                   atmf012.nc "
+export LIST_FILES="sfcf003.nc \
+                   atmf003.nc "
 
 export ATMRES=C384 #needed for default_vars
 export DT_ATMOS=300
@@ -31,8 +31,10 @@ export RESTART_FILE_SUFFIX_SECS="${SYEAR}-${SMONTH}-${SDAY}-$(printf "%05d" $(( 
 export BMIC=.true.
 
 #Simulation length and output
-export DAYS=0.5
-export FHMAX=12
+#export DAYS=0.5
+#export FHMAX=12
+export DAYS=0.125
+export FHMAX=3
 export RESTART_N=3
 export RESTART_INTERVAL="${RESTART_N} -1"
 export OUTPUT_FH="3 -1"
@@ -48,6 +50,8 @@ export atm_omp_num_threads=$THRD_cpl_bmrk
 # atm/ocn/ice resolution
 export NPX=385
 export NPY=385
+export NPZ=127
+export NPZP=128
 export IMO=1536
 export JMO=768
 export OUTPUT_GRID="'gaussian_grid'"
@@ -134,6 +138,8 @@ export FV_SG_ADJ=450
 #model configurations
 export FV3_RUN=control_run.IN
 #export FV3_RUN=cpld_control_run.IN
-export CCPP_SUITE=FV3_GFS_v17_coupled_p8_ugwpv1
+export CCPP_SUITE=FV3_GFS_v17_p8_ugwpv1
 export INPUT_NML=global_control.nml.IN
 #export UFS_CONFIGURE=ufs.configure.s2swa.IN
+
+export WLCLK=45

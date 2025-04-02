@@ -175,4 +175,6 @@ if [[ ${BMIC} == .true. ]]; then
   cp ${FV3_IC}/phy_data*.nc ./INPUT
   cp ${FV3_IC}/*stoch*nc ./INPUT
   cp ${FV3_IC}/ca_data*nc ./INPUT
+  #cp ${FV3_IC}/coupler.res ./INPUT
+  cp /scratch1/NCEPDEV/nems/Nick.Szapiro/tasks/gefs/atm/uwm_fix/tests/coupler.res ./INPUT
 fi

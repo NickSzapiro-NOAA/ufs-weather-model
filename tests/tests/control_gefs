@@ -17,7 +17,7 @@ export DT_ATMOS=300
 export_fv3
 export_tiled
 export_ugwpv1
-export_cpl
+#export_cpl
 
 #IC
 export SYEAR=2021
@@ -77,6 +77,7 @@ export IAU_INC_FILES="'fv3_increment.nc'"
 export IAU_OFFSET=0
 export IAUFHRS='6'
 export IAU_DELTHRS=6
+export MODEL_INITIALIZATION=true
 
 #stochastic physics
 export STOCHINI=.true.
@@ -131,8 +132,8 @@ export FV_SG_ADJ=450
 #export DOGP_LWSCAT=.false.
 
 #model configurations
-#export FV3_RUN=control_run.IN
-export FV3_RUN=cpld_control_run.IN
+export FV3_RUN=control_run.IN
+#export FV3_RUN=cpld_control_run.IN
 export CCPP_SUITE=FV3_GFS_v17_coupled_p8_ugwpv1
 export INPUT_NML=global_control.nml.IN
 #export UFS_CONFIGURE=ufs.configure.s2swa.IN

@@ -70,6 +70,7 @@ export RESTART_FILE_SUFFIX_SECS="${SYEAR}-${SMONTH}-${SDAY}-$(printf "%05d" $(( 
 #CICE forecast day output stream
 hist_n_24h=$(( 24*3600/${DT_CICE} ))
 export CICE_HISTFREQ_N="0, 0, 6, ${hist_n_24h}, 1"
+export OUTPUT_FH='1 -1'
 
 # ATM warm start
 export WARM_START=.true.

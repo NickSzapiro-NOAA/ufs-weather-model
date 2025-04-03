@@ -80,7 +80,7 @@ export DNATS=0
 
 export RESTART_N=3
 export RESTART_INTERVAL="${RESTART_N} -1"
-export OUTPUT_FH='0 21 24'
+export OUTPUT_FH='1 -1'
 #CICE forecast day output stream
 hist_n_24h=$(( 24*3600/${DT_CICE} ))
 export CICE_HISTFREQ_N="0, 0, 6, ${hist_n_24h}, 1"

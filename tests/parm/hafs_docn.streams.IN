@@ -3,7 +3,7 @@ taxmode01:                 extend
 mapalgo01:                 bilinear
 tInterpAlgo01:             linear
 readMode01:                single
-dtlimit01:                 1.5
+dtlimit01:                 1.e30
 stream_offset01:           0
 yearFirst01:               @[SYEAR]
 yearLast01:                @[SYEAR]

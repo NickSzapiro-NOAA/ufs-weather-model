@@ -3,7 +3,7 @@
 #
 
 source ${PATHRT}/tests/cpld_control_gfsv17_nowav_iau
-
+export CNTL_DIR=cpld_restart_gfsv17_nowav_iau
 export TEST_DESCR+=" restart"
 
 export FHROT=18 #restart after any IAU

@@ -1,2 +1,3 @@
 source ${PATHRT}/tests/cpld_control_gfsv17_nowav_iau
+export CNTL_DIR=cpld_control_gfsv17_nowav_iau_post
 export WRITE_DOPOST=.true.

@@ -6,7 +6,7 @@ source ${PATHRT}/tests/cpld_debug_gefs
 
 export TEST_DESCR="AMIP+ FV3-CCPP-CDEPS_DOCN-CICE_icePrescribed system"
 
-export CNTL_DIR=cpld_debug_gefs_ds2s
+export CNTL_DIR=cpld_debug_gefs_ds2s_pcice
 
 export LIST_FILES="sfcf003.nc \
                    atmf003.nc "

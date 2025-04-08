@@ -248,3 +248,6 @@ export FIELD_TABLE=field_table_gefsv13
 export DIAG_TABLE=diag_table_gefsv13.IN
 export INPUT_NML=global_control.nml.IN
 export UFS_CONFIGURE=ufs.configure.s2swa.IN
+
+export histaux_enabled=.true.
+export MED_history_n=1

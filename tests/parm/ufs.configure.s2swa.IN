@@ -142,6 +142,20 @@ MED_attributes::
       history_option_atm_inst = nsteps
       history_n_wav_inst = 1
       history_option_wav_inst = nsteps
+      histaux_ice2med_file1_auxname = ice.1h.aux
+      histaux_ice2med_file1_doavg = .false.
+      histaux_ice2med_file1_enabled = @[histaux_enabled]
+      histaux_ice2med_file1_flds = all
+      histaux_ice2med_file1_history_n = @[MED_history_n]
+      histaux_ice2med_file1_history_option = nhours
+      histaux_ice2med_file1_ntperfile = 9999
+      histaux_ocn2med_file1_auxname = ocn.1h.aux
+      histaux_ocn2med_file1_doavg = .false.
+      histaux_ocn2med_file1_enabled = @[histaux_enabled]
+      histaux_ocn2med_file1_flds = all
+      histaux_ocn2med_file1_history_n = @[MED_history_n]
+      histaux_ocn2med_file1_history_option = nhours
+      histaux_ocn2med_file1_ntperfile = 9999
 ::
 ALLCOMP_attributes::
       ScalarFieldCount = 3

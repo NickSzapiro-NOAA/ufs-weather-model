@@ -75,6 +75,7 @@ MED_attributes::
       WAV_model = @[wav_model]
       coupling_mode = @[CPLMODE]
       pio_rearranger = @[pio_rearranger]
+      mapuv_with_cart3d = @[MAPUV3D]
 ::
 
 ALLCOMP_attributes::

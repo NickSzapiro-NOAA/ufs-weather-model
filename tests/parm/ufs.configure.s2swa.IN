@@ -134,7 +134,9 @@ MED_attributes::
       coupling_mode = @[CPLMODE]
       pio_rearranger = @[pio_rearranger]
       ocean_albedo_limit = @[ocean_albedo_limit]
+      mapuv_with_cart3d = @[MAPUV3D]
 ::
+
 ALLCOMP_attributes::
       ScalarFieldCount = 3
       ScalarFieldIdxGridNX = 1

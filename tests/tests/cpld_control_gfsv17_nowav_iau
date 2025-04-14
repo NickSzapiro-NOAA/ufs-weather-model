@@ -53,7 +53,7 @@ export CPLWAV=.false.
 export CPLWAV2ATM=.false.
 export MOM6_USE_WAVES=False
 
-export WRITE_DOPOST=.false.
+export WRITE_DOPOST=.true.
 export FHZERO=3
 
 export UFS_CONFIGURE=ufs.configure.s2s.IN

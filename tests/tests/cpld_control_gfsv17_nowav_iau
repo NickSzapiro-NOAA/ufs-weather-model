@@ -10,6 +10,8 @@ export CNTL_DIR=cpld_control_gfsv17_nowav_iau
 
 export LIST_FILES="sfcf024.nc \
                    atmf024.nc \
+                   GFSFLX.GrbF24 \
+                   GFSPRS.GrbF24 \
                    RESTART/20210323.120000.coupler.res \
                    RESTART/20210323.120000.fv_core.res.nc \
                    RESTART/20210323.120000.fv_core.res.tile1.nc \

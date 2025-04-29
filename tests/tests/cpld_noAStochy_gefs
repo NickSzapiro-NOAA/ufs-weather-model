@@ -1,0 +1,20 @@
+#
+#  deny stochy gefs test
+#
+
+source ${PATHRT}/tests/cpld_control_gefs
+
+export TEST_DESCR+=" no astochy"
+
+export CNTL_DIR=cpld_noAStochy_gefs
+
+#stochastic physics
+export STOCHINI=.true.
+export DO_SPPT=.false.
+export DO_SHUM=.false.
+export DO_SKEB=.false.
+export SKEB=-999.
+export SPPT=-999.
+export PERT_CLDS=.false.
+export PERT_MP=.false.
+export PERT_RADTEND=.false.

@@ -24,3 +24,7 @@ export DO_OCN_SPPT=False
 export PERT_EPBL=False
 export OCN_SPPT=-999.
 export EPBL=-999.
+
+export DO_CA=.false.
+export CA_GLOBAL=.false.
+export CA_SGS=.false.

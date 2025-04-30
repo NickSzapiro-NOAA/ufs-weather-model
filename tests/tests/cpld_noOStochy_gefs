@@ -2,7 +2,7 @@
 #  deny stochy gefs test
 #
 
-source ${PATHRT}/tests/cpld_control_gefs
+source ${PATHRT}/tests/cpld_debug_gefs
 
 export TEST_DESCR+=" no ostochy"
 

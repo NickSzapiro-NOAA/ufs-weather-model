@@ -4,12 +4,13 @@
 
 source ${PATHRT}/tests/cpld_debug_gefs
 
-export TEST_DESCR+=" no astochy"
+export TEST_DESCR+=" no stochy"
 
-export CNTL_DIR=cpld_noAStochy_gefs
+export CNTL_DIR=cpld_noStochy_gefs
 
 #stochastic physics
-export STOCHINI=.true.
+export STOCHINI=.false.
+#ATM
 export DO_SPPT=.false.
 export DO_SHUM=.false.
 export DO_SKEB=.false.
@@ -18,3 +19,8 @@ export SPPT=-999.
 export PERT_CLDS=.false.
 export PERT_MP=.false.
 export PERT_RADTEND=.false.
+# MOM6 stochastics
+export DO_OCN_SPPT=False
+export PERT_EPBL=False
+export OCN_SPPT=-999.
+export EPBL=-999.

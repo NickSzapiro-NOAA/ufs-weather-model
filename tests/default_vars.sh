@@ -1613,7 +1613,7 @@ export_datm_cdeps ()
   export NX_GLB=360
   export NY_GLB=320
 
-  # default reso urces
+  # default resources
   export ATM_compute_tasks=${ATM_compute_tasks_cdeps_100}
   export OCN_tasks=${OCN_tasks_cdeps_100}
   export ICE_tasks=${ICE_tasks_cdeps_100}

@@ -1391,6 +1391,8 @@ export_cmeps() {
   # mediator ocean albedo
   export ocean_albedo_limit=0.06
   export use_mean_albedos=.false.
+  # vector remapping
+  export MAPUV3D=true
 }
 
 export_cpl ()
@@ -1611,7 +1613,7 @@ export_datm_cdeps ()
   export NX_GLB=360
   export NY_GLB=320
 
-  # default resources
+  # default reso urces
   export ATM_compute_tasks=${ATM_compute_tasks_cdeps_100}
   export OCN_tasks=${OCN_tasks_cdeps_100}
   export ICE_tasks=${ICE_tasks_cdeps_100}

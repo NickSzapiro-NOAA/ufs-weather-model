@@ -183,7 +183,7 @@ fi
 
 #inline post
 if [ $WRITE_DOPOST = .true. ]; then
-  if [[ ${BMIC} == .true. ]]; then
+  if [[ ${BMIC} == .true. && ${CPLCHM} = .true.]]; then
     cp    ${PATHRT}/../FV3/upp/parm/gefs/post_itag_gefs128 itag
     cp    ${PATHRT}/../FV3/upp/parm/gefs/postxconfig-NT-gefs.txt postxconfig-NT.txt
     cp    ${PATHRT}/../FV3/upp/parm/gefs/postxconfig-NT-gefs-f00.txt postxconfig-NT_FH00.txt
@@ -229,7 +229,7 @@ if [ $IAER = 2011 ]; then
   cp    @[INPUTDATA_ROOT]/FV3_input_data_INCCN_aeroclim/aer_data/LUTS/optics_SS.v3_3.dat  optics_SS.dat
   cp    @[INPUTDATA_ROOT]/FV3_input_data_INCCN_aeroclim/aer_data/LUTS/optics_SU.v1_3.dat  optics_SU.dat
 
-  if [[ ${BMIC} == .true. ]]; then
+  if [[ ${BMIC} == .true. &&  ${CPLCHM} = .true. ]]; then
     DIR_OPT=./ExtData/monochromatic
     cp ${DIR_OPT}/optics_BC.v1_3.nc  optics_BC.nc
     cp ${DIR_OPT}/optics_OC.v1_3.nc  optics_OC.nc 

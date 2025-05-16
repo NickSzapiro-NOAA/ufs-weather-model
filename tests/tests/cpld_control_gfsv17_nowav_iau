@@ -1,5 +1,5 @@
 #
-#  cpld_control GFSv17 restart test nowav
+#  cpld_control GFSv17 test with IAU without WAV
 #
 
 source ${PATHRT}/tests/cpld_control_gfsv17_iau

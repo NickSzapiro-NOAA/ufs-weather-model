@@ -7,7 +7,8 @@ module shr_is_restart_fh_mod
                      ESMF_ConfigGetLen, ESMF_ConfigGetAttribute, ESMF_TimePrint, &
                      ESMF_LOGMSG_INFO, ESMF_LogWrite, ESMF_TimeInterval, &
                      ESMF_Time, ESMF_KIND_R8, ESMF_Config, ESMF_Clock, &
-                     ESMF_TimeIntervalSet, ESMF_TimePrint, operator(+), operator(==), &
+                     ESMF_ClockGet, ESMF_TimeIntervalSet, ESMF_TimePrint, &
+                     operator(+), operator(<), operator(==), &
                      ESMF_LogFoundError, ESMF_LOGERR_PASSTHRU
 
   implicit none
@@ -24,7 +25,7 @@ module shr_is_restart_fh_mod
 contains
 
   !-----------------------------------------------------------------------
-  subroutine init_is_restart_fh(currentTime, dtime, lLog, restartfh_info)
+  subroutine init_is_restart_fh(clock, dtime, lLog, restartfh_info)
     !
     ! !DESCRIPTION:
     ! Process restart_fh attribute from model_configure in UFS
@@ -32,18 +33,19 @@ contains
     ! !USES:
     !
     ! !ARGUMENTS:
-    type(ESMF_Time), intent(in) :: currentTime
-    integer, intent(in)         :: dtime ! time step (s)
-    logical, intent(in)         :: lLog ! If true, this task logs restart_fh info
+    type(ESMF_Clock), intent(in) :: clock
+    integer, intent(in)          :: dtime ! time step (s)
+    logical, intent(in)          :: lLog ! If true, this task logs restart_fh info
     type(is_restart_fh_type), intent(out) :: restartfh_info !restart_fh info for each task
     !
     ! !LOCAL VARIABLES:
-    character(len=256)           :: timestr
-    integer                      :: n, nfh, fh_s, rc
-    logical                      :: isPresent
+    character(len=256)            :: timestr
+    integer                       :: n, nfh, fh_s, rc
+    logical                       :: isPresent
     real(kind=ESMF_KIND_R8), allocatable :: restart_fh(:)
-    type(ESMF_TimeInterval)      :: fhInterval
-    type(ESMF_Config)            :: CF_mc
+    type(ESMF_TimeInterval)       :: fhInterval
+    type(ESMF_Time)               :: startTime, currTime
+    type(ESMF_Config)             :: CF_mc
     !-----------------------------------------------------------------------
 
     ! set up Times to write non-interval restarts
@@ -57,20 +59,24 @@ contains
       if (nfh .gt. 0) then
         allocate(restart_fh(1:nfh))
         allocate(restartfh_info%restartFhTimes(1:nfh)) !not deallocated here
-
         call ESMF_ConfigGetAttribute(CF_mc,valueList=restart_fh,label='restart_fh:', rc=rc)
         if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, line=__LINE__, file=__FILE__)) return
-        ! create a list of times at each restart_fh
+
+        ! create a list of times from each restart hour, wrt startTime
+        call ESMF_ClockGet(clock, currTime=currTime, startTime=startTime, rc=rc)
+        if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, line=__LINE__, file=__FILE__)) return
         do n = 1,nfh
           fh_s = NINT(3600*restart_fh(n))
           call ESMF_TimeIntervalSet(fhInterval, s=fh_s, rc=rc)
           if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, line=__LINE__, file=__FILE__)) return
-          restartfh_info%restartFhTimes(n) = currentTime + fhInterval
+          restartfh_info%restartFhTimes(n) = startTime + fhInterval
           call ESMF_TimePrint(restartfh_info%restartFhTimes(n), options="string", &
                               preString="restart_fh at ", unit=timestr, rc=rc)
           if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, line=__LINE__, file=__FILE__)) return
+          
+          ! log times that will (not) fall on a timestep
           if (lLog) then
-            if (mod(fh_s,dtime) /= 0) then
+            if ((restartfh_info%restartFhTimes(n)<currTime) .OR. (mod(fh_s,dtime) /= 0) ) then
               call ESMF_LogWrite('restart time NOT to be written for '//trim(timestr), ESMF_LOGMSG_INFO)
             else
               call ESMF_LogWrite('restart time to be written for '//trim(timestr), ESMF_LOGMSG_INFO)

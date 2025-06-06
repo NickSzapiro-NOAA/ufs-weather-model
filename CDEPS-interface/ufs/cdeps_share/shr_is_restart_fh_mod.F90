@@ -41,6 +41,7 @@ contains
     ! !LOCAL VARIABLES:
     character(len=256)            :: timestr
     integer                       :: n, nfh, fh_s, dt_s, rc
+    real(kind=ESMF_KIND_R8)       :: fhmax, fh_freq
     logical                       :: isPresent
     real(kind=ESMF_KIND_R8), allocatable :: restart_fh(:)
     type(ESMF_TimeInterval)       :: fhInterval, timeStep
@@ -55,12 +56,28 @@ contains
       call ESMF_ConfigLoadFile(config=CF_mc,filename='model_configure' ,rc=rc)
       if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, line=__LINE__, file=__FILE__)) return
 
-      nfh = ESMF_ConfigGetLen(config=CF_mc, label ='restart_fh:',rc=rc)
+      nfh = ESMF_ConfigGetLen(config=CF_mc, label='restart_fh:',rc=rc)
       if (nfh .gt. 0) then
         allocate(restart_fh(1:nfh))
         allocate(restartfh_info%restartFhTimes(1:nfh)) !not deallocated here
         call ESMF_ConfigGetAttribute(CF_mc,valueList=restart_fh,label='restart_fh:', rc=rc)
         if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, line=__LINE__, file=__FILE__)) return
+
+        ! restart_fh: 3 -1 encodes a restart_n-like intent instead. Convert into fh
+        if ((nfh .gt. 1) .and. (restart_fh(2) .lt. 0)) then
+          call ESMF_ConfigGetAttribute(CF_mc,value=fhmax,label ='nhours_fcst:', rc=rc)
+          if (ESMF_LogFoundError(rcToCheck=rc, msg=ESMF_LOGERR_PASSTHRU, line=__LINE__, file=__FILE__)) return
+
+          fh_freq = restart_fh(1)
+          nfh = NINT(fhmax/fh_freq) ! instead of floor in case of floating point subtleties
+          deallocate(restart_fh)
+          deallocate(restartfh_info%restartFhTimes(1:nfh))
+          allocate(restart_fh(1:nfh))
+          allocate(restartfh_info%restartFhTimes(1:nfh))
+          do n = 1,nfh
+            restart_fh(n) = fh_freq*n
+          enddo
+        endif
 
         ! create a list of times from each restart hour, wrt startTime
         call ESMF_ClockGet(clock, currTime=currTime, startTime=startTime, timeStep=timeStep, rc=rc)

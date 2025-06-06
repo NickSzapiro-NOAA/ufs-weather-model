@@ -19,7 +19,7 @@ export LIST_FILES="sfcf000.nc \
                    atmf002.nc"
 
 export_hrrr_conus13km
-export RESTART_INTERVAL=1
+export RESTART_FH="1"
 export INPES=16
 export JNPES=9
 export QUILTING_RESTART=.false.

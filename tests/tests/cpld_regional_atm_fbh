@@ -40,7 +40,7 @@ export DT_FIRE=0.5
 
 # model configuration
 export FHMAX=3
-export RESTART_INTERVAL=0
+export RESTART_FH=0
 export QUILTING=.true.
 export WRITE_GROUP=1
 export WRTTASK_PER_GROUP=5

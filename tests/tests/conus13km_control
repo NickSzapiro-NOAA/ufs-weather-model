@@ -26,7 +26,7 @@ export LIST_FILES="sfcf000.nc \
                    RESTART/20210512.170000.sfc_data.nc"
 
 export_hrrr_conus13km
-export RESTART_INTERVAL=1
+export RESTART_FH=1
 export QUILTING_RESTART=.false.
 export USE_MERRA2=.true.
 

@@ -21,7 +21,7 @@ export OZ_PHYS_OLD=.false.
 export OZ_PHYS_NEW=.true.
 export H2O_PHYS=.true.
 export HYBEDMF=.false.
-export RESTART_INTERVAL="0"
+export RESTART_FH="0"
 
 export CCPP_SUITE=FV3_HRRR
 export INPUT_NML=regional_rrfs_a.nml.IN

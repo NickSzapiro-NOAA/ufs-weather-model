@@ -18,7 +18,7 @@ export LIST_FILES="sfcf000.nc \
 
 export_hrrr_conus13km
 export SMONTH=5
-export RESTART_INTERVAL=1
+export RESTART_FH="1"
 export FHMAX=1
 export atm_omp_num_threads=2
 export INPES=12

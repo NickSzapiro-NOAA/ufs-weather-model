@@ -67,7 +67,7 @@ export CCPP_SUITE=FV3_GFS_v17_coupled_p8_ugwpv1
 export DAYS=1.25
 export FHMAX=30
 export RESTART_N=15
-export RESTART_INTERVAL="${RESTART_N} -1"
+export RESTART_FH="${RESTART_N} -1"
 export OUTPUT_FH="0 15 30"
 export FHZERO=3
 

@@ -7,7 +7,7 @@ export TEST_DESCR+=" restart"
 
 export FHROT=18 #restart after any IAU
 export RESTART_N=3
-export RESTART_INTERVAL="${RESTART_N} -1"
+export RESTART_FH="${RESTART_N} -1"
 RESTHOUR=$(( ${FHROT} + ${SHOUR} ))
 RESTSDAY=$SDAY
 echo "RESTHOUR=$RESTHOUR,RESTSDAY=$RESTSDAY"

@@ -22,7 +22,7 @@ export OZ_PHYS_OLD=.false.
 export OZ_PHYS_NEW=.true.
 export H2O_PHYS=.true.
 export HYBEDMF=.false.
-export RESTART_INTERVAL="3 -1"
+export RESTART_FH="3 -1"
 export QUILTING=.false.
 
 export CCPP_SUITE=FV3_GFS_v15_thompson_mynn_lam3km

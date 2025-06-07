@@ -55,7 +55,7 @@ export ATMRES=C12
 export BLOCKSIZE=12
 
 export RESTART_N=12
-export RESTART_INTERVAL="${RESTART_N} -1"
+export RESTART_FH="${RESTART_N} -1"
 
 export INPES=1
 export JNPES=1

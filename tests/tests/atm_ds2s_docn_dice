@@ -112,7 +112,7 @@ export stream_files_dice=INPUT/ufs.cpld.cpl.hi.ice.nc
 export STREAM_OFFSET=0
 
 export RESTART_N=12
-export RESTART_INTERVAL="${RESTART_N} -1"
+export RESTART_FH="${RESTART_N} -1"
 export OUTPUT_FH='0 21 24'
 
 export K_SPLIT=4

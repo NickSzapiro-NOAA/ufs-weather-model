@@ -38,7 +38,7 @@ export HORD_TM=10
 export D_CON=0
 
 export RESTART_N=3
-export RESTART_INTERVAL="${RESTART_N} -1"
+export RESTART_FH="${RESTART_N} -1"
 export OUTPUT_FH='0 21 24'
 export OUTPUT_GRID="'gaussian_grid'"
 export WRITE_DOPOST=.true.

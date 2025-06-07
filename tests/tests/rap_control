@@ -54,5 +54,5 @@ export LIST_FILES="sfcf000.nc \
                    RESTART/20210323.060000.sfc_data.tile6.nc"
 
 export_rap
-export RESTART_INTERVAL="12 -1"
+export RESTART_FH="12 -1"
 export OUTPUT_FH='0 21 24'

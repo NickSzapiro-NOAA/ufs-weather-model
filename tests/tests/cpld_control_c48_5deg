@@ -65,7 +65,7 @@ export ULTRALOW=.true.
 export ATMRES=C48
 
 export RESTART_N=12
-export RESTART_INTERVAL="${RESTART_N} -1"
+export RESTART_FH="${RESTART_N} -1"
 
 export INPES=$INPES_cpl_c48
 export JNPES=$JNPES_cpl_c48

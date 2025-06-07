@@ -59,11 +59,11 @@ export SYEAR=2021
 export SMONTH=03
 export SDAY=22
 export SHOUR=06
-export RESTART_INTERVAL="12 -1"
+export RESTART_FH="12 -1"
 export OUTPUT_GRID='gaussian_grid'
 
 export FHMAX=12
-export RESTART_INTERVAL="12 -1"
+export RESTART_FH="12 -1"
 
 export INPES=$INPES_cpl_atmw
 export JNPES=$JNPES_cpl_atmw

@@ -25,7 +25,7 @@ export OZ_PHYS_OLD=.false.
 export OZ_PHYS_NEW=.true.
 export H2O_PHYS=.true.
 export HYBEDMF=.false.
-export RESTART_INTERVAL="0"
+export RESTART_FH="0"
 export WRITE_DOPOST=.true.
 export POSTAPP='lam'
 

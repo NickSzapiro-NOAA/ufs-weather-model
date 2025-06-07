@@ -71,7 +71,7 @@ contains
           fh_freq = restart_fh(1)
           nfh = NINT(fhmax/fh_freq) ! instead of floor in case of floating point subtleties
           deallocate(restart_fh)
-          deallocate(restartfh_info%restartFhTimes(1:nfh))
+          deallocate(restartfh_info%restartFhTimes)
           allocate(restart_fh(1:nfh))
           allocate(restartfh_info%restartFhTimes(1:nfh))
           do n = 1,nfh

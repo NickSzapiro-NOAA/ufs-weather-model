@@ -116,7 +116,7 @@ export MESH_DICE=$MESH_OCN
 export eps_imesh=4.0e-1
 
 export RESTART_N=12
-export RESTART_INTERVAL="${RESTART_N} -1"
+export RESTART_FH="${RESTART_N} -1"
 export OUTPUT_FH='0 21 24'
 
 export CCPP_SUITE=FV3_GFS_v17_coupled_p8

@@ -33,6 +33,8 @@ export SHOUR=21
 export SECS=`expr $SHOUR \* 3600`
 export FHROT=0
 export RESTART_FILE_SUFFIX_SECS="${SYEAR}-${SMONTH}-${SDAY}-$(printf "%05d" $(( (${FHROT}+ ${SHOUR})*3600 )))"
+export RESTART_FILE_PREFIX="${SYEAR}${SMONTH}${SDAY}.$(printf "%02d" $(( ${FHROT} + ${SHOUR} )))0000"
+export CICE_DIAGFREQ=`expr $((FHMAX-FHROT)) \* 3600 / $DT_CICE`
 
 export BMIC=.true.
 

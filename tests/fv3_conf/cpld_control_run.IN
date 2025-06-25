@@ -25,7 +25,7 @@ V2_SFC_FILE=${V2_SFC_FILE:-false}
 
 # IC input directories
 if [[ ${BMIC} == .true. ]]; then
-    FV3_IC=${PATHRT}../../gfsretro10/RT/
+    FV3_IC=${PATHRT}/../../gfsretro10/RT/
     MOM_IC=${FV3_IC}; ICE_IC=${FV3_IC};
 elif [[ $ULTRALOW == .true. ]]; then
     FV3_IC=@[INPUTDATA_ROOT]/${FV3_DIR}/INPUT_${LEVELS}_mx${OCNRES}/${SYEAR}${SMONTH}${SDAY}${SHOUR}
@@ -177,8 +177,8 @@ else
             cp $RFILE INPUT/"${RFILE_OLD//${RESTART_FILE_PREFIX}./}"
         done
         ls -1 ./INPUT/cice*nc>ice.restart_file
-        cp ${FV3_IC}/ufs.cpld.cpl*nc .
-        ls -1 ufs.cpld.cpl*nc>rpointer.cpl
+        ls -1 ./INPUT/ufs.cpld.cpl*nc>rpointer.cpl
+        cp ${FV3_IC}/ufs.cpld.ww3.r.${RESTART_FILE_SUFFIX_SECS}.nc .
         cp ${FV3_IC}/gfs*nc ./INPUT
         cp ${FV3_IC}/enkfgfs*nc ./INPUT
         mv ./INPUT/gfs.t00z.ocninc.nc ./INPUT/mom6_increment.nc

@@ -145,3 +145,8 @@ export K_SPLIT=2
 export N_SPLIT=4
 
 export SATMEDMF=.true.
+
+if [[ $MACHINE_ID = gaeac6 ]] || [[ $MACHINE_ID = ursa ]]; then
+   export TPN=144
+fi
+

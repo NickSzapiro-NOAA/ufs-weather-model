@@ -1278,7 +1278,7 @@ export_cice6() {
   # setting to true will allow Frazil FW and Salt to be included in fluxes sent to ocean
   export CICE_FRAZIL_FWSALT=.true.
   export CICE_KTHERM=2
-  export CICE_TFREEZE_OPTION=mushy
+  export CICE_TFREEZE_OPTION=linear_salt
   # SlenderX2
   export CICE_NPROC=${ICE_tasks}
   np2=$((CICE_NPROC/2))

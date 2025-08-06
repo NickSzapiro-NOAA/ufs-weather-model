@@ -87,6 +87,8 @@
     restart_pond_topo = .false.
     tr_pond_lvl  = @[CICE_TR_POND_LVL]
     restart_pond_lvl  = @[CICE_RESTART_POND_LVL]
+    tr_pond_sealvl = .false.
+    restart_pond_sealvl = .false.
     tr_aero      = .false.
     restart_aero = .false.
     tr_fsd       = .false.
@@ -125,6 +127,8 @@
     coriolis        = 'latitude'
     kridge          = 1
     ktransport      = 1
+    dyn_area_min    = 0.001d0
+    dyn_mass_min    = 0.01d0
 /
 
 &shortwave_nml

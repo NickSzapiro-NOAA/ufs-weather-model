@@ -1,1 +1,15 @@
-pm_ideal_supercell intel
+cpld_control_gefs intel
+cpld_restart_gefs intel
+cpld_dcp_gefs intel
+cpld_control_gfsv17 intel
+cpld_control_gfsv17_iau intel
+cpld_restart_gfsv17 intel
+cpld_mpi_gfsv17 intel
+cpld_control_gfsv17_nowav_iau intel
+cpld_restart_gfsv17_nowav_iau intel
+cpld_control_sfs intel
+regional_noquilt intel
+regional_netcdf_parallel intel
+hafs_regional_datm_cdeps intel
+cpld_control_gfsv17 intelllvm
+cpld_control_sfs intelllvm

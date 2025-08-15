@@ -341,9 +341,9 @@
     f_fmelttn_ai   = 'x'
     f_flatn_ai     = 'x'
     f_fsensn_ai     = 'x'
-    f_sitempsnic    = 'mdh1x'
-    f_sitemptop     = 'mdh1x'
-    f_sitempbot     = 'mdh1x'
+    f_sitempsnic    = 'x'
+    f_sitemptop     = 'x'
+    f_sitempbot     = 'x'
 /
 
 &icefields_mechred_nml

@@ -1,0 +1,108 @@
+###############################################################################
+#
+#  global control test: Coupled test at c1152 using GFSv17 configuration
+#
+###############################################################################
+
+export TEST_DESCR="Fully coupled FV3-CCPP-MOM6-CICE-CMEPS-WW3 system - C96MX100 - unst WW3"
+
+export CNTL_DIR=cpld_control_c1152
+
+
+
+export ATMRES=C1152
+
+export_fv3
+export_ugwpv1
+export_cpl
+
+export CPLCHM=.false.
+export DNATS=0
+
+export RESTART_N=3
+export RESTART_INTERVAL="${RESTART_N} -1"
+export OUTPUT_FH='0 21 24'
+#CICE forecast day output stream
+hist_n_24h=$(( 24*3600/${DT_CICE} ))
+export CICE_HISTFREQ_N="0, 0, 6, ${hist_n_24h}, 1"
+
+export DOMAINS_STACK_SIZE=16000000
+export MAX_OUTPUT_FIELDS=300
+export INPES=16
+export JNPES=24
+export NPX=1153
+export NPY=1153
+export NUDGE_QV=.false.
+export RF_CUTOFF=100.0
+export LRADAR=.true.
+export PSL_GWD_DX_FACTOR=2.0
+export CDMBWD=1.67,8.8,1.0,1.0
+export DOGP_CLDOPTICS_LUT=.false.
+export DOGP_LWSCAT=.false.
+export ISEED_CA=561750924
+export HIDE_AIAU="!"
+export HIDE_LIAU="!"
+
+export SKEB=0
+export SKEB_TAU=-999.
+export SKEB_LSCALE=-999.
+export SKEBNORM=1,
+export SKEB_NPASS=30,
+export SKEB_VDOF=5,
+
+export ISEED_SHUM=0
+export SHUM_TAU=-999.
+export SHUM_LSCALE=-999.
+export ISEED_SPPT=0
+export SPPT_TAU=-999.
+export SPPT_LSCALE=-999.
+export SPPT_LOGIT=.true.
+export SPPT_SFCLIMIT=.true.
+export ISEED_OCNSPPT=0
+export EPBL=0.8,0.4,0.2,0.08,0.04
+export ISEED_EPBL=0
+export LNDP_TAU=21600
+export LNDP_LSCALE=500000
+export ISEED_LNDP=0
+export MOM6_RESTART_SETTING='r'
+
+export RES_LATLON_DYNAMICS='""'
+export WRTTASK_PER_GROUP=$(( WPG_cpl_unstr * THRD_cpl_unstr ))
+
+OCN_tasks=$OCN_tasks_cpl_unstr
+ICE_tasks=$ICE_tasks_cpl_unstr
+WAV_tasks=$WAV_tasks_cpl_unstr
+
+export atm_omp_num_threads=$THRD_cpl_unstr
+export med_omp_num_threads=$atm_omp_num_threads
+
+export MOM6_TOPOEDITS=ufs.topo_edits_011818.nc
+export MOM6_ALLOW_LANDMASK_CHANGES=True
+export eps_imesh=2.5e-1
+
+export WW3_DOMAIN=global_270k
+export MESH_WAV=mesh.${WW3_DOMAIN}.nc
+export WW3_MODDEF=mod_def.exp.${WW3_DOMAIN}
+
+export FV3_RUN=cpld_control_run.IN
+export CCPP_SUITE=FV3_GFS_v17_coupled_p8_ugwpv1
+export FIELD_TABLE=field_table_thompson_noaero_tke_progsigma
+export DIAG_TABLE=diag_table_cpld.IN
+export INPUT_NML=global_control.nml.IN
+export UFS_CONFIGURE=ufs.configure.s2sw.IN
+# slow loop
+export WW3_RSTFLDS="ice itstep"
+
+#GFSv17 settings
+export PROGSIGMA=.true.
+export IOPT_DIAG=2
+
+export K_SPLIT=2
+export N_SPLIT=6
+
+# HR4 GFSv17 GWD update
+export DO_GWD_OPT_PSL=.true.
+export DO_GSL_DRAG_SS=.false.
+
+# for nccmp of cice history files
+export nccmp_exclude_attr="--globalex=date_created"

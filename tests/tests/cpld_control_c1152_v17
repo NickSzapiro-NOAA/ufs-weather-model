@@ -19,33 +19,36 @@ export_cpl
 export OCNRES="025"
 export ICERES="0.25"
 export coupling_interval_slow_sec=1800
+export CICE_GRID=grid_cice_NEMS_mx${OCNRES}.nc
+export CICE_MASK=kmtu_cice_NEMS_mx${OCNRES}.nc
+
 
 export WW3_OUTPARS='WND CUR ICE HS T01 T02 DIR FP DP PHS PTP PDIR CHA'
 export WW3_DTFLD=3600
 export WW3_DTPNT=3600
 
-export FHROT=3
-export QUILTING_RESTART=.true.
-export WRITE_GROUP=4
-export WRITE_DOPOST=.true.
-export OUTPUT_GRID="gaussian_grid"
-export OUTPUT_FILE="'netcdf_parallel' 'netcdf_parallel'"
-export IDEFLATE=1
-export QUANTIZE_NSD=14
-export ICHUNK2D=4608
-export JCHUNK2D=2304
-export ICHUNK3D=4608
-export JCHUNK3D=2304
-export KCHUNK3D=1
-export IMO=4608
-export JMO=2304
+#export FHROT=3
+#export QUILTING_RESTART=.true.
+#export WRITE_GROUP=4
+#export WRITE_DOPOST=.true.
+#export OUTPUT_GRID="gaussian_grid"
+#export OUTPUT_FILE="'netcdf_parallel' 'netcdf_parallel'"
+#export IDEFLATE=1
+#export QUANTIZE_NSD=14
+#export ICHUNK2D=4608
+#export JCHUNK2D=2304
+#export ICHUNK3D=4608
+#export JCHUNK3D=2304
+#export KCHUNK3D=1
+#export IMO=4608
+#export JMO=2304
 
 export CPLCHM=.false.
 export DNATS=0
 
 export RESTART_N=3
 export RESTART_INTERVAL="${RESTART_N} -1"
-export OUTPUT_FH='0 21 24'
+export OUTPUT_FH='0 3 6'
 #CICE forecast day output stream
 hist_n_24h=$(( 24*3600/${DT_CICE} ))
 export CICE_HISTFREQ_N="0, 0, 6, ${hist_n_24h}, 1"
@@ -88,23 +91,28 @@ export ISEED_EPBL=0
 export LNDP_TAU=21600
 export LNDP_LSCALE=500000
 export ISEED_LNDP=0
-export MOM6_RESTART_SETTING='r'
+export MOM6_RESTART_SETTING='n'
 
 export RES_LATLON_DYNAMICS='""'
-export WRTTASK_PER_GROUP=360
+export WRTTASK_PER_GROUP=120
 
 OCN_tasks=$OCN_tasks_cpl_unstr
 ICE_tasks=$ICE_tasks_cpl_unstr
 WAV_tasks=$WAV_tasks_cpl_unstr
 
-export atm_omp_num_threads=4
+export atm_omp_num_threads=${THRD_c768}
 export med_omp_num_threads=$atm_omp_num_threads
 
-export MOM6_TOPOEDITS=ufs.topo_edits_011818.nc
+export NX_GLB=1440
+export NY_GLB=1080
+
+export MOM6_INPUT=MOM_input_025.IN
+export MOM6_TOPOEDITS=""
 export MOM6_ALLOW_LANDMASK_CHANGES=True
 export MESH_OCN="mesh.mx025.nc"
 export MESH_ICE="mesh.mx025.nc"
 export eps_imesh=1.0e-1
+export MOM6_CHLCLIM=seawifs-clim-1997-2010.${NX_GLB}x${NY_GLB}.v20180328.nc
 
 export WW3_DOMAIN=global_270k
 export MESH_WAV="mesh.uglo_15km.nc"
@@ -119,7 +127,7 @@ export DIAG_TABLE=diag_table_cpld.IN
 export INPUT_NML=global_control.nml.IN
 export UFS_CONFIGURE=ufs.configure.s2sw.IN
 # slow loop
-export WW3_RSTFLDS="ice itstep"
+export WW3_RSTFLDS="ice"
 
 #GFSv17 settings
 export PROGSIGMA=.true.

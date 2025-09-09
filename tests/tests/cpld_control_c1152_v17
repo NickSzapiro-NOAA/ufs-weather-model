@@ -22,7 +22,7 @@ export coupling_interval_slow_sec=1800
 export CICE_GRID=grid_cice_NEMS_mx${OCNRES}.nc
 export CICE_MASK=kmtu_cice_NEMS_mx${OCNRES}.nc
 
-
+export FHMAX=6
 export WW3_OUTPARS='WND CUR ICE HS T01 T02 DIR FP DP PHS PTP PDIR CHA'
 export WW3_DTFLD=3600
 export WW3_DTPNT=3600

@@ -12,8 +12,9 @@
 - THIS IS YOUR RESPONSIBILITY
  -->
 - [ ] Fill out all sections of this template.
-- [ ] All sub component pull requests have been reviewed by their code managers.
-- [ ] Run the full Intel+GNU RT suite (compared to current baselines) on either Hera/Derecho/Hercules
+- [ ] All subcomponent pull requests have been reviewed by their code managers.
+- [ ] Run the full Intel+GNU RT suite (compared to current baselines), preferably on Ursa (Derecho or Hercules are acceptable alternatives). 
+- [ ] Commit log file w/full results from RT suite run.
 - [ ] Commit 'test_changes.list' from previous step
 ---
 ## Description:

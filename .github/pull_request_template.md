@@ -13,8 +13,8 @@
  -->
 - [ ] Fill out all sections of this template.
 - [ ] All subcomponent pull requests have been reviewed by their code managers.
-- [ ] Run the full Intel+GNU RT suite (compared to current baselines), preferably on Ursa (Derecho or Hercules are acceptable alternatives). 
-- [ ] Commit log file w/full results from RT suite run.
+- [ ] Run the full Intel+GNU RT suite (compared to current baselines), preferably on Ursa (Derecho or Hercules are acceptable alternatives). Exceptions: documentation-only PRs, CI-only PRs
+   - [ ] Commit log file w/full results from RT suite run (if applicable).
 - [ ] Commit 'test_changes.list' from previous step
 ---
 ## Description:

@@ -12,10 +12,11 @@
 - THIS IS YOUR RESPONSIBILITY
  -->
 - [ ] Fill out all sections of this template.
+- [ ] This PR addresses a relevant WM issue (if not, create an issue). 
 - [ ] All subcomponent pull requests have been reviewed by their code managers.
 - [ ] Run the full Intel+GNU RT suite (compared to current baselines), preferably on Ursa (Derecho or Hercules are acceptable alternatives). Exceptions: documentation-only PRs, CI-only PRs
    - [ ] Commit log file w/full results from RT suite run (if applicable).
-- [ ] Commit 'test_changes.list' from previous step
+   - [ ] Commit 'test_changes.list' (unless file is empty). 
 ---
 ## Description:
 <!--

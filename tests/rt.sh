@@ -815,7 +815,7 @@ case ${MACHINE_ID} in
     if [[ "${ACCNR}" == 'epic' ]] ; then
       dprefix="/scratch4/NAGAPE/epic/${USER}/stmp"
     fi
-    DISKNM="/scratch4/NAGAPE/epic/role-epic/UFS-WM_RT"
+    DISKNM="/scratch4/NCEPDEV/nems/Daniel.Sarmiento"
     STMP="${STMP:-${dprefix}/RT_BASELINE}"
     PTMP="${PTMP:-${dprefix}/RT_RUNDIRS}"
 
@@ -870,7 +870,7 @@ case ${MACHINE_ID} in
     COMPILE_QUEUE="batch"
     PARTITION="hercules"
     dprefix=${dprefix:-"/work2/noaa/stmp/${USER}"}
-    DISKNM="/work/noaa/epic/hercules/UFS-WM_RT"
+    DISKNM="/work/noaa/stmp/dsarmien"
     STMP="${dprefix}/stmp"
     PTMP="${dprefix}/stmp"
 

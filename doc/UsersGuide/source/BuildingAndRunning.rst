@@ -10,7 +10,7 @@ Supported Platforms & Compilers
 Before running the Weather Model (:term:`WM`), users should determine which of the 
 :ref:`levels of support <SupportedPlatforms>` 
 is applicable to their system. Generally, Level 1 & 2 systems are restricted to those with access 
-through NOAA and its affiliates. These systems are named (e.g., Hera, Orion, Derecho). 
+through NOAA and its affiliates. These systems are named (e.g., Ursa, Orion, Derecho). 
 Level 3 & 4 systems include certain personal computers or non-NOAA-affiliated HPC systems. 
 The prerequisite software libraries for building the WM already exist in a centralized location on Level 1/preconfigured 
 systems, so users may skip directly to :ref:`getting the data <GetData>` and downloading the code. 
@@ -37,29 +37,28 @@ The WM uses two categories of libraries, which are available as a bundle via
 Common Modules
 ----------------
 
-As of February 24, 2025, the UFS WM Regression Tests (:term:`RTs <RT>`) on Level 1 systems use the following common modules: 
+As of September 29, 2025, the UFS WM Regression Tests (:term:`RTs <RT>`) on Level 1 systems use the following common modules: 
 
 .. code-block:: console
 
    bacio/2.4.1
-   crtm/2.4.0
-   esmf/8.6.0
-   fms/2024.01
+   crtm/2.4.0.1
+   esmf/8.8.0
+   fms/2024.02
    g2/3.5.1
    g2tmpl/1.13.0
-   gftl-shared/1.6.1
-   hdf5/1.14.0
-   ip/4.3.0
+   gftl-shared/1.9.0
+   hdf5/1.14.3
+   ip/5.1.0
    jasper/2.0.32
    libpng/1.6.37
-   mapl/2.40.3-esmf-8.6.0
+   mapl/2.53.4-esmf-8.8.0
    netcdf-c/4.9.2
    netcdf-fortran/4.6.1
-   parallelio/2.5.10
+   parallelio/2.6.2
    scotch/7.0.4
    sp/2.5.0
    w3emc/2.10.0
-   zlib/1.2.13
 
 The most updated list of common modules can be viewed in ``ufs_common.lua`` 
 :wm-repo:`here <blob/develop/modulefiles/ufs_common.lua>`.
@@ -91,8 +90,8 @@ the data required to run the WM RTs are already available at the following ``DIS
      - /glade/derecho/scratch/epicufsrt/ufs-weather-model/RT/
    * - Gaea-C6
      - /gpfs/f6/bil-fire8/world-shared/role.epic/UFS-WM_RT
-   * - Hera
-     - /scratch2/NAGAPE/epic/UFS-WM_RT
+   * - Ursa
+     - /scratch3/NAGAPE/epic/role.epic/UFS-WM_RT
    * - Hercules
      - /work/noaa/epic/hercules/UFS-WM_RT
    * - NOAA Cloud (Level 2)
@@ -118,10 +117,10 @@ The regression testing script (``rt.sh``) has certain default data directories (
 The corresponding data is publicly available in the data bucket. To view the data, users can visit https://noaa-ufs-regtests-pds.s3.amazonaws.com/index.html. 
 Users can download the data and update the ``rt.sh`` script to point to the appropriate locations in order to run RTs on their own system: 
   
-* ``INPUTDATA_ROOT``: https://noaa-ufs-regtests-pds.s3.amazonaws.com/index.html#input-data-20240501/
-* ``INPUTDATA_ROOT_WW3`` https://noaa-ufs-regtests-pds.s3.amazonaws.com/index.html#input-data-20240501/WW3_input_data_20240214/
+* ``INPUTDATA_ROOT``: https://noaa-ufs-regtests-pds.s3.amazonaws.com/index.html#input-data-20250507/
+* ``INPUTDATA_ROOT_WW3`` https://noaa-ufs-regtests-pds.s3.amazonaws.com/index.html#input-data-20250507/WW3_input_data_20250807/
 * ``INPUTDATA_ROOT_BMIC``: https://noaa-ufs-regtests-pds.s3.amazonaws.com/index.html#BM_IC-20220207/
-* ``INPUTDATA_LM4``: https://noaa-ufs-regtests-pds.s3.amazonaws.com/index.html#LM4_input_data
+* ``INPUTDATA_LM4``: https://noaa-ufs-regtests-pds.s3.amazonaws.com/index.html#input-data-20250507/LM4_input_data/
 
 To download data, users must select the files they want from the bucket and download them either in their browser, via a ``wget`` command, or through the AWS CLI. 
 
@@ -165,12 +164,12 @@ On NOAA Level 1 & 2 Systems
 
 Modulefiles for :ref:`preconfigured platforms <SupportedPlatforms>` are located in 
 ``modulefiles/ufs_<platform>.<compiler>``. For example, to load the modules from the 
-``ufs-weather-model`` directory on Hera:
+``ufs-weather-model`` directory on Hercules:
 
 .. code-block:: console
 
     module use modulefiles
-    module load ufs_hera.intel
+    module load ufs_hercules.intel
 
 Note that loading this module file will also set the CMake environment variables shown in
 :numref:`Table %s <CMakeEnv>`.
@@ -180,7 +179,7 @@ Note that loading this module file will also set the CMake environment variables
 .. table:: *CMake environment variables required to configure the build for the Weather Model*
 
    +-------------------------+----------------------------------------------+----------------------+
-   | **EnvironmentVariable** | **Description**                              | **Hera Intel Value** |
+   | **EnvironmentVariable** | **Description**                              | **Ursa Intel Value** |
    +=========================+==============================================+======================+
    |  CMAKE_C_COMPILER       | Name of C compiler                           | mpiicc               |
    +-------------------------+----------------------------------------------+----------------------+
@@ -188,7 +187,7 @@ Note that loading this module file will also set the CMake environment variables
    +-------------------------+----------------------------------------------+----------------------+
    |  CMAKE_Fortran_COMPILER | Name of Fortran compiler                     | mpiifort             |
    +-------------------------+----------------------------------------------+----------------------+
-   |  CMAKE_Platform         | String containing platform and compiler name | hera.intel           |
+   |  CMAKE_Platform         | String containing platform and compiler name | ursa.intel           |
    +-------------------------+----------------------------------------------+----------------------+
 
 On Other Systems
@@ -454,7 +453,7 @@ If any of the environment variables have not been set, the ``build.sh`` script w
 
 .. code-block:: console
 
-   ./build.sh: line 11: CMAKE_Platform: Please set the CMAKE_Platform environment variable, e.g. [macosx.gnu|linux.gnu|linux.intel|hera.intel|...]
+   ./build.sh: line 11: CMAKE_Platform: Please set the CMAKE_Platform environment variable, e.g. [macosx.gnu|linux.gnu|linux.intel|hercules.intel|...]
 
 The WM can be built by running the following command from the ``ufs-weather-model`` directory:
 
@@ -504,6 +503,10 @@ the defaults.
      - Description
    * - export_fv3_v16
      - Set variables to the FV3 default values for GFS v16 cases. This section will be removed once support for GFSv16 is officially depricated.
+   * - export_mpas
+     - Set variables to the MPAS default values. 
+   * - export_gfs_physics
+     - Set default values for GFS physics suite configurations.
    * - export_fv3
      - Set variables to the FV3 default values.
    * - export_tiled
@@ -643,7 +646,7 @@ The ``rt.conf`` file is a pipe-separated values (PSV) file grouped into sections
    #. **CMAKE Options** -- Provides all CMAKE options for the build. This typically includes the ``-DAPP`` and ``-DCCPP_SUITES`` flags; these flags set which components to build and which physics suites will be available at runtime. Additional options are documented in :numref:`Section %s <other-build-options>`, but users can examine the :wm-repo:`CMakeLists.txt <blob/develop/CMakeLists.txt>` file for the most up-to-date list of options. 
    #. **Machines** to run on (``-`` is used to ignore specified machines, ``+`` is used to run only on specified machines). For example: 
       
-      * ``+ hera orion gaea``: Compile will only run on Hera, Orion, and Gaea machines
+      * ``+ ursa orion gaea``: Compile will only run on Ursa, Orion, and Gaea machines
       * ``- wcoss2 acorn``: Compile will NOT be run on WCOSS2 or Acorn
 
    #. ``fv3``: Set as fv3. Previously, this was used to run a test without compiling code (e.g., if FV3 was already present). 
@@ -796,8 +799,8 @@ correctly. If there is a problem with these or other variables (e.g., file paths
 .. code-block:: console
    :emphasize-lines: 5,6
 
-   + echo 'Machine: ' hera.intel '    Account: ' nems
-   Machine:  hera.intel     Account:  nems
+   + echo 'Machine: ' ursa.intel '    Account: ' nems
+   Machine:  ursa.intel     Account:  nems
    + mkdir -p /scratch1/NCEPDEV/stmp4/First.Last
    mkdir: cannot create directory ‘/scratch1/NCEPDEV/stmp4/First.Last’: Permission denied
    ++ echo 'rt.sh error on line 370'

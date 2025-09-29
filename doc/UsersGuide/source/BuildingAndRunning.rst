@@ -502,7 +502,7 @@ the defaults.
    * - Function Name
      - Description
    * - export_fv3_v16
-     - Set variables to the FV3 default values for GFS v16 cases. This section will be removed once support for GFSv16 is officially depricated.
+     - Set variables to the FV3 default values for GFS v16 cases. This section will be removed once support for GFSv16 is officially deprecated.
    * - export_mpas
      - Set variables to the MPAS default values. 
    * - export_gfs_physics
@@ -676,6 +676,7 @@ The ``rt.conf`` file includes a large number of tests. If the user wants to run
 only specific tests, s/he can either (1) comment out the tests to be skipped (using the ``#`` prefix)
 or (2) create a new file (e.g., ``my_rt.conf``), add the tests, and execute ``./rt.sh -l my_rt.conf``.
 
+For the most up-to-date list of supported tests see the :wm-repo:`rt.conf <blob/develop/tests/rt.conf>` file. 
 
 .. _run-wm:
 
@@ -697,7 +698,7 @@ Users can run a number of preconfigured regression test cases from the ``rt.conf
 using the regression test script ``rt.sh`` in the ``tests`` directory. 
 ``rt.sh`` is the top-level script that calls lower-level scripts to build specified 
 WM configurations, set up environments, and run tests. 
-Users should edit the ``rt.conf`` file to indicate which tests/configurations to run or create their own configuration file (e.g., ``my_tests.conf``) with the subset of tests they want to run. 
+Users should edit the ``rt.conf`` file to indicate which tests/configurations to run or create their own configuration file (e.g., ``my_tests.conf``) with the subset of tests from :wm-repo:`rt.conf <blob/develop/tests/rt.conf>`. 
 
 On NOAA RDHPCS
 ------------------
@@ -742,7 +743,7 @@ This section contains additional information on command line options and trouble
 Optional Arguments
 ^^^^^^^^^^^^^^^^^^^^^
 
-To display detailed information on how to use ``rt.sh``, users can simply run ``./rt.sh``, which will output the following options: 
+To display detailed information on how to use ``rt.sh``, users can simply run ``./rt.sh -h``, which will output the following options: 
 
 .. code-block:: console
 
@@ -888,7 +889,7 @@ must satisfy. These requirements are shown in :numref:`Table %s <OperationalRequ
 For the following discussions on opnReqTest, the user should note the distinction between
 ``'test name'`` and ``'test case'``. Examples of test names are ``control``, ``cpld_control``
 and ``regional_control`` which are all found in the ``tests/tests`` directory, whereas
-test case refers to any one of the operational requirements: ``thr``, ``mpi``, ``dcp``, ``rst``, ``bit`` and ``dbg``.
+test case refers to any one of the operational requirements: ``thr``, ``fhz``. ``mpi``, ``dcp``, ``rst``, ``bit`` and ``dbg``.
 
 .. _OperationalRequirement:
 
@@ -908,6 +909,8 @@ test case refers to any one of the operational requirements: ``thr``, ``mpi``, `
   | bit      | Model can be compiled in double/single precision and run to completion        |
   +----------+-------------------------------------------------------------------------------+
   | dbg      | Model can be compiled and run to completion in debug mode                     |
+  +----------+-------------------------------------------------------------------------------+
+  | fhz      | Early forecast output produces consistent results                             |
   +----------+-------------------------------------------------------------------------------+
 
 The operational requirement testing uses the same testing framework as the regression

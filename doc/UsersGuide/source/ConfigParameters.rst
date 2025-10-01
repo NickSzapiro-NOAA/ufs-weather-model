@@ -17,7 +17,7 @@ Configuration Options
 
 ``-DAPP``:
    Sets the :term:`WM` configuration to build. 
-   Valid values: ``ATM``, ``ATMW``, ``ATMAERO``, ``ATMAQ``, ``ATMWM``, ``ATML``, ``ATMF``, ``ATM_DS2S``, ``ATM_DS2S-PCICE``, ``LND``, ``LND-LM4``, ``S2S``, ``S2SA``, ``S2SW``, ``S2SWA``, ``S2SL``, ``S2SWL``, ``S2SWAL``, ``NG-GODAS``, ``HAFS``, ``HAFSW``, ``HAFS-MOM6``, ``HAFS-MOM6W``, ``HAFS-ALL``
+   Valid values: ``ATM``, ``ATMW``, ``ATMAERO``, ``ATMAQ``, ``ATML``, ``ATMF``, ``ATMMPAS``, ``ATM_DS2S``, ``ATM_DS2S-PCICE``, ``LND``, ``LND-LM4``, ``S2S``, ``S2SA``, ``S2SW``, ``S2SWA``, ``S2SL``, ``S2SWL``, ``S2SWAL``, ``NG-GODAS``, ``HAFS``, ``HAFSW``, ``HAFS-MOM6``, ``HAFS-MOM6W``, ``HAFS-ALL``
 
 
 .. _suites:
@@ -37,14 +37,15 @@ Physics Options
    | ``FV3_GFS_v17_p8_mynn``
    | ``FV3_GFS_v17_p8_rrtmgp``
    | ``FV3_GFS_v17_p8_ugwpv1``
+   | ``FV3_GFS_v17_p8_ugwpv1_tempo``
    | ``FV3_GFS_v16``
    | ``FV3_GFS_v16_csawmg``
    | ``FV3_GFS_v16_flake``
    | ``FV3_GFS_v16_ras``
-   | ``FV3_GFS_v15p2``
    | ``FV3_GFS_v15_thompson_mynn_lam3km``
    | ``FV3_global_nest_v1``
    | ``FV3_HAFS_v1_gfdlmp_tedmf``
+   | ``FV3_HAFS_v1_gfdlmpv3_tedmf``
    | ``FV3_HAFS_v1_gfdlmp_tedmf_nonsst``
    | ``FV3_HAFS_v1_thompson``
    | ``FV3_HAFS_v1_thompson_nonsst``
@@ -52,6 +53,7 @@ Physics Options
    | ``FV3_HRRR``
    | ``FV3_HRRR_c3``
    | ``FV3_HRRR_gf``
+   | ``FV3_ideal_mp_nssl``
    | ``FV3_RAP``
    | ``FV3_RAP_cires_ugwp``
    | ``FV3_RAP_clm_lake``
@@ -63,6 +65,7 @@ Physics Options
    | ``FV3_RRFS_v1beta``
    | ``FV3_RRFS_v1nssl``
    | ``FV3_WoFS_v0``
+   | ``MPAS_RRFS``
 
 .. _other-build-options:
 
@@ -104,6 +107,26 @@ Other Build Options
    Valid values: ``ON`` | ``OFF``
 
    .. COMMENT: But what does this DO?! And when/why is it used?
+
+``-DPDLIB``: (Default: OFF)
+   Enable ????
+   Valid values: ``ON`` | ``OFF``
+
+``-DFASTER``: (Default: OFF)
+   Enable ????
+   Valud values: ``ON`` | ``OFF``
+
+``-DHYDRO``: (Default: OFF)
+   Enable ???
+   Valid values: ``ON`` | ``OFF``
+
+``-DCDEPS_INLINE``: (Default: OFF)
+   Enables CDEPS inline 
+   Valid values: ``ON`` | ``OFF``
+
+``-DREGIONAL_MOM6``: (Default: OFF)
+   Enables regional MOM6
+   Valid values: ``ON`` | ``OFF``
 
 
 .. COMMENT: Add any of the following options with -D in front???

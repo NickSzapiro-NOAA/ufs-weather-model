@@ -100,7 +100,7 @@ The July 2020 CAPE case can be run as-is without adjusting the configuration. Us
 Different Date
 ^^^^^^^^^^^^^^^^
 
-Users may choose to run a similar UFS WM configuration for different dates with user-generated :term:`ICs` (see :numref:`Section %s <chgres-data>` for instructions on downloading this data from :term:`HPSS`). In this case, users will need to copy the ``gfs*.nc`` and ``sfc*.nc`` files from ``OUTDIR/gfs.YYYYMMDD/HH/model_data/atmos/input`` into the ``INPUT`` directory of a UFS WM run directory. (The run directory is set in ``create_xml.py`` as ``${PTMP}/${USER}/FV3_RT/rt_${pid}`` for HSD cases.) Note that this will only work when the run directory uses ICs of the same resolution. 
+Users may choose to run a similar UFS WM configuration for different dates with user-generated :term:`ICs` (see :numref:`Section %s <chgres-data>` for instructions on downloading this data from :term:`HPSS`). In this case, users will need to copy the ``gfs*.nc`` and ``sfc*.nc`` files from ``OUTDIR/gfs.YYYYMMDD/HH/model_data/atmos/input`` into the ``INPUT`` directory of a UFS WM run directory. (The run directory is set in ``${UFS_WM}/tests-dev/machine_config/create_xml.py`` as ``${PTMP}/${USER}/FV3_RT/rt_${pid}`` for HSD cases.) Note that this will only work when the run directory uses ICs of the same resolution. 
 
 Additionally, users will need to adjust the model start time in the ``model_configure`` file. For example: 
 

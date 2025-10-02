@@ -72,70 +72,91 @@ Physics Options
 Other Build Options
 =======================
 
-``-DCMEPS_AOFLUX``: (Default: OFF)
-   Enables atmosphere-ocean flux calculation in mediator. 
-   Valid values: ``ON`` | ``OFF``
+``-D32BIT`` (Default: OFF)  
+   Enable 32BIT (single precision arithmetic in dycore and fast physics).  
+   Valid values: ``ON`` | ``OFF``  
 
-   .. COMMENT: But when/why would you do this?
+``-DCCPP_32BIT`` (Default: OFF)  
+   Enable CCPP_32BIT (single precision arithmetic in slow physics).  
+   Valid values: ``ON`` | ``OFF``  
 
-``-DDEBUG``: (Default: OFF)
-   Enables DEBUG mode.
-   Valid values: ``ON`` | ``OFF``
+``-DAVX2`` (Default: ON)  
+   Enable AVX2 instruction set.  
+   Valid values: ``ON`` | ``OFF``  
 
-   .. COMMENT: And what extras does DEBUG mode provide (that VERBOSE) doesn't?
+``-DAVX`` (Default: OFF)  
+   Enable AVX-I instruction set.  
+   Valid values: ``ON`` | ``OFF``  
 
-``-D32BIT``: (Default: OFF)
-   Enables 32-bit, single precision arithmetic in dycore and fast physics.
-   Valid values: ``ON`` | ``OFF``
+``-DSIMDMULTIARCH`` (Default: OFF)  
+   Enable multi-target SIMD instruction sets.  
+   Valid values: ``ON`` | ``OFF``  
 
-   .. COMMENT: But when/why would you do this?
+``-DDEBUG`` (Default: OFF)  
+   Enable DEBUG mode.  
+   Valid values: ``ON`` | ``OFF``  
 
-``-DCCPP_32BIT``: (Default: OFF)
-   Enables 32-bit, single precision arithmetic in slow physics.
-   Valid values: ``ON`` | ``OFF``
+``-DDISABLE_FMA`` (Default: OFF)  
+   Disable Fused Multiply-Add instructions (workaround needed for AMD EPYC).  
+   Valid values: ``ON`` | ``OFF``  
 
-   .. COMMENT: But when/why would you do this?
+``-DINLINE_POST`` (Default: ON)  
+   Enable inline post.  
+   Valid values: ``ON`` | ``OFF``  
 
-``-DMOVING_NEST``: (Default: OFF)
-   Enables moving nest code.
-   Valid values: ``ON`` | ``OFF``
+``-DMULTI_GASES`` (Default: OFF)  
+   Enable MULTI_GASES.  
+   Valid values: ``ON`` | ``OFF``  
 
-   .. COMMENT: But what does that mean? When/why is the moving nest used?
+``-DMOVING_NEST`` (Default: OFF)  
+   Enable moving nest code.  
+   Valid values: ``ON`` | ``OFF``  
 
-``-DMULTI_GASES``: (Default: OFF)
-   Enable ``MULTI_GASES``. 
-   Valid values: ``ON`` | ``OFF``
+``-DREGIONAL_MOM6`` (Default: OFF)  
+   Enable Regional MOM6.  
+   Valid values: ``ON`` | ``OFF``  
 
-   .. COMMENT: But what does this DO?! And when/why is it used?
+``-DOPENMP`` (Default: ON)  
+   Enable OpenMP threading.  
+   Valid values: ``ON`` | ``OFF``  
 
-``-DPDLIB``: (Default: OFF)
-   Enable ????
-   Valid values: ``ON`` | ``OFF``
+``-DPARALLEL_NETCDF`` (Default: OFF)  
+   Enable parallel NetCDF.  
+   Valid values: ``ON`` | ``OFF``  
 
-``-DFASTER``: (Default: OFF)
-   Enable ????
-   Valud values: ``ON`` | ``OFF``
+``-DJEDI_DRIVER`` (Default: OFF)  
+   Enable JEDI as top level driver.  
+   Valid values: ``ON`` | ``OFF``  
 
-``-DHYDRO``: (Default: OFF)
-   Enable ???
-   Valid values: ``ON`` | ``OFF``
+``-DCMEPS_AOFLUX`` (Default: OFF)  
+   Enable atmosphere-ocean flux calculation in mediator.  
+   Valid values: ``ON`` | ``OFF``  
 
-``-DCDEPS_INLINE``: (Default: OFF)
-   Enables CDEPS inline 
-   Valid values: ``ON`` | ``OFF``
+``-DPDLIB`` (Default: OFF)  
+   Enable Domain Decomposition in WW3 via PDLIB with BT1.  
+   Valid values: ``ON`` | ``OFF``  
 
-``-DREGIONAL_MOM6``: (Default: OFF)
-   Enables regional MOM6
-   Valid values: ``ON`` | ``OFF``
+``-DPDLIB_BT4`` (Default: OFF)  
+   Enable Domain Decomposition in WW3 via PDLIB with BT4.  
+   Valid values: ``ON`` | ``OFF``  
 
+``-DCDEPS_INLINE`` (Default: OFF)  
+   Enable CDEPS inline capability.  
+   Valid values: ``ON`` | ``OFF``  
 
-.. COMMENT: Add any of the following options with -D in front???
-      set(AVX2            ON  CACHE BOOL "Enable AVX2 instruction set")
-      set(AVX             OFF CACHE BOOL "Enable AVX-I instruction set")
-      set(SIMDMULTIARCH   OFF CACHE BOOL "Enable multi-target SIMD instruction sets")
-      set(INLINE_POST     OFF CACHE BOOL "Enable inline post")
-      set(OPENMP          ON  CACHE BOOL "Enable OpenMP threading")
-      set(PARALLEL_NETCDF OFF CACHE BOOL "Enable parallel NetCDF")
-      set(JEDI_DRIVER     OFF CACHE BOOL "Enable JEDI as top level driver")
+``-DHYDRO`` (Default: OFF)  
+   Enable hydrostatic set.  
+   Valid values: ``ON`` | ``OFF``  
 
+``BUILD_WITH_IFI`` (Default: OFF)  
+   Build NCEPpost with In-Flight Icing (IFI) library if present.  
+   Valid values: ``ON`` | ``OFF``  
+
+``REQUIRE_IFI`` (Default: OFF)  
+   Abort if libIFI is not found ; enables BUILD_WITH_IFI=ON.  
+   Valid values: ``ON`` | ``OFF``  
+
+``INTERNAL_IFI`` (Default: OFF)  
+   Compile with IFI inside the executable, instead of a library.  
+   Valid values: ``ON`` | ``OFF``  
 

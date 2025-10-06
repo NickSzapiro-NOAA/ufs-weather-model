@@ -53,7 +53,7 @@ mediator). Currently, supported configurations include:
    * - :ref:`HAFSW <hafsw>`
      - Coupled :term:`ATM` - :term:`HYCOM` - :term:`WW3` - :term:`CMEPS`
    * - :ref:`HAFS-MOM6W <hafs-mom6w>`
-     - Coupled :term:`ATM` - :term:`HYCOM` - :term:`CMEPS`
+     - Coupled :term:`ATM` - :term:`HYCOM`- :term:`WW3` - :term:`CMEPS`
    * - :ref:`HAFS-ALL <hafs-all>`
      - Coupled :term:`CDEPS` - :term:`ATM` - :term:`HYCOM` - :term:`WW3` - :term:`CMEPS`
 
@@ -98,7 +98,7 @@ The static input files for global configurations are listed and described in :nu
    * - aerosol.dat
      - External aerosols data file
    * - CFSR.SEAICE.1982.2012.monthly.clim.grb
-     - CFS reanalysis of monthly sea ice climatology
+     - CFS reanalysis of monthly sea ice climatologcd ..y
    * - co2historicaldata_YYYY.txt
      - Monthly CO2 in PPMV data for year YYYY
    * - global_albedo4.1x1.grb
@@ -1332,7 +1332,7 @@ Each WM component has its own ``diag_table`` with associated variables. :numref:
      - Source File
    * - FV3
      - :ref:`FV3 Variables <fv3diagtable>`
-     - `GFS_diagnostics.F90 <https://github.com/NOAA-EMC/fv3atm/blob/develop/ccpp/driver/GFS_diagnostics.F90>`_
+     - `GFS_diagnostics.F90 <https://github.com/NOAA-EMC/ufsatm/blob/develop/ccpp/driver/GFS_diagnostics.F90>`_
    * - MOM6
      - `MOM6 Variables <https://ncar.github.io/MOM6/APIs/namespacemom__diagnostics.html>`_
      - `MOM_diagnostics.F90 <https://github.com/NOAA-EMC/MOM6/blob/main/src/diagnostics/MOM_diagnostics.F90>`_

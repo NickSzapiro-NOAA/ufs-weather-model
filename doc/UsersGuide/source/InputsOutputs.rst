@@ -235,33 +235,39 @@ The static input files for global configurations are listed and described in :nu
    * - Filename
      - Description
      - Used in resolution
-   * - runoff.daitren.clim.1440x1080.v20180328.nc
+   * - runoff.daitren.clim.1440x1080.v20180328.nc Done
      - climatological runoff
      - 0.25
-   * - runoff.daitren.clim.720x576.v20180328.nc
+   * - runoff.daitren.clim.720x576.v20180328.nc Done
      - climatological runoff
      - 0.50
-   * - seawifs-clim-1997-2010.1440x1080.v20180328.nc
+   * - runoff.daitren.iaf.720x576.v20180328.nc Done
+     - interannually varying runoff forcing
+     - 0.50
+   * - seawifs-clim-1997-2010.1440x1080.v20180328.nc Done
      - climatological chlorophyll concentration in sea water
      - 0.25
-   * - seawifs-clim-1997-2010.720x576.v20180328.nc
+   * - seawifs-clim-1997-2010.720x576.v20180328.nc Done
      - climatological chlorophyll concentration in sea water
      - 0.50
    * - seawifs_1998-2006_smoothed_2X.nc
      - climatological chlorophyll concentration in sea water
      - 1.00
-   * - tidal_amplitude.v20140616.nc
+   * - tidal_amplitude.v20140616.nc Done
      - climatological tide amplitude
      - 0.25
-   * - tidal_amplitude.nc
+   * - tidal_amplitude.nc Done
      - climatological tide amplitude
      - 0.50, 1.00
-   * - geothermal_davies2013_v1.nc
+   * - geothermal_davies2013_v1.nc Done
      - climatological geothermal heat flow
      - 0.50, 0.25
    * - KH_background_2d.nc
      - climatological 2-d background harmonic viscosities
      - 1.00
+   * - salt_restore_PHC2.720x576.v20180405.nc Done
+     - climatological salinity restoring field (PHC source)
+     - 0.50
 
 .. _mom-grid-ic-files:
 
@@ -279,29 +285,46 @@ The input files containing grid information and the initial conditions for globa
    
    * - Filename
      - Description
-     - Valid RES options
+     - Valid resolution options
      - Date-dependent
-   * - ocean_hgrid.nc
+     -
+   * - ocean_hgrid.nc Done
      - horizonal grid information
-     - 1.00, 0.50, 0.25
+     - 9.00, 5.00, 1.00, 0.50, 0.25
      -
-   * - ocean_mosaic.nc
+   * - ocean_mosaic.nc Done
      - specify horizonal starting and ending points index
-     - 1.00, 0.50, 0.25
+     - 9.00, 5.00, 1.00, 0.50, 0.25
      -
-   * - ocean_topog.nc
+   * - ocean_topog.nc Done
      - ocean topography
-     - 1.00, 0.50, 0.25
+     - 0.50, 0.25
      -
-   * - ocean_mask.nc
-     - lans/sea mask
-     - 1.00, 0.50, 0.25
+   * - ocean_mask.nc Done
+     - land/sea mask 
+     - 9.00, 5.00, 1.00, 0.50, 0.25
      -
-   * - hycom1_75_800m.nc
+   * - ocean_static.nc Done
+     - static ocean grid and mask data
+     - 0.50
+     -
+   * - land_mosaic_tile1Xocean_mosaic_tile1.nc Done
+     - land/ocean mosaic coupling 
+     - 1.00, 0.50
+     -
+   * - land_mask.nc Done
+     - land mask
+     - 1.00, 0.50
+     -
+   * - basin_codes.nc Done
+     - ocean basin classification grid
+     - 0.50
+     -
+   * - hycom1_75_800m.nc Done
      - vertical coordinate level thickness
      - 1.00, 0.50, 0.25
      -
-   * - layer_coord.nc
+   * - layer_coord.nc Good
      - vertical layer target potential density
      - 1.00, 0.50, 0.25
      -
@@ -313,15 +336,26 @@ The input files containing grid information and the initial conditions for globa
      - specify grid points where topography are manually modified to adjust throughflow strength for narrow channels
      - 1.00
      -
-   * - MOM_channels_global_025
+   * - topog.nc Done 
+     - topography
+     - 9.00, 1.00, 0.25   
+   * - MOM_channels_global_025 Good
      - specifies restricted channel widths
      - 0.50, 0.25
+     -
+   * - MOM_layout Good
+     - specifies parameters for testing mask_tables in a non-FRE enviroment (production use is not recommended )
+     - 0.50, 0.25
+     - 
+   * - MOM_override Good
+     - blank file for overriding default MOM6 parameters
+     - 9.00, 5.00, 1.00, 0.50, 0.25
      -
    * - MOM_channel_SPEAR
      - specifies restricted channel widths
      - 1.00
      -
-   * - interpolate_zgrid_40L.nc
+   * - interpolate_zgrid_40L.nc Good
      - specify target depth for output
      - 1.00, 0.50, 0.25
      -
@@ -333,6 +367,7 @@ The input files containing grid information and the initial conditions for globa
      - ocean temperature and salinity initial conditions (from CFSR)
      - 1.00, 0.50, 0.25
      - ✔
+    
 
 .. _hycom-in:
 

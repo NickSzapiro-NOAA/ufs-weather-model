@@ -235,37 +235,37 @@ The static input files for global configurations are listed and described in :nu
    * - Filename
      - Description
      - Used in resolution
-   * - runoff.daitren.clim.1440x1080.v20180328.nc Done
+   * - runoff.daitren.clim.1440x1080.v20180328.nc 
      - climatological runoff
      - 0.25
-   * - runoff.daitren.clim.720x576.v20180328.nc Done
+   * - runoff.daitren.clim.720x576.v20180328.nc 
      - climatological runoff
      - 0.50
-   * - runoff.daitren.iaf.720x576.v20180328.nc Done
+   * - runoff.daitren.iaf.720x576.v20180328.nc 
      - interannually varying runoff forcing
      - 0.50
-   * - seawifs-clim-1997-2010.1440x1080.v20180328.nc Done
+   * - seawifs-clim-1997-2010.1440x1080.v20180328.nc 
      - climatological chlorophyll concentration in sea water
      - 0.25
-   * - seawifs-clim-1997-2010.720x576.v20180328.nc Done
+   * - seawifs-clim-1997-2010.720x576.v20180328.nc 
      - climatological chlorophyll concentration in sea water
      - 0.50
-   * - seawifs_1998-2006_smoothed_2X.nc
+   * - seawifs_1998-2006_smoothed_2X.nc  
      - climatological chlorophyll concentration in sea water
      - 1.00
-   * - tidal_amplitude.v20140616.nc Done
+   * - tidal_amplitude.v20140616.nc 
      - climatological tide amplitude
      - 0.25
-   * - tidal_amplitude.nc Done
+   * - tidal_amplitude.nc 
      - climatological tide amplitude
      - 0.50, 1.00
-   * - geothermal_davies2013_v1.nc Done
+   * - geothermal_davies2013_v1.nc 
      - climatological geothermal heat flow
      - 0.50, 0.25
-   * - KH_background_2d.nc
+   * - KH_background_2d.nc 
      - climatological 2-d background harmonic viscosities
      - 1.00
-   * - salt_restore_PHC2.720x576.v20180405.nc Done
+   * - salt_restore_PHC2.720x576.v20180405.nc 
      - climatological salinity restoring field (PHC source)
      - 0.50
 
@@ -288,74 +288,103 @@ The input files containing grid information and the initial conditions for globa
      - Valid resolution options
      - Date-dependent
      -
-   * - ocean_hgrid.nc Done
+   * - ocean_hgrid.nc 
      - horizonal grid information
      - 9.00, 5.00, 1.00, 0.50, 0.25
      -
-   * - ocean_mosaic.nc Done
+   * - oceanda_zgrid_25L.nc
+     - defines the vertical z-coordinate depth structure for 25 ocean layers used in data assimilation
+     - 5.00
+     -
+   * - vgrid_75_2m.nc 
+     - vertical grid levels 
+     - 1.00
+     -
+   * - ocean_mosaic.nc 
      - specify horizonal starting and ending points index
      - 9.00, 5.00, 1.00, 0.50, 0.25
      -
-   * - ocean_topog.nc Done
+   * - ocean_topog.nc 
      - ocean topography
      - 0.50, 0.25
      -
-   * - ocean_mask.nc Done
-     - land/sea mask 
+   * - ocean_mask.nc 
+     - ocean mask 
      - 9.00, 5.00, 1.00, 0.50, 0.25
      -
-   * - ocean_static.nc Done
+   * - ocean_static.nc 
      - static ocean grid and mask data
      - 0.50
      -
-   * - land_mosaic_tile1Xocean_mosaic_tile1.nc Done
-     - land/ocean mosaic coupling 
+   * - land_mosaic_tile1Xocean_mosaic_tile1.nc 
+     - land/ocean mosaic tiles 
      - 1.00, 0.50
      -
-   * - land_mask.nc Done
+   * - atmos_mosaic_tile1Xland_mosaic_tile1.nc 
+     - atmosphere/land mosaic tiles
+     - 1.00
+     -
+   * - atmos_mosaic_tile1Xocean_mosaic_tile1.nc 
+     - atmosphere/ocean mosaic tiles 
+     - 1.00
+     -
+   * - land_mask.nc 
      - land mask
      - 1.00, 0.50
      -
-   * - basin_codes.nc Done
+   * - basin_codes.nc 
      - ocean basin classification grid
      - 0.50
      -
-   * - hycom1_75_800m.nc Done
+   * - hycom1_25.nc
+     - vertical coordinate thickness defining 25 vertical levels
+     - 9.00, 5.00
+     -
+   * - hycom1_75_800m.nc 
      - vertical coordinate level thickness
      - 1.00, 0.50, 0.25
      -
-   * - layer_coord.nc Good
+   * - layer_coord.nc 
      - vertical layer target potential density
      - 1.00, 0.50, 0.25
      -
-   * - All_edits.nc
+   * - layer_coord25.nc
+     - vertical layer target potential density defining 25 vertical levels 
+     - 9.00, 5.00
+     -
+   * - All_edits.nc 
      - specify grid points where topography are manually modified to adjust throughflow strength for narrow channels
      - 0.25
      -
-   * - topo_edits_011818.nc
+   * - topo_edits_011818.nc 
      - specify grid points where topography are manually modified to adjust throughflow strength for narrow channels
      - 1.00
      -
-   * - topog.nc Done 
+   * - ufs.topo_edits_011818.nc
+     - UFS specific grid points where topography are manually modified to adjust throughflow strength for narrow channels
+     - 1.00
+     -
+   * - topog.nc  
      - topography
-     - 9.00, 1.00, 0.25   
-   * - MOM_channels_global_025 Good
+     - 9.00, 1.00, 0.25
+     -   
+   * - MOM_channels_global_025 
      - specifies restricted channel widths
      - 0.50, 0.25
      -
-   * - MOM_layout Good
+   * - MOM_layout 
      - specifies parameters for testing mask_tables in a non-FRE enviroment (production use is not recommended )
      - 0.50, 0.25
      - 
-   * - MOM_override Good
+   * - MOM_override 
      - blank file for overriding default MOM6 parameters
      - 9.00, 5.00, 1.00, 0.50, 0.25
      -
-   * - MOM_channel_SPEAR
+   * - MOM_channels_SPEAR
      - specifies restricted channel widths
      - 1.00
      -
-   * - interpolate_zgrid_40L.nc Good
+   * - interpolate_zgrid_40L.nc 
      - specify target depth for output
      - 1.00, 0.50, 0.25
      -
@@ -364,11 +393,26 @@ The input files containing grid information and the initial conditions for globa
      - 0.25
      - ✔
    * - MOM6_IC_TS.nc
-     - ocean temperature and salinity initial conditions (from CFSR)
+     - ocean temperature and salinity initial conditions (from :term:`CFSR`)
      - 1.00, 0.50, 0.25
      - ✔
+   * - woa18_decav_s00_01.nc
+     - Global annual climatological average ocean salinity from 1955–2017 (from :term:`NCEI`)
+     - 1.00
+     - ✔
+   * - woa18_decav_t00_01.nc
+     - Global annual climatological average ocean temperature from 1955–2017 (from :term:`NCEI`)
+     - 1.00
+     - ✔
+   * - mom6.mx050.2021032206.warmstart.nc
+     - MOM6 warm restart file
+     - 0.50
+     - ✔
+   * - mom6.mx100.2021032206.warmstart.nc
+     - MOM6 warm restart file
+     - 1.00
+     - ✔
     
-
 .. _hycom-in:
 
 -------

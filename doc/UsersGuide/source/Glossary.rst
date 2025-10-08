@@ -36,7 +36,8 @@ Glossary
 
    CESM
       The `Community Earth System Model <https://www.cesm.ucar.edu/>`_ (CESM) is a fully-coupled global climate model developed at the National Center for Atmospheric Research (:term:`NCAR`) in collaboration with colleagues in the research community. 
-
+   CFSR
+      The `Climate Forecast System Reanlysis <https://climatedataguide.ucar.edu/climate-data/climate-forecast-system-reanalysis-cfsr>`_ (CFSR) is a third generation reanalysis product. 
    chgres_cube
       The preprocessing software used to create initial and boundary condition files to "coldstart" the forecast model. It is part of :term:`UFS_UTILS`. 
 
@@ -131,6 +132,9 @@ Glossary
 
    NCAR
       The `National Center for Atmospheric Research <https://ncar.ucar.edu/>`_. 
+   
+   NCEI
+      The `National Center for Environmental Information <https://www.ncei.noaa.gov/>`_.
 
    NCEP
       National Centers for Environmental Prediction (NCEP) is a branch of the :term:`National Weather Service <NWS>` and consists of nine centers, including the :term:`Environmental Modeling Center <EMC>`. More information can be found at https://www.weather.gov/ncep/.

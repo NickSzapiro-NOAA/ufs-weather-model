@@ -114,6 +114,9 @@ Glossary
    
    ICs
       Initial conditions
+   
+   IMS
+      The `Interactive Multisensor Snow and Ice Mapping System <https://usicecenter.gov/Products/ImsHome>`_.
 
    LM4
       NUOPC NOAA-GFDL Land Model version 4
@@ -156,7 +159,9 @@ Glossary
 
    NG-GODAS
       Next Generation-Global Ocean Data Assimilation System. NG-GODAS is a UFS Weather Model configuration that couples ocean (:term:`MOM6`), sea ice (:term:`CICE6`), and Data Assimilation (DA) capabilities with the :term:`DATM` component of :term:`CDEPS`.
-
+   
+   NIC
+      U.S. `National Ice Center <https://usicecenter.gov/>`_.
    NOAHMP
    Noah-MP
       The Noah Multi-Physics (Noah-MP) land surface model (LSM) is an open-source, community-developed LSM that has been incorporated into the UFS Weather Model (WM). It is a UFS WM land component. 

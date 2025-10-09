@@ -102,7 +102,7 @@ The static input files for global configurations are listed and described in :nu
    * - CFSR.SEAICE.1982.2012.monthly.clim.grb
      - :term:`CFS` reanalysis of monthly sea ice climatology
    * - freezeH2O.dat
-     - Lookup table used by the Thompson microphysics scheme to calculate water freezing
+     - Defines freezing behavior of water under different temperatures and pressures
    * - co2historicaldata_YYYY.txt
      - Monthly CO2 in PPMV data for year YYYY
    * - global_albedo4.1x1.grb
@@ -142,6 +142,10 @@ The static input files for global configurations are listed and described in :nu
      - Climatological surface roughness
    * - IMS-NIC.blended.ice.monthly.clim.grb
      - Monthly climatology of global sea ice concentration from blended :term:`IMS`` and :term:`NIC` datasets
+   * - qr_acr_qgV2.dat
+     - Precomputed data for rain-graupel collection processes
+   * - qr_acr_qsV2.dat:
+     - Precomputed data for rain–snow collection processes
    * - RTGSST.1982.2012.monthly.clim.grb
      - Monthly, climatological, real-time global sea surface temperature
    * - seaice_newland.grb

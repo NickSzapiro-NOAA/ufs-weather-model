@@ -619,14 +619,22 @@ The input files containing grid information and the initial conditions for globa
      - cice model IC or restart file
      - 1.00, 0.50, 0.25
      - ✔
+   * - cice.mxRES.YYYYMMDDHH.warmstart.nc
+     - warm restart file used to continue a previous CICE run from an existing model state
+     - 1.00, 0.50
+     - ✔
    * - grid_cice_NEMS_mxRES.nc
      - cice model grid at resolution RES
-     - 100, 050, 025
+     - 9.00, 5.00, 1.00, 0.50, 0.25
      -
    * - kmtu_cice_NEMS_mxRES.nc
      - cice model land mask at resolution RES
-     - 100, 050, 025
+     - 9.00, 5.00, 1.00, 0.50, 0.25
      -
+   * - mesh.mxRES.nc
+     - CICE mesh at resolution RES
+     - 9.00, 5.00, 1.00, 0.50, 0.25
+     - 
 
 .. _ww3-in:
 
@@ -768,7 +776,7 @@ Coupled regional configurations require forcing files to fill regions that canno
      - Interpolated wind data from GFS
      - 6 min
 
-The model driver input (ww3_multi.inp) includes the input, model and output grids definition, the starting and ending times for the entire model run and output types and intervals. The ww3_multi.inp.IN template is located under tests/parm/ directory. The inputs are described hereinafter:
+The model driver input (ww3_shel.nml.IN) includes the input, model and output grids definition, the starting and ending times for the entire model run and output types and intervals. The ww3_multi.inp.IN template is located under tests/parm/ directory. The inputs are described hereinafter:
 
 .. _WW3_Driver:
 

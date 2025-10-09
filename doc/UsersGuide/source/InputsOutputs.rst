@@ -407,11 +407,11 @@ The input files containing grid information and the initial conditions for globa
      - 1.00, 0.50, 0.25
      - ✔
    * - woa18_decav_s00_01.nc
-     - Global annual climatological average ocean salinity from 1955–2017 (from :term:`NCEI`)
+     - global annual climatological average ocean salinity from 1955–2017 (from :term:`NCEI`)
      - 1.00
      - ✔
    * - woa18_decav_t00_01.nc
-     - Global annual climatological average ocean temperature from 1955–2017 (from :term:`NCEI`)
+     - global annual climatological average ocean temperature from 1955–2017 (from :term:`NCEI`)
      - 1.00
      - ✔
    * - mom6.mx050.2021032206.warmstart.nc

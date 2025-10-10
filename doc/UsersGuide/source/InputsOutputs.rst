@@ -1364,7 +1364,7 @@ Registration of diagnostic fields is done using the following syntax
 
    diag_id = register_diag_field(module_name, diag_name, axes, ...)
 
-in file ``FV3/atmos_cubed_sphere/tools/fv_diagnostics.F90``.  As an example, the sea level pressure is registered as:
+in file ``ufsatm/FV3/atmos_cubed_sphere/tools/fv_diagnostics.F90``.  As an example, the sea level pressure is registered as:
 
 .. code-block:: console
 
@@ -1427,7 +1427,7 @@ Each WM component has its own ``diag_table`` with associated variables. :numref:
    * - WM Component
      - Diag Table
      - Source File
-   * - FV3
+   * - UFSatm 
      - :ref:`FV3 Variables <fv3diagtable>`
      - `GFS_diagnostics.F90 <https://github.com/NOAA-EMC/ufsatm/blob/develop/ccpp/driver/GFS_diagnostics.F90>`_
    * - MOM6
@@ -2178,8 +2178,7 @@ A sample subset of this namelist is shown below:
      FNABSC   = 'global_mxsnoalb.uariz.t126.384.190.rg.grb'
    /
 
-Additional variables for the ``&namsfc`` namelist can be found in the ``FV3/ccpp/physics/physics/Interstitials/UFS_SCM_NEPTUNE/sfcsub.F`` file.
-
+Additional variables for the ``&namsfc`` namelist can be found in the ``ufsatm/ccpp/physics/physics/Interstitials/UFS_SCM_NEPTUNE/sfcsub.F`` file. 
 .. _atmos_model_nml_section:
 
 ^^^^^^^^^^^^^^^^^^^^
@@ -2284,8 +2283,7 @@ A sample subset of this namelist is shown below:
      cplflx       = .true.
    /
 
-Additional variables for the ``&gfs_physics_nml`` namelist can be found in the ``FV3/ccpp/data/GFS_typedefs.F90``
-file.
+Additional variables for the ``&gfs_physics_nml`` namelist can be found in the `GFS_typedefs.F90 <https://github.com/NOAA-EMC/ufsatm/blob/develop/ccpp/data/CCPP_typedefs.F90>`_
 
 .. _OutputFiles:
 
@@ -2293,10 +2291,10 @@ file.
 Output files
 =============
 
-.. _fv3atm-out:
+.. _UFSatm-out:
 
 -------
-FV3Atm
+UFSAtm
 -------
 
 The output files generated when running ``fv3.exe`` are defined in the ``diag_table`` file. For the default global configuration, the following files are output (six files of each kind, corresponding to the six tiles of the model grid):

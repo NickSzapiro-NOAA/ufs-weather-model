@@ -620,7 +620,7 @@ Where can I find up-to-date documentation for the ``diag_table`` variables used 
 ===========================================================================================================
 
 Information on ``diag_table`` variables has been added to the :ref:`diag_table section <diag-table-options>` of the UFS Weather Model documentation. 
-Currently, only variables coming from fv3atm and MOM6 are included, but ``diag_table`` variables from other components will be added as time permits. 
+Currently, only variables coming from ufsatm and MOM6 are included, but ``diag_table`` variables from other components will be added as time permits. 
 
 * :ref:`FV3ATM diag_table variables <fv3diagtable>`
 * `MOM6 diag_table variables <https://ncar.github.io/MOM6/APIs/namespacemom__diagnostics.html>`_

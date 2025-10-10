@@ -164,12 +164,12 @@ On NOAA Level 1 & 2 Systems
 
 Modulefiles for :ref:`preconfigured platforms <SupportedPlatforms>` are located in 
 ``modulefiles/ufs_<platform>.<compiler>``. For example, to load the modules from the 
-``ufs-weather-model`` directory on Hercules:
+``ufs-weather-model`` directory on Ursa:
 
 .. code-block:: console
 
     module use modulefiles
-    module load ufs_hercules.intel
+    module load ufs_ursa.intel
 
 Note that loading this module file will also set the CMake environment variables shown in
 :numref:`Table %s <CMakeEnv>`.

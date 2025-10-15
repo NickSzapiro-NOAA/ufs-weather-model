@@ -453,7 +453,7 @@ If any of the environment variables have not been set, the ``build.sh`` script w
 
 .. code-block:: console
 
-   ./build.sh: line 11: CMAKE_Platform: Please set the CMAKE_Platform environment variable, e.g. [macosx.gnu|linux.gnu|linux.intel|hercules.intel|...]
+   ./build.sh: line 11: CMAKE_Platform: Please set the CMAKE_Platform environment variable, e.g. [macosx.gnu|linux.gnu|linux.intel|ursa.intel|...]
 
 The WM can be built by running the following command from the ``ufs-weather-model`` directory:
 
@@ -889,7 +889,7 @@ must satisfy. These requirements are shown in :numref:`Table %s <OperationalRequ
 For the following discussions on opnReqTest, the user should note the distinction between
 ``'test name'`` and ``'test case'``. Examples of test names are ``control``, ``cpld_control``
 and ``regional_control`` which are all found in the ``tests/tests`` directory, whereas
-test case refers to any one of the operational requirements: ``thr``, ``fhz``. ``mpi``, ``dcp``, ``rst``, ``bit`` and ``dbg``.
+test case refers to any one of the operational requirements: ``thr``, ``fhz``, ``mpi``, ``dcp``, ``rst``, ``bit`` and ``dbg``.
 
 .. _OperationalRequirement:
 

@@ -1,2 +1,4 @@
-control_p8_rrtmgp intel
-control_p8_rrtmgp_rad32 intel
+regional_restart intel
+regional_2dwrtdecomp intel
+conus13km_debug intel
+conus13km_debug_qr intel

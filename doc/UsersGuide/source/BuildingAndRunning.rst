@@ -91,7 +91,7 @@ the data required to run the WM RTs are already available at the following ``DIS
    * - Gaea-C6
      - /gpfs/f6/bil-fire8/world-shared/role.epic/UFS-WM_RT
    * - Ursa
-     - /scratch3/NAGAPE/epic/role.epic/UFS-WM_RT
+     - /scratch4/NAGAPE/epic/role.epic/UFS-WM_RT
    * - Hercules
      - /work/noaa/epic/hercules/UFS-WM_RT
    * - NOAA Cloud (Level 2)

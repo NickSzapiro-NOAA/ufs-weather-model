@@ -37,7 +37,7 @@ The WM uses two categories of libraries, which are available as a bundle via
 Common Modules
 ----------------
 
-As of September 29, 2025, the UFS WM Regression Tests (:term:`RTs <RT>`) on Level 1 systems use the following common modules: 
+As of October 20, 2025, the UFS WM Regression Tests (:term:`RTs <RT>`) on Level 1 systems use the following common modules: 
 
 .. code-block:: console
 

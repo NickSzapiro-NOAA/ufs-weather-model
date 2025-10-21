@@ -453,7 +453,7 @@ If any of the environment variables have not been set, the ``build.sh`` script w
 
 .. code-block:: console
 
-   ./build.sh: line 11: CMAKE_Platform: Please set the CMAKE_Platform environment variable, e.g. [macosx.gnu|linux.gnu|linux.intel|ursa.intel|...]
+   ./build.sh: line 11: CMAKE_Platform: Please set the CMAKE_Platform environment variable, e.g., [ufs_hercules.intel|ufs_hercules.gnu|ufs_ursa.intel|ufs_ursa.intelllvm|...]
 
 The WM can be built by running the following command from the ``ufs-weather-model`` directory:
 

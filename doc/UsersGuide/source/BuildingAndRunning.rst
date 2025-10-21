@@ -181,9 +181,9 @@ Note that loading this module file will also set the CMake environment variables
    +-------------------------+----------------------------------------------+----------------------+
    | **EnvironmentVariable** | **Description**                              | **Ursa Intel Value** |
    +=========================+==============================================+======================+
-   |  CMAKE_C_COMPILER       | Name of C compiler                           | mpiicc               |
+   |  CMAKE_C_COMPILER       | Name of C compiler                           | mpiicx               |
    +-------------------------+----------------------------------------------+----------------------+
-   |  CMAKE_CXX_COMPILER     | Name of C++ compiler                         | mpiicpc              |
+   |  CMAKE_CXX_COMPILER     | Name of C++ compiler                         | mpiicpx              |
    +-------------------------+----------------------------------------------+----------------------+
    |  CMAKE_Fortran_COMPILER | Name of Fortran compiler                     | mpiifort             |
    +-------------------------+----------------------------------------------+----------------------+
@@ -208,238 +208,23 @@ The UFS Weather Model can be built in one of several configurations (see :numref
 The ``CMAKE_FLAGS`` environment variable specifies which configuration to build using the ``-DAPP`` and ``-DCCPP_SUITES`` variables.
 Users set which components to build using ``-DAPP``. Users select the :term:`CCPP` suite(s) by setting the 
 ``CCPP_SUITES`` environment variable at build time in order to have one or more CCPP physics suites available at runtime. 
-Multiple suites can be set. Additional variables, such as ``-D32BIT=ON``, 
-can be set if the user chooses. These options are documented in :numref:`Section %s <other-build-options>`. 
-The following examples assume a bash shell.
+Multiple suites can be set. Additional variables, such as ``-D32BIT=ON``, can be set if the user chooses. 
 
-ATM Configurations
----------------------
-
-.. _atm:
-
-**Standalone ATM**
-
-For the ``ufs-weather-model ATM`` configuration (standalone :term:`ATM`):
+For example, the ``ufs-weather-model ATMW`` configuration (standalone ATM coupled to :term:`WW3`) would look like:
 
 .. code-block:: console
 
-    export CMAKE_FLAGS="-DAPP=ATM -DCCPP_SUITES=FV3_GFS_v16"
+    export CMAKE_FLAGS="-DAPP=ATMW -DCCPP_SUITES=FV3_GFS_v17_p8"
 
-.. _atmw:
-
-**ATMW**
-
-For the ``ufs-weather-model ATMW`` configuration (standalone ATM coupled to :term:`WW3`):
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=ATMW -DCCPP_SUITES=FV3_GFS_v16"
-
-.. _atmaero:
-
-**ATMAERO**
-
-For the ``ufs-weather-model ATMAERO`` configuration (standalone ATM coupled to :term:`GOCART`):
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=ATMAERO -DCCPP_SUITES=FV3_GFS_v17_p8"
-
-.. _atmaq:
-
-**ATMAQ**
-
-For the ``ufs-weather-model ATMAQ`` configuration (standalone ATM coupled to :term:`CMAQ`):
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=ATMAQ -DCCPP_SUITES=FV3_GFS_v15p2"
-
-.. _atml:
-
-**ATML**
-
-For the ``ufs-weather-model ATML`` configuration (standalone ATM coupled to :term:`LND`):
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=ATML -DCCPP_SUITES=FV3_GFS_v17_p8"
-
-.. _atmf:
-
-**ATMF**
-
-For the ``ufs-weather-model ATMF`` configuration (standalone ATM coupled to :term:`UFS Fire`):
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=ATMF -DCCPP_SUITES=FV3_HRRR -D32BIT=ON"
-
-.. _atm_ds2s:
-
-**ATM_DS2S**
-
-For the ``ufs-weather-model ATM_DS2S`` configuration (:term:`ATM`/:term:`DOCN`/:term:`DICE`):
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=ATM_DS2S  -DCCPP_SUITES=FV3_GFS_v17_coupled_p8_ugwpv1"
-
-
-.. _atm_ds2s-pcice:
-
-**ATM_DS2S-PCICE**
-
-For the ``ufs-weather-model ATM_DS2S-PCICE`` configuration (:term:`ATM`/:term:`DOCN`/:term:`CICE6` [prescribed ice mode]):
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=ATM_DS2S-PCICE -DCCPP_SUITES=FV3_GFS_v17_coupled_p8"
-
-
-S2S Configurations 
-----------------------
-
-.. _s2s:
-
-**S2S**
-
-For the ``ufs-weather-model S2S`` configuration (coupled atm/ice/ocean):
+Other common examples include:
 
 .. code-block:: console
 
     export CMAKE_FLAGS="-DAPP=S2S -DCCPP_SUITES=FV3_GFS_v17_coupled_p8"
 
-To turn on debugging flags, add ``-DDEBUG=ON`` flag after ``-DAPP=S2S``. Users can allow verbose build messages by running: 
-
-.. code-block:: console
-
-    export BUILD_VERBOSE=1
-
-To receive atmosphere-ocean fluxes from the CMEPS :term:`mediator`, add the argument ``-DCMEPS_AOFLUX=ON``.
-For example:
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=S2S -DCCPP_SUITES=FV3_GFS_v17_coupled_p8_sfcocn -DCMEPS_AOFLUX=ON"
-
-.. _s2sa:
-
-**S2SA**
-
-For the ``ufs-weather-model S2SA`` configuration (atm/ice/ocean/aerosols):
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=S2SA -DCCPP_SUITES=FV3_GFS_2017_coupled,FV3_GFS_v15p2_coupled,FV3_GFS_v16_coupled,FV3_GFS_v16_coupled_noahmp"
-
-.. _s2sw:
-
-**S2SW**
-
-For the ``ufs-weather-model S2SW`` configuration (atm/ice/ocean/wave):
-
-.. code-block:: console
-
     export CMAKE_FLAGS="-DAPP=S2SW -DCCPP_SUITES=FV3_GFS_v17_coupled_p8"
 
-.. _s2swa:
-
-**S2SWA**
-
-For the ``ufs-weather-model S2SWA`` configuration (atm/ice/ocean/wave/aerosols):
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=S2SWA -DCCPP_SUITES=FV3_GFS_v17_coupled_p8,FV3_GFS_cpld_rasmgshocnsstnoahmp_ugwp"
-
-.. _s2swal:
-
-**S2SWAL**
-
-For the ``ufs-weather-model S2SWAL`` configuration (atm/ice/ocean/wave/aerosols/land):
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=S2SWAL -DCCPP_SUITES=FV3_GFS_v17_coupled_p8,FV3_GFS_v17_coupled_p8_ugwpv1"
-
-
-.. _ng-godas:
-
-NG-GODAS Configuration
-------------------------
-
-For the ``ufs-weather-model NG-GODAS`` configuration (atm/ocean/ice/data assimilation): 
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=NG-GODAS"
-
-HAFS Configurations
-----------------------
-
-.. _hafs:
-
-**HAFS**
-
-For the ``ufs-weather-model HAFS`` configuration (atm/ocean) in 32 bit:
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=HAFS -D32BIT=ON -DCCPP_SUITES=FV3_HAFS_v0_gfdlmp_tedmf_nonsst,FV3_HAFS_v0_gfdlmp_tedmf"
-
-.. _hafsw:
-
-**HAFSW**
-
-For the ``ufs-weather-model HAFSW`` configuration (atm/:term:`HYCOM`/wave) in 32-bit with moving nest:
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=HAFSW -D32BIT=ON -DMOVING_NEST=ON -DCCPP_SUITES=FV3_HAFS_v0_gfdlmp_tedmf,FV3_HAFS_v0_gfdlmp_tedmf_nonsst,FV3_HAFS_v0_thompson_tedmf_gfdlsf"
-
-.. _hafs-mom6w:
-
-**HAFS-MOM6W**
-
-For the ``ufs-weather-model HAFS-MOM6`` configuration (atm/:term:`MOM6`/wave) in 32-bit with moving nest:
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=HAFS-MOM6W -DREGIONAL_MOM6=ON -DCDEPS_INLINE=ON -DMOVING_NEST=ON -DCCPP_SUITES=FV3_HAFS_v1_gfdlmp_tedmf,FV3_HAFS_v1_gfdlmp_tedmf_nonsst,FV3_HAFS_v1_thompson,FV3_HAFS_v1_thompson_nonsst -D32BIT=ON"
-
-.. _hafs-all:
-
-**HAFS-ALL**
-
-For the ``ufs-weather-model HAFS-ALL`` configuration (data/atm/ocean/wave) in 32 bit:
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=HAFS-ALL -D32BIT=ON -DCCPP_SUITES=FV3_HAFS_v0_gfdlmp_tedmf,FV3_HAFS_v0_gfdlmp_tedmf_nonsst"
-
-Land Configurations
-----------------------
-
-.. _lnd:
-
-**LND**
-
-For the ``ufs-weather-model LND`` configuration (:term:`DATM`/land [:term:`NOAHMP`]):
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=LND"
-
-.. _lnd-lm4:
-
-**LM4**
-
-For the ``ufs-weather-model LND-LM4`` configuration (:term:`DATM`/land [:term:`LM4`]):
-
-.. code-block:: console
-
-    export CMAKE_FLAGS="-DAPP=LND-LM4"
+For the complete and most up-to-date list of ``-DAPP`` and ``DCCPP_SUITES`` options, see :ref:`Chapter 7 <ConfigParams>` or :wm-repo:`CMakeLists.txt <blob/develop/CMakeLists.txt>` file. 
 
 ------------------
 Building the Model

@@ -496,3 +496,41 @@ If you are using this log as a pull request verification, please commit 'test_ch
 Result: FAILURE
 
 ====END OF URSA REGRESSION TESTING LOG====
+
+NOTES:
+[Times](Memory) are at the end of each compile/test in format [MM:SS](Size).
+The first time is for the full script (prep+run+finalize).
+The second time is specifically for the run phase.
+Times/Memory will be empty for failed tests.
+
+BASELINE DIRECTORY: /scratch4/NAGAPE/epic/role-epic/UFS-WM_RT/NEMSfv3gfs/develop-20251017
+COMPARISON DIRECTORY: /scratch4/NCEPDEV/stmp/Nick.Szapiro/RT_RUNDIRS/Nick.Szapiro/FV3_RT/rt_481951
+
+RT.SH OPTIONS USED:
+* (-a) - HPC PROJECT ACCOUNT: nems
+* (-l) - USE CONFIG FILE: rt_retry.conf
+* (-e) - USE ECFLOW
+
+PASS -- COMPILE 's2sw_pdlib_intel' [15:12, 12:43] ( 1 warnings 1036 remarks )
+PASS -- TEST 'cpld_warmstart_c48_5deg_intel' [03:35, 01:25](3019 MB)
+PASS -- TEST 'cpld_restart_c48_5deg_intel' [03:28, 00:53](2473 MB)
+
+PASS -- COMPILE 'atm_dyn32_intel' [09:12, 06:25] ( 1 warnings 502 remarks )
+PASS -- TEST 'regional_control_intel' [05:29, 03:35](1712 MB)
+PASS -- TEST 'regional_restart_intel' [04:26, 02:00](1701 MB)
+
+PASS -- COMPILE 'rrfs_dyn32_phy32_debug_intel' [04:11, 02:07] ( 781 warnings 422 remarks )
+PASS -- TEST 'conus13km_debug_intel' [16:40, 14:27](1825 MB)
+
+SYNOPSIS:
+Starting Date/Time: 20251024 13:45:51
+Ending Date/Time: 20251024 14:09:31
+Total Time: 00h:23m:43s
+Compiles Completed: 3/3
+Tests Completed: 5/5
+
+NOTES:
+A file 'test_changes.list' was generated but is empty.
+If you are using this log as a pull request verification, please commit 'test_changes.list'.
+
+Result: SUCCESS

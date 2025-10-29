@@ -477,3 +477,29 @@ If you are using this log as a pull request verification, please commit 'test_ch
 Result: FAILURE
 
 ====END OF URSA REGRESSION TESTING LOG====
+
+PASS -- COMPILE 'atm_dyn32_intel' [08:11, 06:21] ( 1 warnings 502 remarks )
+PASS -- TEST 'regional_control_intel' [05:28, 03:34](1718 MB)
+PASS -- TEST 'regional_restart_intel' [03:27, 02:02](1695 MB)
+
+PASS -- COMPILE 'rrfs_dyn32_phy32_debug_intel' [04:11, 02:30] ( 782 warnings 422 remarks )
+PASS -- TEST 'conus13km_debug_decomp_intel' [16:35, 14:49](1873 MB)
+
+PASS -- COMPILE 'rrfs_dyn32_phy32_gnu' [04:11, 02:48]
+PASS -- TEST 'conus13km_control_gnu' [04:41, 02:59](906 MB)
+PASS -- TEST 'conus13km_restart_gnu' [12:33, 10:38](576 MB)
+
+SYNOPSIS:
+Starting Date/Time: 20251028 22:44:04
+Ending Date/Time: 20251028 23:06:54
+Total Time: 00h:22m:53s
+Compiles Completed: 3/3
+Tests Completed: 5/5
+
+NOTES:
+A file 'test_changes.list' was generated but is empty.
+If you are using this log as a pull request verification, please commit 'test_changes.list'.
+
+Result: SUCCESS
+
+====END OF URSA REGRESSION TESTING LOG====

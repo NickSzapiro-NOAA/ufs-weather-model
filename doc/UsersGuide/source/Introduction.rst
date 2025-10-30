@@ -5,7 +5,7 @@ Introduction
 *************************
 
 The Unified Forecast System (:term:`UFS`) Weather Model (:term:`WM`) is a prognostic model that can be
-used for short-range research, the Land Data Assimilation (DA) System v2.0.0, and operational forecasts, as exemplified by
+used for short- and medium-range research and operational forecasts, as exemplified by
 its use in the operational Global Forecast System (GFS) and the Hurricane Analysis and Forecast System (HAFS) of the National Oceanic and
 Atmospheric Administration (NOAA). In addition to its use in NOAA's operational forecast systems, the UFS WM is the atmospheric model used in public UFS application releases, such as the most recent Short-Range Weather (SRW) Application releases. These releases represent a snapshot of a continuously evolving system undergoing open
 development. More information about the UFS can be found on the UFS Community Portal at https://ufs.epic.noaa.gov/ and on the Earth Prediction Innovation Center (EPIC) website at https://epic.noaa.gov/get-code/ufs-weather-model/.

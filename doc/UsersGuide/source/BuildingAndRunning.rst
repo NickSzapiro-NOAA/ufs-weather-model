@@ -455,11 +455,12 @@ in 32-bit mode and then runs the ``control`` test:
    RUN | cpld_control_gfsv17                               | - noaacloud                          | baseline |
    RUN | cpld_control_gfsv17_iau                           | - noaacloud                          | baseline | cpld_control_gfsv17
    RUN | cpld_restart_gfsv17                               | - noaacloud                          |          | cpld_control_gfsv17
+   RUN | cpld_restart_gfsv17_iau                           | - noaacloud                          |          | cpld_control_gfsv17_iau
    RUN | cpld_mpi_gfsv17                                   | - noaacloud                          |          |
 
 The ``rt.conf`` file includes a large number of tests. If the user wants to run
 only specific tests, s/he can either (1) comment out the tests to be skipped (using the ``#`` prefix)
-or (2) create a new file (e.g., ``my_rt.conf``), add the tests, and execute ``./rt.sh -l my_rt.conf``.
+or (2) create a new file (e.g., ``my_rt.conf``), add the tests, and execute ``./rt.sh -a  <account> -l my_rt.conf``.
 
 For the most up-to-date list of supported tests see the :wm-repo:`rt.conf <blob/develop/tests/rt.conf>` file. 
 
@@ -495,7 +496,7 @@ regression tests by editing the ``rt.conf`` file and executing:
 
     ./rt.sh -a <account> -l rt.conf
 
-where ``<account>`` is to the account/project number where users submit their batch jobs. 
+where ``<account>`` is the account/project number where users submit their batch jobs. 
 Users may need to add additional command line arguments or change information in the ``rt.sh`` file as well. 
 This information is provided in :numref:`Section %s <rt.sh>` below. 
 

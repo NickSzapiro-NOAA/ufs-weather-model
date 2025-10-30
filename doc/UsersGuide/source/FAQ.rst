@@ -310,7 +310,7 @@ CMEPS
 ^^^^^
 
 The mediator MPI tasks can overlap with other components and in UFS
-the tasks are normally shared on the UFSatm forecast tasks. However, a
+the tasks are normally shared on the UFSATM forecast tasks. However, a
 large number of tasks for the mediator is generally not recommended
 since it may cause slow performance. This means that the number of
 MPI tasks for CMEPS is given by

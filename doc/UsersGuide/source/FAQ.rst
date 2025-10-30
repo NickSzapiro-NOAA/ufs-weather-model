@@ -292,9 +292,9 @@ GOCART
 GOCART shares the same grid and forecast tasks as UFSATM, but it does
 not have a separate write grid component in its NUOPC CAP. Also, while
 GOCART does not have threading capability, it shares the same data
-structure as UFSatm and so it has to use the same number of threads
-used by UFSatm. Therefore, the total number of MPI ranks and threads
-in GOCART is the same as the those for the UFSatm forecast component
+structure as UFSATM and so it has to use the same number of threads
+used by UFSATM. Therefore, the total number of MPI ranks and threads
+in GOCART is the same as the those for the UFSATM forecast component
 (i.e., excluding any write grid component). Currently, GOCART only runs
 on the global forecast grid component, for which only one namelist is
 needed.

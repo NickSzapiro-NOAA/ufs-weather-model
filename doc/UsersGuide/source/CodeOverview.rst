@@ -24,11 +24,12 @@ Preconfigured (Level 1) systems for the UFS WM already have the required externa
 Currently, Level 1 (or Tier-1) platforms for regression testing are: 
 
    * WCOSS2 (Intel)
-   * Gaea (Intel)
+   * Gaea C6 (Intel)
    * Ursa (Intel/GNU compilers)
    * Jet (Intel)
    * Orion (Intel)
    * Hercules (Intel/GNU compilers)
+   * Derecho (Intel/GNU compilers)
    * AWS Docker container (Intel)
 
 More information is available in the :wm-wiki:`UFS WM wiki <Regression-Test-Policy-for-Weather-Model-Platforms-and-Compilers>`. 
@@ -109,8 +110,7 @@ The UFS :term:`WM` repository supports the :term:`UFS` short-range weather appli
      - Community Fire Behavior Model
      - https://github.com/NOAA-EMC/fire_behavior
 
-
-In the table, the left-hand column contains a description of each repository, and the 
+In the table, the left-hand column contains the name of each repository, the middle column contains the repository description and the 
 right-hand column shows the GitHub location of the authoritative component repositories. 
 The UFS WM currently uses Git submodules to manage these subcomponents.
    
@@ -133,6 +133,7 @@ The umbrella repository for the UFS WM is named ``ufs-weather-model``. Under thi
     │         ├── (datm)                            -------- CDEPS DATM
     │         ├── (docn)                            -------- CDEPS DOCN
     │         └── (dice)                            -------- CDEPS DICE
+    ├── CI                                          -------- directory containing package.py
     ├── CICE-interface
     │    └── CICE                                   -------- CICE6 sea ice model
     │         ├── (icepack)                         -------- Sea ice column physics
@@ -146,21 +147,6 @@ The umbrella repository for the UFS WM is named ``ufs-weather-model``. Under thi
     ├── doc                                         -------- User Guide files
     ├── driver
     ├── fire_behavior                               -------- Community Fire Behavior Model
-    ├── ufsatm                                      -------- UFSATM atmosphere model
-    │    ├── (atmos_cubed_sphere)                   -------- FV3 dynamical core
-    │    │    ├── (docs)
-    │    │    ├── (driver)
-    │    │    ├── (model)
-    │    │    └── (tools)
-    │    ├── (ccpp)                                 -------- Common Community Physics Package
-    │    │    ├── (config)
-    │    │    ├── (driver)
-    │    │    ├── (framework)                       -------- CCPP framework
-    │    │    ├── (physics)                         -------- CCPP-compliant physics schemes
-    │    │    └── (suites)                          -------- CCPP physics suite definition files (SDFs)
-    │    ├── (cpl)                                  -------- Coupling field data structures
-    │    ├── (io)                                   -------- UFSAtm write grid comp code
-    │    └── (stochastic_physics)                   -------- Wrapper for stochastic physics
     ├── GOCART
     │    └── (ESMF)                                 -------- GOCART model
     ├── HYCOM-interface
@@ -190,6 +176,21 @@ The umbrella repository for the UFS WM is named ``ufs-weather-model``. Under thi
     ├── tests-dev                                   -------- developmental testing framework
     │    ├── test_cases
     │    └── machine_config
+    ├── UFSATM                                      -------- UFSATM atmosphere model
+    │    ├── (atmos_cubed_sphere)                   -------- FV3 dynamical core
+    │    │    ├── (docs)
+    │    │    ├── (driver)
+    │    │    ├── (model)
+    │    │    └── (tools)
+    │    ├── (ccpp)                                 -------- Common Community Physics Package
+    │    │    ├── (config)
+    │    │    ├── (driver)
+    │    │    ├── (framework)                       -------- CCPP framework
+    │    │    ├── (physics)                         -------- CCPP-compliant physics schemes
+    │    │    └── (suites)                          -------- CCPP physics suite definition files (SDFs)
+    │    ├── (cpl)                                  -------- Coupling field data structures
+    │    ├── (io)                                   -------- UFSAtm write grid comp code
+    │    └── (stochastic_physics)                   -------- Wrapper for stochastic physics
     └── WW3
          └── (model)                                -------- WW3 model
              └── (src)                              -------- NUOPC WW3 caps

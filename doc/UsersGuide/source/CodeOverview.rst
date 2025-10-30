@@ -51,63 +51,64 @@ The UFS :term:`WM` repository supports the :term:`UFS` short-range weather appli
 .. _Repo_Structure:
 
 .. list-table:: *List of Repositories that comprise the ufs-weather-model*
-  :widths: 40 40 20
-  :header-rows: 1
+   :widths: 20 50 30
+   :header-rows: 1
 
-  * - Repository Description
-    - Authoritative repository URL
-    - Repository name
-  * - Umbrella repository for the UFS Weather Model
-    - https://github.com/ufs-community/ufs-weather-model
-    - UFS Weather Model
-  * - Framework to connect the :term:`CCPP` library to a host model
-    - https://github.com/NCAR/ccpp-framework
-    - CCPP Framework
-  * - CCPP library of physical parameterizations
-    - https://github.com/NCAR/ccpp-physics
-    - CCPP Physics
-  * - Umbrella repository for the physics and dynamics of the atmospheric model  
-    - https://github.com/NOAA-EMC/ufsatm
-    - UFSATM
-  * - :term:`FV3` dynamical core
-    - https://github.com/NOAA-GFDL/GFDL_atmos_cubed_sphere
-    - GFDL_atmos_cubed_sphere 
-  * - Stochastic physics pattern generator
-    - https://github.com/NOAA-PSL/stochastic_physics
-    - Stochastic Physics
-  * - Modular Ocean Model (:term:`MOM6`)
-    - https://github.com/NOAA-EMC/MOM6
-    - MOM6
-  * - HYbrid Coordinate Ocean Model (:term:`HYCOM`)
-    - https://github.com/NOAA-EMC/HYCOM-src
-    - HYCOM-src
-  * - Los Alamos sea ice model (:term:`CICE6`)
-    - https://github.com/NOAA-EMC/CICE
-    - CICE
-  * - NOAA/NCEP WAVEWATCH III Model (:term:`WW3`)
-    - https://github.com/NOAA-EMC/WW3
-    - WW3
-  * - The Goddard Chemistry Aerosol Radiation and Transport (:term:`GOCART`)
-    - https://github.com/GEOS-ESM/GOCART
-    - GOCART 
-  * - NUOPC Community Mediator for Earth Prediction Systems (:term:`CMEPS`)
-    - https://github.com/NOAA-EMC/CMEPS
-    - CMEPS
-  * - Community Data Models for Earth Prediction Systems (:term:`CDEPS`)
-    - https://github.com/NOAA-EMC/CDEPS
-    - CDEPS
-  * - Air Quality Model (:term:`AQM`)
-    - https://github.com/NOAA-EMC/AQM
-    - AQM
-  * - Noah-MP Land Surface Model (Noah-MP)
-    - https://github.com/NOAA-EMC/noahmp
-    - Noah-MP
-  * - NOAA-GFDL Land Model (:term:`LM4`)
-    - https://github.com/NOAA-GFDL/LM4-NUOPC-driver
-    - LM4-NUOPC-driver
-  * - Community Fire Behavior Model
-    - https://github.com/NOAA-EMC/fire_behavior
-    - Fire Behavior
+   * - Repository name
+     - Repository Description
+     - Authoritative repository URL
+   * - UFS Weather Model
+     - Umbrella repository for the UFS Weather Model
+     - https://github.com/ufs-community/ufs-weather-model
+   * - CCPP Framework
+     - Framework to connect the :term:`CCPP` library to a host model
+     - https://github.com/NCAR/ccpp-framework
+   * - CCPP Physics
+     - CCPP library of physical parameterizations
+     - https://github.com/NCAR/ccpp-physics
+   * - UFSATM
+     - Umbrella repository for the physics and dynamics of the atmospheric model
+     - https://github.com/NOAA-EMC/ufsatm
+   * - GFDL_atmos_cubed_sphere
+     - :term:`FV3` dynamical core
+     - https://github.com/NOAA-GFDL/GFDL_atmos_cubed_sphere
+   * - Stochastic Physics
+     - Stochastic physics pattern generator
+     - https://github.com/NOAA-PSL/stochastic_physics
+   * - MOM6
+     - Modular Ocean Model (:term:`MOM6`)
+     - https://github.com/NOAA-EMC/MOM6
+   * - HYCOM-src
+     - HYbrid Coordinate Ocean Model (:term:`HYCOM`)
+     - https://github.com/NOAA-EMC/HYCOM-src
+   * - CICE
+     - Los Alamos sea ice model (:term:`CICE6`)
+     - https://github.com/NOAA-EMC/CICE
+   * - WW3
+     - NOAA/NCEP WAVEWATCH III Model (:term:`WW3`)
+     - https://github.com/NOAA-EMC/WW3
+   * - GOCART
+     - The Goddard Chemistry Aerosol Radiation and Transport (:term:`GOCART`)
+     - https://github.com/GEOS-ESM/GOCART
+   * - CMEPS
+     - NUOPC Community Mediator for Earth Prediction Systems (:term:`CMEPS`)
+     - https://github.com/NOAA-EMC/CMEPS
+   * - CDEPS
+     - Community Data Models for Earth Prediction Systems (:term:`CDEPS`)
+     - https://github.com/NOAA-EMC/CDEPS
+   * - AQM
+     - Air Quality Model (:term:`AQM`)
+     - https://github.com/NOAA-EMC/AQM
+   * - Noah-MP
+     - Noah-MP Land Surface Model (Noah-MP)
+     - https://github.com/NOAA-EMC/noahmp
+   * - LM4-NUOPC-driver
+     - NOAA-GFDL Land Model (:term:`LM4`)
+     - https://github.com/NOAA-GFDL/LM4-NUOPC-driver
+   * - Fire Behavior
+     - Community Fire Behavior Model
+     - https://github.com/NOAA-EMC/fire_behavior
+
 
 In the table, the left-hand column contains a description of each repository, and the 
 right-hand column shows the GitHub location of the authoritative component repositories. 

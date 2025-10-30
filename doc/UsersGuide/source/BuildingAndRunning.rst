@@ -220,9 +220,9 @@ Other common examples include:
 
 .. code-block:: console
 
-    export CMAKE_FLAGS="-DAPP=S2S -DCCPP_SUITES=FV3_GFS_v17_coupled_p8"
+    export CMAKE_FLAGS="-DAPP=S2S -DCCPP_SUITES=FV3_GFS_v17_coupled_p8_ugwpv1"
 
-    export CMAKE_FLAGS="-DAPP=S2SW -DCCPP_SUITES=FV3_GFS_v17_coupled_p8"
+    export CMAKE_FLAGS="-DAPP=S2SW -DCCPP_SUITES=FV3_GFS_v17_coupled_p8_ugwpv1"
 
 For the complete and most up-to-date list of ``-DAPP`` and ``DCCPP_SUITES`` options, see :ref:`Chapter 7 <ConfigParams>` or the :wm-repo:`CMakeLists.txt <blob/develop/CMakeLists.txt>` file. 
 

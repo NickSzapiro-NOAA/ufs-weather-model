@@ -77,7 +77,7 @@ Other Build Options
    Valid values: ``ON`` | ``OFF``  
 
 ``-DCCPP_32BIT`` (Default: OFF)  
-   Enable CCPP_32BIT (single precision arithmetic in slow physics).  
+   Enable CCPP_32BIT (single precision arithmetic in dycore and slow physics).  
    Valid values: ``ON`` | ``OFF``  
 
 ``-DAVX2`` (Default: ON)  
@@ -133,11 +133,11 @@ Other Build Options
    Valid values: ``ON`` | ``OFF``  
 
 ``-DPDLIB`` (Default: OFF)  
-   Enable Domain Decomposition in WW3 via PDLIB with BT1.  
+   Enable domain decomposition in WW3 via PDLIB with BT1.  
    Valid values: ``ON`` | ``OFF``  
 
 ``-DPDLIB_BT4`` (Default: OFF)  
-   Enable Domain Decomposition in WW3 via PDLIB with BT4.  
+   Enable domain decomposition in WW3 via PDLIB with BT4.  
    Valid values: ``ON`` | ``OFF``  
 
 ``-DCDEPS_INLINE`` (Default: OFF)  
@@ -149,7 +149,7 @@ Other Build Options
    Valid values: ``ON`` | ``OFF``  
 
 ``BUILD_WITH_IFI`` (Default: OFF)  
-   Build NCEPpost with In-Flight Icing (IFI) library if present.  
+   Build UPP with In-Flight Icing (IFI) library if present.  
    Valid values: ``ON`` | ``OFF``  
 
 ``REQUIRE_IFI`` (Default: OFF)  

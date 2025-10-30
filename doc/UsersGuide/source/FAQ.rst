@@ -227,7 +227,7 @@ same PETs). An example of a global five-component coupled configuration
 UFSATM
 ^^^^^^
 
-The UFSatm component consists of one or more forecast grid components
+The UFSATM component consists of one or more forecast grid components
 and write grid components.
 
 The MPI tasks for the forecast grid components are specified in the

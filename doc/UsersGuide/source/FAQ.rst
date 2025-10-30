@@ -224,7 +224,7 @@ tasks, as long as those components do not overlap (i.e., share the
 same PETs). An example of a global five-component coupled configuration
 ``ufs.configure`` appears at the end of this section.
 
-UFSatm
+UFSATM
 ^^^^^^
 
 The UFSatm component consists of one or more forecast grid components

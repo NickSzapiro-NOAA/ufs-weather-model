@@ -46,7 +46,7 @@ Currently, Level 2 platforms for regression testing are:
 UFS Weather Model Hierarchical Repository Structure
 ===================================================
 
-The UFS :term:`WM` repository supports the :term:`UFS` short- and medium-range weather applications (:term:`SRW` / :term:`MRW` Apps). The WM repository contains atmosphere, ocean, sea ice, land, and wave components, as well as some infrastructure components. Each of these subcomponents has its own repository. All the repositories are currently located in GitHub with public access to the broader community. :numref:`Table %s <Repo_Structure>` describes the list of repositories that comprise the UFS WM.
+The UFS :term:`WM` repository supports the :term:`UFS` short-range weather applications (:term:`SRW`). The WM repository contains atmosphere, ocean, sea ice, land, and wave components, as well as some infrastructure components. Each of these subcomponents has its own repository. All the repositories are currently located in GitHub with public access to the broader community. :numref:`Table %s <Repo_Structure>` describes the list of repositories that comprise the UFS WM.
 
 .. _Repo_Structure:
 
@@ -56,40 +56,58 @@ The UFS :term:`WM` repository supports the :term:`UFS` short- and medium-range w
 
   * - Repository Description
     - Authoritative repository URL
+    - Repository name
   * - Umbrella repository for the UFS Weather Model
     - https://github.com/ufs-community/ufs-weather-model
+    - UFS Weather Model
   * - Framework to connect the :term:`CCPP` library to a host model
     - https://github.com/NCAR/ccpp-framework
+    - CCPP Framework
   * - CCPP library of physical parameterizations
     - https://github.com/NCAR/ccpp-physics
+    - CCPP Physics
   * - Umbrella repository for the physics and dynamics of the atmospheric model  
     - https://github.com/NOAA-EMC/ufsatm
+    - UFSATM
   * - :term:`FV3` dynamical core
     - https://github.com/NOAA-GFDL/GFDL_atmos_cubed_sphere
+    - GFDL_atmos_cubed_sphere 
   * - Stochastic physics pattern generator
     - https://github.com/NOAA-PSL/stochastic_physics
+    - Stochastic Physics
   * - Modular Ocean Model (:term:`MOM6`)
     - https://github.com/NOAA-EMC/MOM6
+    - MOM6
   * - HYbrid Coordinate Ocean Model (:term:`HYCOM`)
     - https://github.com/NOAA-EMC/HYCOM-src
+    - HYCOM-src
   * - Los Alamos sea ice model (:term:`CICE6`)
     - https://github.com/NOAA-EMC/CICE
+    - CICE
   * - NOAA/NCEP WAVEWATCH III Model (:term:`WW3`)
     - https://github.com/NOAA-EMC/WW3
+    - WW3
   * - The Goddard Chemistry Aerosol Radiation and Transport (:term:`GOCART`)
-    - https://github.com/GEOS-ESM/GOCART 
+    - https://github.com/GEOS-ESM/GOCART
+    - GOCART 
   * - NUOPC Community Mediator for Earth Prediction Systems (:term:`CMEPS`)
     - https://github.com/NOAA-EMC/CMEPS
+    - CMEPS
   * - Community Data Models for Earth Prediction Systems (:term:`CDEPS`)
     - https://github.com/NOAA-EMC/CDEPS
+    - CDEPS
   * - Air Quality Model (:term:`AQM`)
     - https://github.com/NOAA-EMC/AQM
+    - AQM
   * - Noah-MP Land Surface Model (Noah-MP)
     - https://github.com/NOAA-EMC/noahmp
+    - Noah-MP
   * - NOAA-GFDL Land Model (:term:`LM4`)
     - https://github.com/NOAA-GFDL/LM4-NUOPC-driver
+    - LM4-NUOPC-driver
   * - Community Fire Behavior Model
     - https://github.com/NOAA-EMC/fire_behavior
+    - Fire Behavior
 
 In the table, the left-hand column contains a description of each repository, and the 
 right-hand column shows the GitHub location of the authoritative component repositories. 

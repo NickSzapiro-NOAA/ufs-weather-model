@@ -4,7 +4,7 @@
 
 source ${PATHRT}/tests/cpld_control_gefs
 
-export TEST_DESCR="Fully coupled FV3-CCPP-GOCART-MOM6-CICE-CMEPS-WW3 system - C384L127 MX025 - dcp test"
+export TEST_DESCR+=" - dcp test"
 
 export INPES=$((INPES/2))
 export JNPES=$((JNPES*2))

@@ -51,7 +51,7 @@ The UFS :term:`WM` repository supports the :term:`UFS` short-range weather appli
 .. _Repo_Structure:
 
 .. list-table:: *List of Repositories that comprise the ufs-weather-model*
-  :widths: 50 50
+  :widths: 40 40 20
   :header-rows: 1
 
   * - Repository Description

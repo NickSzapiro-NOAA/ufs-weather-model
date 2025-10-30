@@ -4,7 +4,7 @@
 
 source ${PATHRT}/tests/cpld_control_gefs
 
-export TEST_DESCR="Fully coupled FV3-CCPP-GOCART-MOM6-CICE-CMEPS-WW3 system - C384L127 MX025 - restart test"
+export TEST_DESCR+=" - restart test"
 
 export FHROT_REST=9 #restart after any IAU
 export FHROT=$((FHROT+FHROT_REST))

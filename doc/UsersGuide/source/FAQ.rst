@@ -275,7 +275,7 @@ If ESMF-managed threading is used, the total number of PETs for the
 atmosphere component is given by the product of the number of threads
 requested and the total number of MPI ranks (both forecast and write
 grid component). If ``num_threads_atm`` is the number of threads
-specified for the UFSatm component, in ``ufs.configure`` the ATM PET
+specified for the UFSATM component, in ``ufs.configure`` the ATM PET
 bounds are given by:
 
 ::

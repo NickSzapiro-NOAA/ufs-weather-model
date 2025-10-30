@@ -289,7 +289,7 @@ Note that in UFS WM, the ATM component is normally listed first in
 GOCART
 ^^^^^^
 
-GOCART shares the same grid and forecast tasks as UFSatm, but it does
+GOCART shares the same grid and forecast tasks as UFSATM, but it does
 not have a separate write grid component in its NUOPC CAP. Also, while
 GOCART does not have threading capability, it shares the same data
 structure as UFSatm and so it has to use the same number of threads

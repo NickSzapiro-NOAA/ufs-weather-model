@@ -264,7 +264,7 @@ write grid component are the product of the ``write_groups`` and the
 
 In the above case, the write grid component requires 60 tasks.
 
-The total number of MPI ranks for UFSatm is the sum of the forecast tasks and any
+The total number of MPI ranks for UFSATM is the sum of the forecast tasks and any
 write grid component tasks.
 
 ::

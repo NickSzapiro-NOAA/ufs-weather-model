@@ -250,7 +250,7 @@ not support an ``8,8`` layout for a blocksize of 32. If ``layout =
 a ``blocksize=32``. A layout of ``4,6`` is supported for C96 with a
 blocksize of 32.
 
-The UFSatm will utilize the write grid component if ``quilting`` is
+The UFSATM will utilize the write grid component if ``quilting`` is
 set to .true. In this case, the required MPI tasks for the
 write grid component are the product of the ``write_groups`` and the
 ``write_tasks_per_group`` in the ``model_configure`` file.

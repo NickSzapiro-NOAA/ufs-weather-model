@@ -89,7 +89,7 @@ Change to something like:
 
 .. code-block:: console
 
-   WLCLK=08:00
+   WLCLK=480
 
 This allows enough time (6–8 hours recommended) for the full 120-hour simulation to run, depending on system performance.
 

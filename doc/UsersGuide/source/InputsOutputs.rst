@@ -4,6 +4,11 @@
 Data: Input, Model Configuration, and Output Files
 *****************************************************
 
+.. attention::
+
+  The most up-to-date files are located in the `UFS Weather Model Regression Test Data Bucket <https://noaa-ufs-regtests-pds.s3.amazonaws.com/index.html>` for the most recent dates listed. 
+  File descritpions will appear below, but due to continous updates we can not guarantee that every single file will appear below, especially when running different configurations.  
+
 The UFS Weather Model can be run in one of several configurations (sometimes referred to as "applications"), from a single-component atmospheric 
 model to a fully coupled model with multiple earth system components (e.g., atmosphere, ocean, sea-ice and 
 mediator). Currently, supported configurations include:

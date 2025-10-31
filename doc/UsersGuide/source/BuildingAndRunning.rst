@@ -601,7 +601,7 @@ Log Files
 ------------
 
 The regression test generates a number of log files. The summary log file
-``RegressionTests_<machine>.<compiler>.log`` in the ``tests`` directory provides a summary
+``RegressionTests_<machine>.log`` in the ``tests`` directory provides a summary
 of the regression test outcomes:
 
 .. code-block:: console

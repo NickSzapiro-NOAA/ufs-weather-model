@@ -648,7 +648,7 @@ are set in two stages. First, default values are specified in ``tests/default_va
 the default values are overriden if necessary by values specified in a test file
 ``tests/tests/<test-name>``. For example, the variable ``DT_ATMOS`` is initially assigned 1800 
 in the function ``export_fv3`` of the script ``default_vars.sh``, but the test file 
-``tests/tests/control_p8_faster`` overrides this setting by reassigning 720 to the variable.
+(e.g., ``tests/tests/control_p8_faster``) overrides this setting by reassigning 720 to the variable.
 
 The files ``fv3_run`` and ``job_card`` also reside in the ``$RUNDIR`` directory. 
 These files are generated from the template files in the ``tests/fv3_conf``

@@ -659,21 +659,21 @@ input data directory of a given platform to the ``$RUNDIR`` directory.
 
 .. _RTSubDirs:
 
-.. table:: *Regression Test Subdirectories*
+.. list-table:: Regression Test Subdirectories
    :widths: 25 75
    :header-rows: 1
 
    * - Name
      - Description
-   * - tests/
+   * - ``tests/``
      - Regression test root directory. Contains rt-related scripts and the summary log file.
-   * - tests/tests/
+   * - ``tests/tests/``
      - Contains specific test files.
-   * - tests/parm/
+   * - ``tests/parm/``
      - Contains templates for model configuration files.
-   * - tests/fv3_conf/
+   * - ``tests/fv3_conf/``
      - Contains templates for setting up initial conditions and a batch job.
-   * - tests/logs/log_<platform>/
+   * - ``tests/logs/log_<platform>/``
      - Contains fine-grained log files.
 
 .. _UsingOpnReqTest:

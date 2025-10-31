@@ -564,7 +564,7 @@ create the configuration file (e.g. ``my_rt.conf``) based on the desired tests i
 
 .. code-block:: console
 
-   ./rt.sh -r -l my_rt.conf
+   ./rt.sh -a <account> -r -l my_rt.conf
 
 adding additional arguments as desired. 
 
@@ -572,7 +572,7 @@ To run a single test, users can try the following command instead of creating a 
 
 .. code-block:: console
 
-   ./rt.sh -r -k -n "control_p8 <compiler>"
+   ./rt.sh -a <account> -r -k -n "control_p8 <compiler>"
 
 where ``<compiler>`` is ``gnu`` or ``intel``. 
 
@@ -601,16 +601,26 @@ Log Files
 ------------
 
 The regression test generates a number of log files. The summary log file
-``RegressionTests_<machine>.<compiler>.log`` in the ``tests`` directory compares
-the results of the test against the baseline for a given platform and
-reports the outcome: 
+``RegressionTests_<machine>.<compiler>.log`` in the ``tests`` directory provides a summary
+of the regression test outcomes:
+
+.. code-block:: console
+
+  PASS -- COMPILE 's2sw_pdlib_intel' [14:10, 12:22] ( 1 warnings 1036 remarks )
+  PASS -- TEST 'cpld_control_pdlib_p8_intel' [12:41, 11:00](2171 MB)
+  PASS -- TEST 'cpld_restart_pdlib_p8_intel' [07:49, 05:23](1636 MB)
+  PASS -- TEST 'cpld_mpi_pdlib_p8_intel' [17:40, 15:30](2120 MB)
+  PASS -- TEST 'cpld_control_c48_5deg_intel' [13:30, 11:22](3029 MB)
+  FAILED: TEST TIMED OUT -- TEST 'cpld_warmstart_c48_5deg_intel' [, ]( MB)
+  FAILED: UNABLE TO START TEST -- TEST 'cpld_restart_c48_5deg_intel' [, ]( MB)
+
+More detailed log files are located in the ``tests/logs/log_directory`` directory:
 
    * ``'Missing file'`` results when the expected files from the simulation are not found and typically occurs when the simulation did not run to completion; 
    * ``'OK'`` means that the simulation results are bit-for-bit identical to those of the baseline; 
    * ``'NOT OK'`` when the results are **not** bit-for-bit identical; and 
-   * ``'Missing baseline'`` when there is no baseline data to compare against.
+   * ``'Missing baseline'`` when there is no baseline data to compare against
 
-More detailed log files are located in the ``tests/log_<machine>.<compiler>/`` directory.
 The run directory path, which corresponds to the value of ``RUNDIR`` in the ``run_<test-name>`` file, 
 is particularly useful. ``$RUNDIR`` is a self-contained (i.e., sandboxed) 
 directory with the executable file, initial conditions, model configuration files, 
@@ -623,9 +633,12 @@ by navigating into ``$RUNDIR`` and invoking the command:
 
 This can be particularly useful for debugging and testing code changes. Note that
 ``$RUNDIR`` is automatically deleted at the end of a successful regression test;
-specifying the ``-k`` option retains the ``$RUNDIR``, e.g. ``./rt.sh -l rt.conf -k``.
+specifying the ``-k`` option retains the ``$RUNDIR``, e.g. ``./rt.sh -a <account> -l rt.conf -k``.
 
-Inside the ``$RUNDIR`` directory are a number of model configuration files (``input.nml``, 
+The ``$RUNDIR`` directory contains subdirectories for each test that is run via ``rt.sh``. 
+Inside these subdirectories are a number of files, including the ``err`` and ``out`` files,
+which contain information sent to standard error and standard out, respectively. Additionally, 
+there are a number of model configuration files (``input.nml``, 
 ``model_configure``, ``ufs.configure``) and other application
 dependent files (e.g., ``ice_in`` for the Subseasonal-to-Seasonal Application).
 These model configuration files are
@@ -635,7 +648,7 @@ are set in two stages. First, default values are specified in ``tests/default_va
 the default values are overriden if necessary by values specified in a test file
 ``tests/tests/<test-name>``. For example, the variable ``DT_ATMOS`` is initially assigned 1800 
 in the function ``export_fv3`` of the script ``default_vars.sh``, but the test file 
-``tests/tests/control`` overrides this setting by reassigning 720 to the variable.
+``tests/tests/control_p8_faster`` overrides this setting by reassigning 720 to the variable.
 
 The files ``fv3_run`` and ``job_card`` also reside in the ``$RUNDIR`` directory. 
 These files are generated from the template files in the ``tests/fv3_conf``
@@ -647,21 +660,21 @@ input data directory of a given platform to the ``$RUNDIR`` directory.
 .. _RTSubDirs:
 
 .. table:: *Regression Test Subdirectories*
+   :widths: 25 75
+   :header-rows: 1
 
-   +-----------------+--------------------------------------------------------------------------------------+
-   | **Name**        | **Description**                                                                      |
-   +=================+======================================================================================+
-   | tests/          | Regression test root directory. Contains rt-related scripts and the summary log file |
-   +-----------------+--------------------------------------------------------------------------------------+
-   | tests/tests/    | Contains specific test files                                                         |
-   +-----------------+--------------------------------------------------------------------------------------+
-   | tests/parm/     | Contains templates for model configuration files                                     |
-   +-----------------+--------------------------------------------------------------------------------------+
-   | tests/fv3_conf/ | Contains templates for setting up initial conditions and a batch job                 |
-   +-----------------+--------------------------------------------------------------------------------------+
-   | tests/log_*/    | Contains fine-grained log files                                                      |
-   +-----------------+--------------------------------------------------------------------------------------+
-
+   * - Name
+     - Description
+   * - ``tests/``
+     - Regression test root directory. Contains rt-related scripts and the summary log file.
+   * - ``tests/tests/``
+     - Contains specific test files.
+   * - ``tests/parm/``
+     - Contains templates for model configuration files.
+   * - ``tests/fv3_conf/``
+     - Contains templates for setting up initial conditions and a batch job.
+   * - ``tests/logs/log_<platform>/``
+     - Contains fine-grained log files.
 
 .. _UsingOpnReqTest:
 
@@ -673,7 +686,7 @@ tests in place of ``rt.sh``. Given the name of a test, ``opnReqTest`` carries ou
 Each test case addresses an aspect of the requirements that new operational implementations
 must satisfy. These requirements are shown in :numref:`Table %s <OperationalRequirement>`.
 For the following discussions on opnReqTest, the user should note the distinction between
-``'test name'`` and ``'test case'``. Examples of test names are ``control``, ``cpld_control``
+``'test name'`` and ``'test case'``. Examples of test names are ``control_p8``, ``cpld_control_p8``
 and ``regional_control`` which are all found in the ``tests/tests`` directory, whereas
 test case refers to any one of the operational requirements: ``thr``, ``fhz``, ``mpi``, ``dcp``, ``rst``, ``bit`` and ``dbg``.
 

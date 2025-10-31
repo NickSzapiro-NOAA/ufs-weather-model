@@ -45,7 +45,7 @@ To generate coldstart ICs via the UFS_UTILS ``gdas_init``/``chgres_cube`` utilit
    ./build_all.sh
    cd util/gdas_init
 
-where ``<platform>`` is Ursa.
+where ``<platform>`` is ursa.
 
 Then, users will need to edit the ``config`` file to: 
 

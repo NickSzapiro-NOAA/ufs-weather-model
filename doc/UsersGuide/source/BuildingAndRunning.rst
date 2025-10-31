@@ -614,7 +614,7 @@ of the regression test outcomes:
   FAILED: TEST TIMED OUT -- TEST 'cpld_warmstart_c48_5deg_intel' [, ]( MB)
   FAILED: UNABLE TO START TEST -- TEST 'cpld_restart_c48_5deg_intel' [, ]( MB)
 
-More detailed log files are located in the ``tests/logs/log_directory`` directory:
+More detailed log files are located in the ``tests/logs/log_<machine>`` directory:
 
    * ``'Missing file'`` results when the expected files from the simulation are not found and typically occurs when the simulation did not run to completion; 
    * ``'OK'`` means that the simulation results are bit-for-bit identical to those of the baseline; 

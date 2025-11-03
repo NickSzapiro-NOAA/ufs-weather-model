@@ -105,7 +105,7 @@ the data required to run the WM RTs are already available at the following ``DIS
 
 Within ``DISKNM``, input data for the UFS WM is located at the following locations: 
 
-  * **INPUTDATA_ROOT**: ``${DISKNM}/NEMSfv3gfs/input-data-20251015``
+  * **INPUTDATA_ROOT**: ``${DISKNM}/NEMSfv3gfs/input-data-20250507``
   * **INPUTDATA_ROOT_WW3** ``${INPUTDATA_ROOT}/WW3_input_data_20250807``
   * **INPUTDATA_ROOT_BMIC**: ``${DISKNM}/NEMSfv3gfs/BM_IC-20220207``
   * **INPUTDATA_LM4**: ``${INPUTDATA_ROOT}/LM4_input_data``

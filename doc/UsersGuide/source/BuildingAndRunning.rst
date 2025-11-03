@@ -431,7 +431,7 @@ The ``rt.conf`` file is a pipe-separated values (PSV) file grouped into sections
    #. **CMAKE Options** -- Provides all CMAKE options for the build. This typically includes the ``-DAPP`` and ``-DCCPP_SUITES`` flags; these flags set which components to build and which physics suites will be available at runtime. Additional options are documented in :numref:`Section %s <other-build-options>`, but users can examine the :wm-repo:`CMakeLists.txt <blob/develop/CMakeLists.txt>` file for the most up-to-date list of options. 
    #. **Machines** to run on (``-`` is used to ignore specified machines, ``+`` is used to run only on specified machines). For example: 
       
-      * ``+ ursa orion gaea``: Compile will only run on Ursa, Orion, and Gaea machines
+      * ``+ ursa orion gaeac6``: Compile will only run on Ursa, Orion, and Gaea-C6 machines
       * ``- wcoss2 acorn``: Compile will NOT be run on WCOSS2 or Acorn
 
    #. ``fv3``: Set as fv3. Previously, this was used to run a test without compiling code (e.g., if FV3 was already present). 
@@ -621,21 +621,21 @@ More detailed log files for each test are located in the ``tests/logs/log_<machi
    * ``'NOT OK'`` when the results are **not** bit-for-bit identical; and 
    * ``'Missing baseline'`` when there is no baseline data to compare against
 
-The run directory path, which corresponds to the value of ``RUNDIR`` in the ``run_<test-name>`` file, 
-is particularly useful. ``$RUNDIR`` is a self-contained (i.e., sandboxed) 
-directory with the executable file, initial conditions, model configuration files, 
+The run directory also contains useful information. It is symlinked from the ``tests`` directory as ``run_dir``, 
+and the actual path is set in ``rt.sh`` via the ``$RUNDIR_ROOT`` variable. The run directory is a self-contained 
+(i.e., sandboxed) directory with the executable file, initial conditions, model configuration files, 
 environment setup scripts and a batch job submission script. The user can run the test 
-by navigating into ``$RUNDIR`` and invoking the command:
+by navigating into the run directory and invoking the command:
 
 .. code-block:: console
 
     sbatch job_card
 
 This can be particularly useful for debugging and testing code changes. Note that
-``$RUNDIR`` is automatically deleted at the end of a successful regression test;
-specifying the ``-k`` option retains the ``$RUNDIR``, e.g. ``./rt.sh -a <account> -l rt.conf -k``.
+the run directory is automatically deleted at the end of a successful regression test;
+specifying the ``-k`` option retains the run directory, e.g. ``./rt.sh -a <account> -l rt.conf -k``.
 
-The ``$RUNDIR`` directory contains subdirectories for each test that is run via ``rt.sh``. 
+The run directory contains subdirectories named ``run_<test-name>`` for each test that is run via ``rt.sh``. 
 Inside these subdirectories are a number of files, including the ``err`` and ``out`` files,
 which contain information sent to standard error and standard out, respectively. Additionally, 
 there are a number of model configuration files (``input.nml``, 
@@ -650,11 +650,11 @@ the default values are overriden if necessary by values specified in a test file
 in the function ``export_fv3`` of the script ``default_vars.sh``, but the test file 
 (e.g., ``tests/tests/control_p8_faster``) overrides this setting by reassigning 720 to the variable.
 
-The files ``fv3_run`` and ``job_card`` also reside in the ``$RUNDIR`` directory. 
+The files ``fv3_run`` and ``job_card`` also reside in the run directory. 
 These files are generated from the template files in the ``tests/fv3_conf``
 directory. ``job_card`` is a platform-specific batch job submission script, while 
 ``fv3_run`` prepares the initial conditions for the test by copying relevant data from the
-input data directory of a given platform to the ``$RUNDIR`` directory.
+input data directory of a given platform to the run directory.
 :numref:`Table %s <RTSubDirs>` summarizes the subdirectories discussed above.
 
 .. _RTSubDirs:
@@ -765,12 +765,12 @@ executing ``./opnReqTest -h``, which produces the following results:
 
 
 Frequently used options are ``-e`` to use the ecFlow
-workflow manager, and ``-k`` to keep the ``$RUNDIR``. The Rocoto workflow manager 
+workflow manager, and ``-k`` to keep the run directory. The Rocoto workflow manager 
 is not used operationally and therefore is not an option. 
 
 As discussed in :numref:`Section %s <log-files>`, the variables and
 values used to configure model parameters and to set up initial conditions in the
-``$RUNDIR`` directory are set up in two stages. First, ``tests/default_vars.sh``
+run directory are set up in two stages. First, ``tests/default_vars.sh``
 define default values; then a specific test file in the ``tests/tests`` subdirectory
 either overrides the default values or creates new variables if required by the test.
 The regression test treats the different test cases shown in

@@ -88,7 +88,6 @@ export ICE_tasks=${ICE_tasks_cpl_bmrk}
 export WAV_tasks=${WAV_tasks_cpl_bmrk}
 
 export atm_omp_num_threads=$THRD_cpl_bmrk
-export chm_omp_num_threads=$atm_omp_num_threads
 export med_omp_num_threads=$atm_omp_num_threads
 export ocn_omp_num_threads=$OCN_thrds_cpl_bmrk
 export ice_omp_num_threads=$ICE_thrds_cpl_bmrk
@@ -257,10 +256,12 @@ export DOGP_LWSCAT=.false.
 #model configurations
 export FV3_RUN=cpld_control_run.IN
 export CCPP_SUITE=FV3_GFS_v17_coupled_p8_ugwpv1
-export FIELD_TABLE=field_table_gefsv13
-export DIAG_TABLE=diag_table_gefsv13.IN
+export FIELD_TABLE=field_table_thompson_noaero_tke_progsigma
+export DIAG_TABLE=diag_table_cpld.IN
+#export FIELD_TABLE=field_table_gefsv13
+#export DIAG_TABLE=diag_table_gefsv13.IN
 export INPUT_NML=global_control.nml.IN
-export UFS_CONFIGURE=ufs.configure.s2swa.IN
+export UFS_CONFIGURE=ufs.configure.s2sw.IN
 
 if [[ $MACHINE_ID = orion ]]; then
    WLCLK=40

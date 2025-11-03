@@ -21,45 +21,45 @@ mediator). Currently, supported configurations include:
 
    * - Configuration Name
      - Description
-   * - :ref:`ATM <atm>`
+   * - ATM
      - Standalone Atmospheric Model (:term:`ATM`)
-   * - :ref:`ATMW <atmw>`
+   * - ATMW
      - :term:`ATM` coupled to :term:`WW3`
-   * - :ref:`ATMAERO <atmaero>`
+   * - ATMAERO
      - :term:`ATM` coupled to :term:`GOCART`
-   * - :ref:`ATMAQ <atmaq>`
+   * - ATMAQ
      - :term:`ATM` coupled to :term:`CMAQ`
-   * - :ref:`ATML <atml>`
+   * - ATML
      - :term:`ATM` coupled to :term:`NOAHMP`
-   * - :ref:`ATMF <atmf>`
+   * - ATMF
      - :term:`ATM` coupled to the Community Fire Behavior Model (aka :term:`UFS FIRE`) 
-   * - :ref:`ATM_DS2S <atm_ds2s>`
+   * - ATM_DS2S
      - Coupled :term:`ATM` - :term:`DOCN` - :term:`DICE` - :term:`CDEPS`
-   * - :ref:`ATM_DS2S-PCICE <atm_ds2s-pcice>`
+   * - ATM_DS2S-PCICE <atm_ds2s-pcice>`
      - Coupled :term:`ATM` - :term:`DOCN` - :term:`CICE6` (prescribed ice mode) - :term:`CDEPS`
-   * - :ref:`S2S <s2s>`
+   * - S2S
      - Coupled :term:`ATM` - :term:`MOM6` - :term:`CICE6` - :term:`CMEPS`
-   * - :ref:`S2SA <s2sa>`
+   * - S2SA
      - Coupled :term:`ATM` - :term:`MOM6` - :term:`CICE6` - :term:`GOCART` - :term:`CMEPS`
-   * - :ref:`S2SW <s2sw>`
+   * - S2SW
      - Coupled :term:`ATM` - :term:`MOM6` - :term:`CICE6` - :term:`WW3` - :term:`CMEPS`
-   * - :ref:`S2SWA <s2swa>`
+   * - S2SWA
      - Coupled :term:`ATM` - :term:`MOM6` - :term:`CICE6` - :term:`GOCART` - :term:`WW3` - :term:`CMEPS`
-   * - :ref:`S2SWAL <s2swal>`
+   * - S2SWAL
      - Coupled :term:`ATM` - :term:`MOM6` - :term:`CICE6` - :term:`GOCART` - :term:`WW3` - :term:`CMEPS` - :term:`NOAHMP`
-   * - :ref:`NG-GODAS <ng-godas>`
+   * - NG-GODAS
      - Coupled :term:`CDEPS` - :term:`DATM` - :term:`MOM6` - :term:`CICE6` - :term:`CMEPS`
-   * - :ref:`LND <lnd>`
+   * - LND
      - Coupled :term:`CDEPS` - :term:`DATM` - :term:`NOAHMP`
-   * - :ref:`LND-LM4 <lnd-lm4>`
+   * - LND-LM4
      - Coupled :term:`CDEPS` - :term:`DATM` - :term:`LM4`
-   * - :ref:`HAFS <hafs>`
+   * - HAFS
      - Coupled :term:`ATM` - :term:`HYCOM` - :term:`CMEPS`
-   * - :ref:`HAFSW <hafsw>`
+   * - HAFSW
      - Coupled :term:`ATM` - :term:`HYCOM` - :term:`WW3` - :term:`CMEPS`
-   * - :ref:`HAFS-MOM6W <hafs-mom6w>`
+   * - HAFS-MOM6W
      - Coupled :term:`ATM` - :term:`MOM6`- :term:`WW3` - :term:`CMEPS`
-   * - :ref:`HAFS-ALL <hafs-all>`
+   * - HAFS-ALL
      - Coupled :term:`CDEPS` - :term:`ATM` - :term:`HYCOM` - :term:`WW3` - :term:`CMEPS`
 
 .. COMMENT: Should HAFS-ALL be DATM instead of ATM?
@@ -105,7 +105,7 @@ The static input files for global configurations are listed and described in :nu
    * - CCN_ACTIVATE.BIN
      - Cloud condensation nuclei activation binary file
    * - CFSR.SEAICE.1982.2012.monthly.clim.grb
-     - :term:`CFS` reanalysis of monthly sea ice climatology
+     - :term:`CFS <CFSR>` reanalysis of monthly sea ice climatology
    * - freezeH2O.dat
      - Defines freezing behavior of water under different temperatures and pressures
    * - co2historicaldata_YYYY.txt
@@ -146,7 +146,7 @@ The static input files for global configurations are listed and described in :nu
    * - global_zorclim.1x1.grb
      - Climatological surface roughness
    * - IMS-NIC.blended.ice.monthly.clim.grb
-     - Monthly climatology of global sea ice concentration from blended :term:`IMS`` and :term:`NIC` datasets
+     - Monthly climatology of global sea ice concentration from blended :term:`IMS` and :term:`NIC` datasets
    * - qr_acr_qgV2.dat
      - Precomputed data for rain-graupel collection processes
    * - qr_acr_qsV2.dat:
@@ -302,7 +302,6 @@ The input files containing grid information and the initial conditions for globa
      - Description
      - Valid resolution options
      - Date-dependent
-     -
    * - ocean_hgrid.nc 
      - horizonal grid information
      - 9.00, 5.00, 1.00, 0.50, 0.25
@@ -908,7 +907,7 @@ The input files containing grid information and the time-varying forcing files f
 
 .. note:: 
 
-   Users can find atmospheric forcing files for use with the land (:ref:`LND <lnd>`) component in the `Land Data Assimilation (DA) data bucket <https://registry.opendata.aws/noaa-ufs-land-da/>`_. These files provide atmospheric forcing data related to precipitation, solar radiation, longwave radiation, temperature, pressure, winds, humidity, topography, and mesh data. Forcing files for the land component configuration come from the Global Soil Wetness Project Phase 3 (`GSWP3 <https://hydro.iis.u-tokyo.ac.jp/GSWP3/>`_) dataset. 
+   Users can find atmospheric forcing files for use with the Noah-MP land component (LND) in the `Land Data Assimilation (DA) data bucket <https://registry.opendata.aws/noaa-ufs-land-da/>`_. These files provide atmospheric forcing data related to precipitation, solar radiation, longwave radiation, temperature, pressure, winds, humidity, topography, and mesh data. Forcing files for the land component configuration come from the Global Soil Wetness Project Phase 3 (`GSWP3 <https://hydro.iis.u-tokyo.ac.jp/GSWP3/>`_) dataset. 
 
    .. code-block:: console
 

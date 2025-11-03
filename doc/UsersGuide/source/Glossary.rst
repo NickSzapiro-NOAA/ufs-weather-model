@@ -36,8 +36,10 @@ Glossary
 
    CESM
       The `Community Earth System Model <https://www.cesm.ucar.edu/>`_ (CESM) is a fully-coupled global climate model developed at the National Center for Atmospheric Research (:term:`NCAR`) in collaboration with colleagues in the research community. 
+   
    CFSR
       The `Climate Forecast System Reanlysis <https://climatedataguide.ucar.edu/climate-data/climate-forecast-system-reanalysis-cfsr>`_ (CFSR) is a third generation reanalysis product. 
+   
    chgres_cube
       The preprocessing software used to create initial and boundary condition files to "coldstart" the forecast model. It is part of :term:`UFS_UTILS`. 
 
@@ -162,6 +164,7 @@ Glossary
    
    NIC
       U.S. `National Ice Center <https://usicecenter.gov/>`_.
+   
    NOAHMP
    Noah-MP
       The Noah Multi-Physics (Noah-MP) land surface model (LSM) is an open-source, community-developed LSM that has been incorporated into the UFS Weather Model (WM). It is a UFS WM land component. 

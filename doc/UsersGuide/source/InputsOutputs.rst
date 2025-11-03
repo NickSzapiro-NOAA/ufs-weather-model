@@ -1436,8 +1436,7 @@ Each WM component has its own ``diag_table`` with associated variables. :numref:
      - `GFS_diagnostics.F90 <https://github.com/NOAA-EMC/ufsatm/blob/develop/ccpp/driver/GFS_diagnostics.F90>`_
    * - MOM6
      - `MOM6 Variables <https://ncar.github.io/MOM6/APIs/namespacemom__diagnostics.html>`_
-     - `MOM_diagnostics.F90 <https://github.com/NOAA-EMC/MOM6/blob/main/src/diagnostics/MOM_diagnostics.F90>`_
-
+     - `MOM_diagnostics.F90 <https://github.com/NOAA-EMC/MOM6/blob/dev/emc/src/diagnostics/MOM_diagnostics.F90>`_
 
 A brief example of the diag_table is shown below.  ``"..."`` denotes where lines have been removed.
 

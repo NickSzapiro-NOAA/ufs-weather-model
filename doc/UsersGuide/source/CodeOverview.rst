@@ -133,7 +133,7 @@ The umbrella repository for the UFS WM is named ``ufs-weather-model``. Under thi
     │         ├── (datm)                            -------- CDEPS DATM
     │         ├── (docn)                            -------- CDEPS DOCN
     │         └── (dice)                            -------- CDEPS DICE
-    ├── CI                                          -------- directory containing package.py
+    ├── ci
     ├── CICE-interface
     │    └── CICE                                   -------- CICE6 sea ice model
     │         ├── (icepack)                         -------- Sea ice column physics
@@ -177,11 +177,6 @@ The umbrella repository for the UFS WM is named ``ufs-weather-model``. Under thi
     │    ├── test_cases
     │    └── machine_config
     ├── UFSATM                                      -------- UFSATM atmosphere model
-    │    ├── (atmos_cubed_sphere)                   -------- FV3 dynamical core
-    │    │    ├── (docs)
-    │    │    ├── (driver)
-    │    │    ├── (model)
-    │    │    └── (tools)
     │    ├── (ccpp)                                 -------- Common Community Physics Package
     │    │    ├── (config)
     │    │    ├── (driver)
@@ -189,8 +184,15 @@ The umbrella repository for the UFS WM is named ``ufs-weather-model``. Under thi
     │    │    ├── (physics)                         -------- CCPP-compliant physics schemes
     │    │    └── (suites)                          -------- CCPP physics suite definition files (SDFs)
     │    ├── (cpl)                                  -------- Coupling field data structures
-    │    ├── (io)                                   -------- UFSAtm write grid comp code
-    │    └── (stochastic_physics)                   -------- Wrapper for stochastic physics
+    │    ├── (fv3)
+    │    │    └── (atmos_cubed_sphere)              -------- FV3 dynamical core
+    │    │         ├── (docs)
+    │    │         ├── (driver)
+    │    │         ├── (model)
+    │    │         └── (tools)
+    │    ├── (io)                                   -------- UFSATM write grid component code
+    │    ├── (mpas)                                 -------- MPAS dynamical core
+    │    └── (upp)                                  -------- Unified Post Processor
     └── WW3
          └── (model)                                -------- WW3 model
              └── (src)                              -------- NUOPC WW3 caps

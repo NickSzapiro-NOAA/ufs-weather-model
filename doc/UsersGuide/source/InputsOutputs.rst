@@ -35,7 +35,7 @@ mediator). Currently, supported configurations include:
      - :term:`ATM` coupled to the Community Fire Behavior Model (aka :term:`UFS FIRE`) 
    * - ATM_DS2S
      - Coupled :term:`ATM` - :term:`DOCN` - :term:`DICE` - :term:`CDEPS`
-   * - ATM_DS2S-PCICE <atm_ds2s-pcice>`
+   * - ATM_DS2S-PCICE
      - Coupled :term:`ATM` - :term:`DOCN` - :term:`CICE6` (prescribed ice mode) - :term:`CDEPS`
    * - S2S
      - Coupled :term:`ATM` - :term:`MOM6` - :term:`CICE6` - :term:`CMEPS`
@@ -239,7 +239,7 @@ MOM6
 Static Datasets (i.e., *fix files*)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The static input files for global configurations are listed and described in :numref:`Table %s <MOM6_FixFiles>`.
+The static input files for global configurations are listed and described in :numref:`Table %s <MOM6_FixFiles>`. Note that not all files are required for all resolutions. 
 
 .. _MOM6_FixFiles:
 

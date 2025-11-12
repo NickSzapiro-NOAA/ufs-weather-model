@@ -57,3 +57,6 @@ export CICE_DIAGFREQ=`expr $((FHMAX-$FHROT)) \* 3600 / $DT_CICE`
 export MOM6_OUTPUT_FH=3
 
 export WLCLK=60
+
+# https://github.com/ufs-community/ufs-weather-model/issues/2738
+export nccmp_exclude="--exclude=tiice"

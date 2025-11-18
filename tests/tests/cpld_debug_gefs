@@ -11,6 +11,7 @@ export CNTL_DIR=cpld_debug_gefs
 export LIST_FILES="sfcf003.nc \
                    atmf003.nc \
                    GFSPRS.GrbF03 \
+                   GFSFLX.GrbF03 \
                    RESTART/20210325.090000.coupler.res \
                    RESTART/20210325.090000.fv_core.res.nc \
                    RESTART/20210325.090000.fv_core.res.tile1.nc \

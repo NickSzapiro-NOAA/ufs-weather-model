@@ -250,6 +250,8 @@ export FV_SG_ADJ=450
 export PROGSIGMA=.true.
 export IOPT_TRS=2
 export IOPT_DIAG=1
+# TODO: check FSICL=0 in next version
+export FSICL=99999
 
 # RRTMGP
 export DO_RRTMGP=.false.

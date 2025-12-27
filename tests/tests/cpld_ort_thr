@@ -2,9 +2,7 @@
 #  threading ORT
 #
 
-source ${PATHRT}/tests/${BASE_RT}
-
-export TEST_DESCR=" - thr"
+export TEST_DESCR+=" - thr"
 
 #tasks with no threads
 export THRD_cpl_bmrk=1

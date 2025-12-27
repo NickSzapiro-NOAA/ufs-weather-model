@@ -2,9 +2,7 @@
 #  restart ORT
 #
 
-source ${PATHRT}/tests/${BASE_RT}
-
-export TEST_DESCR=" - restart"
+export TEST_DESCR+=" - restart"
 
 #export FHROT_REST=9 #restart after any IAU
 #export FHROT=$((FHROT+FHROT_REST))

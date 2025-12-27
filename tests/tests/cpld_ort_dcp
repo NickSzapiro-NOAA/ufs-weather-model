@@ -1,8 +1,6 @@
 #
-#  ORTs (dcp, ...) from base RT
+#  decomposition ORT
 #
-
-source ${PATHRT}/tests/${BASE_RT}
 
 export TEST_DESCR+=" - dcp"
 

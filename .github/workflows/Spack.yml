@@ -20,7 +20,7 @@ jobs:
             os: "ubuntu-24.04",
             app: "S2SWA",
             ccpp_suites: "FV3_GFS_v17_coupled_p8,FV3_GFS_v17_coupled_p8_ugwpv1",
-            other-variants: ' ^esmf@8.8.0',
+            other-variants: ' ^esmf@8.8.0', ' ^w3emc@git.d923949dc98e85f440698c3a79b57aff6302fec6=2.12.0'
           }
         - {
             os: "ubuntu-24.04",

@@ -57,6 +57,8 @@ jobs:
         # Set to save to a different cache key than the restored one (in order to add new packages etc.).
         #  Be sure to unset it after a new cache is generated or a new one will be created each time!
         repo-save-key-suffix: ''
+        # Add verbose to see compiler warnings in the console
+        spack-install-flags: -v
 
   # The recipe-check job validates the Spack recipe by making sure each CMake
   # build option is represented. If this check fails due to the addition of a

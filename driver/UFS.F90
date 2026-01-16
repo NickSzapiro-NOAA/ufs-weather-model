@@ -36,6 +36,7 @@
 
       USE MPI
       USE ESMF
+      use w3emc_4
 !
 !-----------------------------------------------------------------------
 !***  USE the UFSDriver module.  Although it

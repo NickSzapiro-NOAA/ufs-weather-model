@@ -60,6 +60,16 @@ jobs:
         # Add verbose to see compiler warnings in the console
         spack-install-flags: -v
 
+    - name: "Upload Spack Build Logs"
+      if: always() # Run this even if the build fails
+      uses: actions/upload-artifact@v4
+      with:
+        name: spack-build-logs-${{ matrix.config.app }}
+        path: |
+          **/spack-build-out.txt
+          **/spack-build-env.txt
+          **/spack-configure-args.txt
+
   # The recipe-check job validates the Spack recipe by making sure each CMake
   # build option is represented. If this check fails due to the addition of a
   # new CMake option, ci/package.py should be updated in order to make that

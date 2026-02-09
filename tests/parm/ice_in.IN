@@ -54,6 +54,7 @@
     hist_suffix         = @[CICE_hist_suffix]
     history_dir         = '@[CICE_HISTORY_DIR]'
     history_file        = 'iceh'
+    write_histrest      = .false.
     write_ic            = .true.
     incond_dir          = '@[CICE_INCOND_DIR]'
     incond_file         = 'iceh_ic'
@@ -341,10 +342,13 @@
     f_fcondtopn_ai = 'x'
     f_fmelttn_ai   = 'x'
     f_flatn_ai     = 'x'
-    f_fsensn_ai     = 'x'
-    f_sitempsnic    = 'x'
-    f_sitemptop     = 'x'
-    f_sitempbot     = 'x'
+    f_fsensn_ai    = 'x'
+    f_sisnthick    = 'x'
+    f_sithick      = 'x'
+    f_sifb         = 'mdh1x'
+    f_sitempsnic   = 'x'
+    f_sitemptop    = 'x'
+    f_sitempbot    = 'x'
 /
 
 &icefields_mechred_nml
@@ -367,6 +371,8 @@
     f_vredistn     = 'x'
     f_araftn       = 'x'
     f_vraftn       = 'x'
+    f_sirdgconc    = 'x'
+    f_sirdgthick   = 'x'
 /
 
 &icefields_pond_nml

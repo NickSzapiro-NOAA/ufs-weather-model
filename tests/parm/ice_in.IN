@@ -330,7 +330,7 @@
     f_icepresent   = 'x'
     f_iage         = 'x'
     f_FY           = 'x'
-    f_aicen        = 'x'
+    f_aicen        = 'mdh1x'
     f_vicen        = 'x'
     f_vsnon        = 'x'
     f_snowfracn    = 'x'

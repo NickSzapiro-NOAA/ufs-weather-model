@@ -46,9 +46,6 @@ cpld_control_c12_9deg intel
 cpld_warmstart_c12_9deg intel
 cpld_restart_c12_9deg intel
 cpld_debug_pdlib_p8 intel
-control_c384 intel
-control_c384gdas intel
-rap_decomp intel
 datm_cdeps_control_cfsr intel
 datm_cdeps_restart_cfsr intel
 datm_cdeps_control_gefs intel
@@ -65,17 +62,12 @@ datm_cdeps_gfs intel
 datm_cdeps_debug_cfsr intel
 atm_ds2s_docn_pcice intel
 atm_ds2s_docn_dice intel
-cpld_regional_atm_fbh intel
 cpld_control_gfsv17 intelllvm
 cpld_debug_gfsv17 intelllvm
 cpld_control_sfs intelllvm
 cpld_control_p8 intelllvm
 datm_cdeps_control_cfsr intelllvm
 datm_cdeps_debug_cfsr intelllvm
-rap_control gnu
-rap_restart gnu
-rap_restart_dyn32_phy32 gnu
-hrrr_control_restart_dyn32_phy32 gnu
 cpld_control_p8 gnu
 cpld_control_nowave_noaero_p8 gnu
 cpld_debug_p8 gnu

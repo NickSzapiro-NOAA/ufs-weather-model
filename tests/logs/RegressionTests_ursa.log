@@ -626,3 +626,46 @@ If you are using this log as a pull request verification, please commit 'test_ch
 Result: FAILURE
 
 ====END OF URSA REGRESSION TESTING LOG====
+
+BASELINE DIRECTORY: /scratch4/NAGAPE/epic/role-epic/UFS-WM_RT/NEMSfv3gfs/develop-20260202
+COMPARISON DIRECTORY: /scratch4/NCEPDEV/stmp/Nick.Szapiro/RT_RUNDIRS/Nick.Szapiro/FV3_RT/rt_3010110
+
+RT.SH OPTIONS USED:
+* (-a) - HPC PROJECT ACCOUNT: nems
+* (-l) - USE CONFIG FILE: rt_retry.conf
+* (-e) - USE ECFLOW
+
+PASS -- COMPILE 'atm_dyn32_intel' [09:10, 07:36] ( 1 warnings 492 remarks )
+PASS -- TEST 'control_c384_intel' [08:07, 05:26](2058 MB)
+PASS -- TEST 'control_c384gdas_intel' [09:44, 06:17](1908 MB)
+
+PASS -- COMPILE 'rrfs_dyn32_phy32_intel' [07:10, 05:55] ( 4 warnings 415 remarks )
+PASS -- TEST 'hrrr_control_dyn32_phy32_intel' [03:25, 02:03](1717 MB)
+PASS -- TEST 'hrrr_control_restart_dyn32_phy32_intel' [03:17, 01:17](1631 MB)
+PASS -- TEST 'rap_control_dyn32_phy32_intel' [03:25, 02:06](1722 MB)
+PASS -- TEST 'rap_restart_dyn32_phy32_intel' [03:22, 01:09](1634 MB)
+
+PASS -- COMPILE 'rrfs_gnu' [04:10, 02:55]
+PASS -- TEST 'rap_control_gnu' [05:30, 03:25](847 MB)
+PASS -- TEST 'rap_restart_gnu' [03:24, 01:51](581 MB)
+
+PASS -- COMPILE 'rrfs_intel' [07:10, 06:07] ( 4 warnings 448 remarks )
+PASS -- TEST 'rap_decomp_intel' [04:26, 02:46](1726 MB)
+
+PASS -- COMPILE 'atm_fbh_intel' [07:10, 05:29] ( 4 warnings 422 remarks )
+PASS -- TEST 'cpld_regional_atm_fbh_intel' [08:20, 06:28](1139 MB)
+
+SYNOPSIS:
+Starting Date/Time: 20260210 07:22:15
+Ending Date/Time: 20260210 07:42:25
+Total Time: 00h:20m:13s
+Compiles Completed: 5/5
+Tests Completed: 10/10
+
+NOTES:
+A file 'test_changes.list' was generated but is empty.
+If you are using this log as a pull request verification, please commit 'test_changes.list'.
+
+Result: SUCCESS
+
+====END OF URSA REGRESSION TESTING LOG====

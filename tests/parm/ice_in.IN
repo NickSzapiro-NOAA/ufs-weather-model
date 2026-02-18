@@ -129,8 +129,8 @@
     coriolis        = 'latitude'
     kridge          = 1
     ktransport      = 1
-    dyn_area_min    = 0.001d0
-    dyn_mass_min    = 0.01d0
+    dyn_area_min    = @[CICE_DYN_AREA_MIN]
+    dyn_mass_min    = @[CICE_DYN_MASS_MIN]
 /
 
 &shortwave_nml

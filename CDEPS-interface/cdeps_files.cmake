@@ -85,6 +85,7 @@ list(APPEND cdeps_docn_files
 list(APPEND cdeps_drof_files
   CDEPS/drof/rof_comp_nuopc.F90
   CDEPS/drof/drof_datamode_copyall.F90
+  CDEPS/drof/drof_datamode_cplhist.F90
 )
 
 list(APPEND cdeps_dwav_files

@@ -1,8 +1,9 @@
 #
-#  cpld_control unstr PDLIB P8 test
+#  cpld_control GFSv17 with UGWPv1 test, i.e., GSL orographic drag +
+#  version 1 non-stationary GWD
 #
 
-source ${PATHRT}/tests/cpld_control_pdlib_p8
+source ${PATHRT}/tests/cpld_zap_gfsv17
 export TEST_DESCR+=" mpi"
 
 export INPES=$INPES_cpl_unstr_mpi
@@ -18,4 +19,7 @@ export CICE_NPROC=$ICE_tasks
 export np2=`expr $CICE_NPROC / 2`
 export CICE_BLCKX=`expr $NX_GLB / $np2`
 export CICE_BLCKY=`expr $NY_GLB / 2`
+
+export atm_omp_num_threads=$THRD_cpl_unstr
+export med_omp_num_threads=$atm_omp_num_threads
 

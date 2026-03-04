@@ -54,7 +54,8 @@
     hist_suffix         = @[CICE_hist_suffix]
     history_dir         = '@[CICE_HISTORY_DIR]'
     history_file        = 'iceh'
-    write_ic            = .true.
+    write_histrest      = .false.
+    write_ic            = .false.
     incond_dir          = '@[CICE_INCOND_DIR]'
     incond_file         = 'iceh_ic'
     version_name        = 'CICE_6.0.2'
@@ -128,8 +129,8 @@
     coriolis        = 'latitude'
     kridge          = 1
     ktransport      = 1
-    dyn_area_min    = 0.001d0
-    dyn_mass_min    = 0.01d0
+    dyn_area_min    = @[CICE_DYN_AREA_MIN]
+    dyn_mass_min    = @[CICE_DYN_MASS_MIN]
 /
 
 &shortwave_nml
@@ -367,6 +368,8 @@
     f_vredistn     = 'x'
     f_araftn       = 'x'
     f_vraftn       = 'x'
+    f_sirdgconc    = 'x'
+    f_sirdgthick   = 'x'
 /
 
 &icefields_pond_nml

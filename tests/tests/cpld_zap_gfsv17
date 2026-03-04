@@ -1,0 +1,12 @@
+#
+#  cpld_control GFSv17 with UGWPv1 test, i.e., GSL orographic drag +
+#  version 1 non-stationary GWD
+#
+
+source ${PATHRT}/tests/cpld_control_gfsv17
+
+export CNTL_DIR=cpld_zap_gfsv17
+export TEST_DESCR+=" zap"
+
+export CICE_DYN_AREA_MIN=0.00000001d0
+export CICE_DYN_MASS_MIN=0.0000001d0

@@ -1,0 +1,91 @@
+====START OF URSA REGRESSION TESTING LOG====
+
+UFSWM hash used in testing:
+e3b604cc7d8e761e474066435e19a4d29dd1b8ec
+
+Submodule hashes used in testing:
+ fc153862cfcc01fc4da513a2ff56af0bbd1234e0 AQM (v0.2.0-73-gfc15386)
+ 642e81395472d5887b54f601b60ee607ed39bf09 AQM/src/model/CMAQ (CMAQv5.2.1_07Feb2018-6194-g642e81395)
+ 9f53664ef2e607ad25d6b6c939f2eac9ec818ee6 CDEPS-interface/CDEPS (cdeps0.4.17-432-g9f53664)
+ 7e810b60c662ee1063ca2d9c5a87f91f9b603d40 CICE-interface/CICE (CICE6.0.0-445-g7e810b6)
+ daa41638c6cef298583f35ee4dec5ab1bb077aea CICE-interface/CICE/icepack (Icepack1.1.0-231-gdaa4163)
+ 27e3961d9bb323fc5ff16a532947caddb515eb95 CMEPS-interface/CMEPS (cmeps_v0.4.1-2331-g27e3961)
+ 69049ec0c26b3160c3dbe1980b2feb78470a37a6 CMakeModules (v1.0.0-36-g69049ec)
+ 9ff3df9545dd582f415f682d3297e8c6c841e5cb GOCART (sdr_v2.1.2.6-291-g9ff3df9)
+ bcf7777bb037ae2feb2a8a8ac51aacb3511b52d9 HYCOM-interface/HYCOM (2.3.00-122-gbcf7777)
+ 05a3f7ae291b59a2ab7611a042f2fc99be31dc61 LM4-driver (baseline_change_240904-7-g05a3f7a)
+ c03c4f68816030f726785daf0db6150aa1e9cc6f LM4-driver/LM4 (land_lad2_2021.02)
+ b4d9a232181b3057587f30362876a9626abf7f98 MOM6-interface/MOM6 (dev/master/repository_split_2014.10.10-10784-gb4d9a2321)
+ 65ef5c73bc7f5663d5688f75c3855d431da4baea MOM6-interface/MOM6/pkg/CVMix-src (65ef5c7)
+ 29e64d652786e1d076a05128c920f394202bfe10 MOM6-interface/MOM6/pkg/GSW-Fortran (29e64d6)
+ 2c7b3bc2a8096f6232020c47507593058795102e NOAHMP-interface/noahmp (v3.7.1-471-g2c7b3bc)
+ 071307b2f42c1c368cd5bbe8df635fe4dc4cb8cf UFSATM (heads/develop)
+ 22bc1a5de8a19996310aedc3482931616cd74a1b UFSATM/ccpp/framework (2025-10-15-dev-5-g22bc1a5)
+ 9e709790d12301e697634e55af25224708b54a80 UFSATM/ccpp/physics (EP4-2227-g9e709790)
+ c62efd27caa26f660edf24232f33f154e608b77a UFSATM/ccpp/physics/physics/MP/TEMPO/TEMPO (v2.1.3~3)
+ 41c5fcd950fed09b8afe186dede266824eca7fd3 UFSATM/ccpp/physics/physics/Radiation/RRTMGP/rte-rrtmgp (41c5fcd)
+ 0c00ba42a222a26754348c6f103a8e97d26f33e7 UFSATM/ccpp/physics/physics/SFC_Layer/MYNN/MYNN (0c00ba4)
+ 3e5db3750e382976b4d6011c6d9c1437b0cf34f6 UFSATM/fv3/atmos_cubed_sphere (201912_public_release-502-g3e5db37)
+ 38d2177aef842a5c6abe26ffe876804b95fd9e0a UFSATM/mpas/MPAS-Model (remotes/origin/master-60-g38d2177a)
+ 7d9597c471470be061ab8853dd62bcd03f15d6aa UFSATM/upp (upp_v10.2.0-354-g7d9597c4)
+-5afd607642ae0fd6a53b137230336386beb47ce6 UFSATM/upp/sorc/libIFI.fd
+-3d35332fe66e3e63a285cc8d96facdf255a33481 UFSATM/upp/sorc/ncep_post.fd/post_gtg.fd
+ dcc9da76c2d32c6ca7a5318a56db033295d9f43c WW3 (6.07.1-531-gdcc9da76)
+ 3be9c444ace991b4235e4e978449cc3d3fd0d2d1 fire_behavior (v0.2.0-3-g3be9c44)
+ ae192f119b8614b4476a1b04ba55f6fb93e2953d stochastic_physics (ufs-v2.0.0-298-gae192f1)
+
+
+NOTES:
+[Times](Memory) are at the end of each compile/test in format [MM:SS](Size).
+The first time is for the full script (prep+run+finalize).
+The second time is specifically for the run phase.
+Times/Memory will be empty for failed tests.
+
+BASELINE DIRECTORY: /scratch4/NCEPDEV/stmp/Nick.Szapiro/RT_BASELINE/Nick.Szapiro/FV3_RT/REGRESSION_TEST
+COMPARISON DIRECTORY: /scratch4/NCEPDEV/stmp/Nick.Szapiro/RT_RUNDIRS/Nick.Szapiro/FV3_RT/rt_3307610
+
+RT.SH OPTIONS USED:
+* (-a) - HPC PROJECT ACCOUNT: nems
+* (-l) - USE CONFIG FILE: my_rt.conf
+* (-m) - COMPARE AGAINST CREATED BASELINES
+* (-e) - USE ECFLOW
+
+PASS -- COMPILE 's2swa_32bit_pdlib_intel' [15:12, 13:45] ( 1 warnings 1089 remarks )
+PASS -- TEST 'cpld_control_gfsv17_intel' [11:55, 09:23](2048 MB)
+FAILED: UNABLE TO COMPLETE COMPARISON -- TEST 'cpld_mpi_gfsv17_intel' [, ]( MB)
+PASS -- TEST 'cpld_mpi_ice_gfsv17_intel' [13:49, 08:15](2055 MB)
+PASS -- TEST 'cpld_zap_gfsv17_intel' [15:57, 09:25](2052 MB)
+FAILED: UNABLE TO COMPLETE COMPARISON -- TEST 'cpld_zap_mpi_gfsv17_intel' [, ]( MB)
+
+PASS -- COMPILE 's2swa_intel' [16:13, 14:16] ( 1 warnings 1090 remarks )
+PASS -- TEST 'cpld_control_p8_intel' [12:57, 07:34](2479 MB)
+FAILED: UNABLE TO COMPLETE COMPARISON -- TEST 'cpld_mpi_p8_intel' [, ]( MB)
+
+PASS -- COMPILE 's2sw_pdlib_intel' [17:13, 16:08] ( 1 warnings 1081 remarks )
+PASS -- TEST 'cpld_control_pdlib_p8_intel' [12:43, 08:20](2158 MB)
+FAILED: UNABLE TO COMPLETE COMPARISON -- TEST 'cpld_mpi_pdlib_p8_intel' [, ]( MB)
+
+SYNOPSIS:
+Starting Date/Time: 20260304 21:13:42
+Ending Date/Time: 20260304 21:53:08
+Total Time: 00h:39m:29s
+Compiles Completed: 3/3
+Tests Completed: 5/9
+Failed Tests:
+* TEST cpld_mpi_gfsv17_intel: FAILED: UNABLE TO COMPLETE COMPARISON
+-- LOG: /scratch3/NCEPDEV/nems/Nick.Szapiro/tasks/cm_cice/repr_mpi/ufs-weather-model/tests/logs/log_ursa/run_cpld_mpi_gfsv17_intel.log
+* TEST cpld_zap_mpi_gfsv17_intel: FAILED: UNABLE TO COMPLETE COMPARISON
+-- LOG: /scratch3/NCEPDEV/nems/Nick.Szapiro/tasks/cm_cice/repr_mpi/ufs-weather-model/tests/logs/log_ursa/run_cpld_zap_mpi_gfsv17_intel.log
+* TEST cpld_mpi_p8_intel: FAILED: UNABLE TO COMPLETE COMPARISON
+-- LOG: /scratch3/NCEPDEV/nems/Nick.Szapiro/tasks/cm_cice/repr_mpi/ufs-weather-model/tests/logs/log_ursa/run_cpld_mpi_p8_intel.log
+* TEST cpld_mpi_pdlib_p8_intel: FAILED: UNABLE TO COMPLETE COMPARISON
+-- LOG: /scratch3/NCEPDEV/nems/Nick.Szapiro/tasks/cm_cice/repr_mpi/ufs-weather-model/tests/logs/log_ursa/run_cpld_mpi_pdlib_p8_intel.log
+
+NOTES:
+A file 'test_changes.list' was generated with list of all failed tests.
+You can use './rt.sh -c -b test_changes.list' to create baselines for the failed tests.
+If you are using this log as a pull request verification, please commit 'test_changes.list'.
+
+Result: FAILURE
+
+====END OF URSA REGRESSION TESTING LOG====

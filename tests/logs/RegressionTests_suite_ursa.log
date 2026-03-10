@@ -1,7 +1,7 @@
 ====START OF URSA REGRESSION TESTING LOG====
 
 UFSWM hash used in testing:
-e3b604cc7d8e761e474066435e19a4d29dd1b8ec
+af6b36d742350695817a3e913ad1901cb3c21410
 
 Submodule hashes used in testing:
  fc153862cfcc01fc4da513a2ff56af0bbd1234e0 AQM (v0.2.0-73-gfc15386)
@@ -42,7 +42,7 @@ The second time is specifically for the run phase.
 Times/Memory will be empty for failed tests.
 
 BASELINE DIRECTORY: /scratch4/NCEPDEV/stmp/Nick.Szapiro/RT_BASELINE/Nick.Szapiro/FV3_RT/REGRESSION_TEST
-COMPARISON DIRECTORY: /scratch4/NCEPDEV/stmp/Nick.Szapiro/RT_RUNDIRS/Nick.Szapiro/FV3_RT/rt_3307610
+COMPARISON DIRECTORY: /scratch4/NCEPDEV/stmp/Nick.Szapiro/RT_RUNDIRS/Nick.Szapiro/FV3_RT/rt_1970506
 
 RT.SH OPTIONS USED:
 * (-a) - HPC PROJECT ACCOUNT: nems
@@ -50,30 +50,35 @@ RT.SH OPTIONS USED:
 * (-m) - COMPARE AGAINST CREATED BASELINES
 * (-e) - USE ECFLOW
 
-PASS -- COMPILE 's2swa_32bit_pdlib_intel' [15:12, 13:45] ( 1 warnings 1089 remarks )
-PASS -- TEST 'cpld_control_gfsv17_intel' [11:55, 09:23](2048 MB)
+PASS -- COMPILE 's2swa_32bit_pdlib_intel' [16:10, 14:29] ( 1 warnings 1089 remarks )
+PASS -- TEST 'cpld_control_gfsv17_intel' [11:56, 09:20](2051 MB)
 FAILED: UNABLE TO COMPLETE COMPARISON -- TEST 'cpld_mpi_gfsv17_intel' [, ]( MB)
-PASS -- TEST 'cpld_mpi_ice_gfsv17_intel' [13:49, 08:15](2055 MB)
-PASS -- TEST 'cpld_zap_gfsv17_intel' [15:57, 09:25](2052 MB)
+PASS -- TEST 'cpld_mpi_ice_gfsv17_intel' [10:58, 08:14](2051 MB)
+FAILED: UNABLE TO COMPLETE COMPARISON -- TEST 'cpld_mpi_ia_gfsv17_intel' [, ]( MB)
+PASS -- TEST 'cpld_mpi_io_gfsv17_intel' [16:55, 14:31](2045 MB)
+PASS -- TEST 'cpld_mpi_iw_gfsv17_intel' [11:54, 09:57](2068 MB)
+PASS -- TEST 'cpld_zap_gfsv17_intel' [11:59, 09:25](2051 MB)
 FAILED: UNABLE TO COMPLETE COMPARISON -- TEST 'cpld_zap_mpi_gfsv17_intel' [, ]( MB)
 
-PASS -- COMPILE 's2swa_intel' [16:13, 14:16] ( 1 warnings 1090 remarks )
-PASS -- TEST 'cpld_control_p8_intel' [12:57, 07:34](2479 MB)
+PASS -- COMPILE 's2swa_intel' [16:10, 14:26] ( 1 warnings 1090 remarks )
+PASS -- TEST 'cpld_control_p8_intel' [11:13, 07:24](2493 MB)
 FAILED: UNABLE TO COMPLETE COMPARISON -- TEST 'cpld_mpi_p8_intel' [, ]( MB)
 
-PASS -- COMPILE 's2sw_pdlib_intel' [17:13, 16:08] ( 1 warnings 1081 remarks )
-PASS -- TEST 'cpld_control_pdlib_p8_intel' [12:43, 08:20](2158 MB)
+PASS -- COMPILE 's2sw_pdlib_intel' [17:10, 15:11] ( 1 warnings 1081 remarks )
+PASS -- TEST 'cpld_control_pdlib_p8_intel' [11:43, 08:16](2162 MB)
 FAILED: UNABLE TO COMPLETE COMPARISON -- TEST 'cpld_mpi_pdlib_p8_intel' [, ]( MB)
 
 SYNOPSIS:
-Starting Date/Time: 20260304 21:13:42
-Ending Date/Time: 20260304 21:53:08
-Total Time: 00h:39m:29s
+Starting Date/Time: 20260306 04:05:29
+Ending Date/Time: 20260306 04:42:54
+Total Time: 00h:37m:29s
 Compiles Completed: 3/3
-Tests Completed: 5/9
+Tests Completed: 7/12
 Failed Tests:
 * TEST cpld_mpi_gfsv17_intel: FAILED: UNABLE TO COMPLETE COMPARISON
 -- LOG: /scratch3/NCEPDEV/nems/Nick.Szapiro/tasks/cm_cice/repr_mpi/ufs-weather-model/tests/logs/log_ursa/run_cpld_mpi_gfsv17_intel.log
+* TEST cpld_mpi_ia_gfsv17_intel: FAILED: UNABLE TO COMPLETE COMPARISON
+-- LOG: /scratch3/NCEPDEV/nems/Nick.Szapiro/tasks/cm_cice/repr_mpi/ufs-weather-model/tests/logs/log_ursa/run_cpld_mpi_ia_gfsv17_intel.log
 * TEST cpld_zap_mpi_gfsv17_intel: FAILED: UNABLE TO COMPLETE COMPARISON
 -- LOG: /scratch3/NCEPDEV/nems/Nick.Szapiro/tasks/cm_cice/repr_mpi/ufs-weather-model/tests/logs/log_ursa/run_cpld_zap_mpi_gfsv17_intel.log
 * TEST cpld_mpi_p8_intel: FAILED: UNABLE TO COMPLETE COMPARISON

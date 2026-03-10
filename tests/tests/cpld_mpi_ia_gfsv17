@@ -1,0 +1,23 @@
+#
+#  cpld_control GFSv17 with UGWPv1 test, i.e., GSL orographic drag +
+#  version 1 non-stationary GWD
+#
+
+source ${PATHRT}/tests/cpld_control_gfsv17
+export TEST_DESCR+=" mpi"
+
+export INPES=$INPES_cpl_unstr_mpi
+export JNPES=$JNPES_cpl_unstr_mpi
+export atm_omp_num_threads=$THRD_cpl_unstr_mpi
+export WRTTASK_PER_GROUP=$(( WPG_cpl_unstr_mpi * THRD_cpl_unstr_mpi ))
+
+ICE_tasks=$ICE_tasks_cpl_unstr_mpi
+
+export CICE_NPROC=$ICE_tasks
+export np2=`expr $CICE_NPROC / 2`
+export CICE_BLCKX=`expr $NX_GLB / $np2`
+export CICE_BLCKY=`expr $NY_GLB / 2`
+
+export atm_omp_num_threads=$THRD_cpl_unstr
+export med_omp_num_threads=$atm_omp_num_threads
+

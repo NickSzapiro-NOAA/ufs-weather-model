@@ -127,13 +127,15 @@ jobs:
             REPORTER="github-check"
           fi
 
-          # 1. Cat the out files. 2. Strip Spack paths. 3. Send to Reviewdog
-          cat ./spack-logs/**/spack-build-out.txt | sed 's|.*/ufs-weather-model/||' | reviewdog \
-            -name="GCC Warnings (Spack)" \
-            -reporter=$REPORTER \
+          # 1. Find the spack-build-out.txt file(s) and cat their contents
+          # 2. Pipe to sed to clean up the absolute paths
+          # 3. Pipe to reviewdog
+          find ./spack-logs -name "spack-build-out.txt" -exec cat {} + | \
+          sed 's|.*/ufs-weather-model/||' | \
+          reviewdog \
+            -name="Intel-Compiler" \
+            -reporter=github-pr-review \
             -level=warning \
             -fail-on-error=false \
-            -efm="%f:%l:%c: Warning: %m" \
-            -efm="%f:%l: Warning: %m" \
-            -efm="%f(%l): warning #%n: %m" \
+            -efm="%f(%l): warning #%n: %m"
             -efm="%f(%l): warning %m"

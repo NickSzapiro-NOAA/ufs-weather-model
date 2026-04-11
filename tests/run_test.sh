@@ -313,8 +313,8 @@ fi
 #ocean or ice
 if [[ ${DATM_CDEPS} = 'true' ]] || [[ ${S2S} = 'true' ]]; then
   if [[ ${HAFS} = 'false' ]]; then
-    atparse < "${PATHRT}/parm/ice_in.model.IN" > ice_in
-    atparse < "${PATHRT}/parm/ice_in.history.cpld" >> ice_in
+    atparse < "${PATHRT}/parm/cice/ice_in.model.IN" > ice_in
+    atparse < "${PATHRT}/parm/cice/ice_in.history.cpld" >> ice_in
     atparse < "${PATHRT}/parm/${MOM6_INPUT:-MOM_input_${OCNRES}.IN}" > INPUT/MOM_input
     atparse < "${PATHRT}/parm/diag_table/${DIAG_TABLE:-diag_table_template.IN}" > diag_table
     atparse < "${PATHRT}/parm/MOM6_data_table.IN" > data_table
@@ -357,8 +357,8 @@ if [[ ${DICE_CDEPS} = 'true' ]]; then
 fi
 
 if [[ ${CICE_PRESCRIBED} = 'true' ]]; then
-  atparse < "${PATHRT}/parm/ice_in.model.IN" > ice_in
-  atparse < "${PATHRT}/parm/ice_in.history.cpld" >> ice_in
+  atparse < "${PATHRT}/parm/cice/ice_in.model.IN" > ice_in
+  atparse < "${PATHRT}/parm/cice/ice_in.history.cpld" >> ice_in
 fi
 
 if [[ ${CDEPS_INLINE} = 'true' ]]; then

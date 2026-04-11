@@ -86,19 +86,20 @@ jobs:
         recipe-file: package/spack/package.py
         cmakelists-txt: package/CMakeLists.txt
 
-  # -------------------------------------------------------------------------
+ # -------------------------------------------------------------------------
   # NEW JOB: Parse logs from the matrix and post GitHub PR comments
   # -------------------------------------------------------------------------
   reviewdog-warnings:
     name: Check Compiler Warnings
     runs-on: ubuntu-latest
     needs: [Spack]
-    # Run even if the Spack compilation fails so we can see warnings/errors
-    if: always() 
+    # success() || failure() ensures it runs if Spack fails, but safely skips if you cancel the workflow
+    if: success() || failure() 
     
     permissions:
       contents: read
       pull-requests: write
+      checks: write # REQUIRED for the github-check reporter
 
     steps:
       - name: Checkout Code
@@ -113,11 +114,29 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           pattern: spack-build-logs-*
-          merge-multiple: true
+          # Note: merge-multiple is removed. Logs will safely stay in their own subfolders.
           path: ./spack-logs
 
+      - name: Debug Downloaded Artifacts
+        run: |
+          echo "=== WHAT FILES DID WE DOWNLOAD? ==="
+          find ./spack-logs -type f
+          
       - name: Run Reviewdog
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          find ./spack-logs -name "spack-build-out.txt" -exec cat {} + | sed 's|.*/ufs-weather-model/||' | reviewdog -name="GNU-Compiler" -reporter=github-check -level=warning -fail-on-error=false -efm="%f:%l:%c: Warning: %m" -efm="%f:%l: Warning: %m" -efm="%f:%l:%c: warning: %m" -efm="%f:%l: warning: %m"
+          # Finds only the build output files, ignoring env/config texts
+          find ./spack-logs -type f -name "*build-out*" -exec cat {} + | \
+          sed 's|.*/ufs-weather-model/||' | \
+          reviewdog \
+            -name="Compiler-Warnings" \
+            -reporter=github-check \
+            -level=warning \
+            -fail-on-error=false \
+            -efm="%f(%l): warning #%n: %m" \
+            -efm="%f(%l): warning %m" \
+            -efm="%f:%l:%c: Warning: %m" \
+            -efm="%f:%l: Warning: %m" \
+            -efm="%f:%l:%c: warning: %m" \
+            -efm="%f:%l: warning: %m"

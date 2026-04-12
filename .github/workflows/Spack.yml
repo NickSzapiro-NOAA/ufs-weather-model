@@ -126,17 +126,15 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Finds only the build output files, ignoring env/config texts
           find ./spack-logs -type f -name "*build-out*" -exec cat {} + | \
-          sed 's|.*/ufs-weather-model/||' | \
+          awk '/^\/.*:[0-9]+:([0-9]+:)?/ { loc=$1 } /^[Ww]arning:/ { if(loc!="") { print loc " " $0; loc="" } }' | \
+          sed 's|.*/spack-devpkg-ufs-weather-model/||' | \
           reviewdog \
             -name="Compiler-Warnings" \
             -reporter=github-check \
             -level=warning \
             -fail-on-error=false \
-            -efm="%f(%l): warning #%n: %m" \
-            -efm="%f(%l): warning %m" \
             -efm="%f:%l:%c: Warning: %m" \
-            -efm="%f:%l: Warning: %m" \
             -efm="%f:%l:%c: warning: %m" \
+            -efm="%f:%l: Warning: %m" \
             -efm="%f:%l: warning: %m"

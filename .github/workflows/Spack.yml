@@ -126,14 +126,29 @@ jobs:
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # 1. Stitch and clean the logs, saving them to a temporary file
           find ./spack-logs -type f -name "*build-out*" -exec cat {} + | \
           awk '/^\/.*:[0-9]+:([0-9]+:)?/ { loc=$1 } /^[Ww]arning:/ { if(loc!="") { print loc " " $0; loc="" } }' | \
-          sed 's|.*/spack-devpkg-ufs-weather-model/||' | \
-          reviewdog \
-            -name="Compiler-Warnings" \
+          sed 's|.*/spack-devpkg-ufs-weather-model/||' > cleaned_warnings.txt
+
+          # 2. Generate the full "Checks" tab summary (Passive, no failing)
+          cat cleaned_warnings.txt | reviewdog \
+            -name="Legacy Warnings Summary" \
             -reporter=github-check \
             -level=warning \
             -fail-on-error=false \
+            -efm="%f:%l:%c: Warning: %m" \
+            -efm="%f:%l:%c: warning: %m" \
+            -efm="%f:%l: Warning: %m" \
+            -efm="%f:%l: warning: %m"
+
+          # 3. Post inline PR comments for NEW warnings (Active, fails build)
+          cat cleaned_warnings.txt | reviewdog \
+            -name="New PR Warnings" \
+            -reporter=github-pr-review \
+            -filter-mode=added \
+            -fail-on-error=true \
+            -level=warning \
             -efm="%f:%l:%c: Warning: %m" \
             -efm="%f:%l:%c: warning: %m" \
             -efm="%f:%l: Warning: %m" \

@@ -136,7 +136,7 @@ jobs:
             -name="Legacy Warnings Summary" \
             -reporter=github-check \
             -level=warning \
-            -fail-on-error=false \
+            -fail-level=none \
             -efm="%f:%l:%c: Warning: %m" \
             -efm="%f:%l:%c: warning: %m" \
             -efm="%f:%l: Warning: %m" \
@@ -148,7 +148,7 @@ jobs:
             -name="New PR Warnings" \
             -reporter=github-pr-review \
             -filter-mode=added \
-            -fail-on-error=true \
+            -fail-level=any \
             -level=warning \
             -efm="%f:%l:%c: Warning: %m" \
             -efm="%f:%l:%c: warning: %m" \

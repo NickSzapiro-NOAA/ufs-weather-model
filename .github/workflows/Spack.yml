@@ -81,7 +81,7 @@ jobs:
     name: Check New Compiler Warnings
     runs-on: ubuntu-24.04
     needs: [Spack]
-    if: (success() || failure()) && github.event_name == 'pull_request'
+    if: (success() || failure()) # && github.event_name == 'pull_request'
     
     permissions:
       contents: read

@@ -91,6 +91,11 @@ if __name__ == "__main__":
     # 1. Save the full list of legacy warnings to a file for monitoring
     with open("all_compiler_warnings.txt", "w") as f:
         for w in all_warnings:
+            # 1. Print warning in friendly format for developers
+            print(f"File: {w['file']} | Line: {w['line']}")
+            print(f"Message: {w['msg']}\n")
+        
+            # 2. Write friendly format for GitHub inline PR comment
             f.write(f"{w['file']}:{w['line']} {w['msg']}\n")
     
     new_warnings = []

@@ -82,7 +82,7 @@ if __name__ == "__main__":
         sys.exit(1)
         
     log_directory = sys.argv[1]
-    base_branch = os.environ.get("GITHUB_BASE_REF", "develop")
+    base_branch = "develop"
     
     print(f"Checking diff against origin/{base_branch}...")
     changed_lines = get_changed_lines(base_branch)

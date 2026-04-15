@@ -73,3 +73,44 @@ jobs:
       with:
         recipe-file: package/spack/package.py
         cmakelists-txt: package/CMakeLists.txt
+
+  # -------------------------------------------------------------------------
+  # Parse build logs and annotate GitHub PR with new compiler warnings
+  # -------------------------------------------------------------------------
+  check-warnings:
+    name: Check New Compiler Warnings
+    runs-on: ubuntu-24.04
+    needs: [Spack]
+    if: (success() || failure()) && github.event_name == 'pull_request'
+    
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6 # Updated to v6 to natively use Node 24
+        with:
+          fetch-depth: 0 
+
+      - name: Download Spack Build Logs
+        uses: actions/download-artifact@v4 # Ensure this is pulling the latest v4 patch
+        with:
+          pattern: spack-build-logs-*
+          path: ./spack-logs
+
+      - name: Run Native Warning Check
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: |
+          echo "Fetching target branch for diff comparison..."
+          git fetch origin ${{ github.base_ref }}
+          
+          echo "Running custom Python warning parser..."
+          python ${{ github.workspace }}/.github/scripts/check_build_compile_warnings.py ./spack-logs
+
+      - name: Upload Legacy Warnings Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-compiler-warnings
+          path: all_compiler_warnings.txt

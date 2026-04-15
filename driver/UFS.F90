@@ -86,6 +86,7 @@
       INTEGER :: resultlen
 !
       INTEGER :: RC, RC_USER                                               !<-- The running error signal
+      INTEGER :: reviewdog_test_unused_var ! ---> DEBUG: deliberate unused variable
 !
 !
 !-----------------------------------------------------------------------

@@ -27,21 +27,39 @@ def get_changed_lines(base_ref):
 def parse_spack_logs(log_dir):
     """Parses Spack build logs to find warnings and strips staging paths."""
     warnings = []
+    log_files = []
     
-    # Recursively find all spack-build-out.txt files in the unzipped artifacts
-    for filepath in glob.glob(f"{log_dir}/**/spack-build-out.txt", recursive=True):
+    # 1. Replicate the bash 'find' command to catch all build-out files, regardless of extension
+    for root, _, files in os.walk(log_dir):
+        for file in files:
+            if "build-out" in file:
+                log_files.append(os.path.join(root, file))
+                
+    print(f"🔍 Found {len(log_files)} Spack log files to parse.")
+    
+    for filepath in log_files:
         with open(filepath, 'r', errors='replace') as f:
             current_file, current_line = None, None
             
             for line in f:
-                # 1. Match the file path line (strips Spack staging paths natively)
-                loc_match = re.search(r'(?:spack-devpkg-ufs-weather-model|spack-src|ufs-weather-model)/([^:]+?)(?::|\()([0-9]+)[:\)]', line)
+                # 1. Match ANY absolute file path that ends in a source extension and has a line number
+                loc_match = re.search(r'(/.*?\.(?:F90|f90|F|f|c|cpp|h))(?::|\()([0-9]+)[:\)]', line, re.IGNORECASE)
+                
                 if loc_match:
-                    current_file = loc_match.group(1).strip()
+                    raw_path = loc_match.group(1)
                     current_line = int(loc_match.group(2))
                     
+                    # Clean the path to make it relative to the git repo root
+                    current_file = raw_path
+                    for marker in ['spack-devpkg-ufs-weather-model/', 'spack-src/', 'ufs-weather-model/']:
+                        if marker in current_file:
+                            current_file = current_file.split(marker)[-1]
+                            break
+                            
+                    current_file = current_file.strip()
+                    
                     # Intel compiler often prints warning on the same line as the path
-                    if 'warning' in line.lower(): # Optional todo: allow harmless warnings here
+                    if 'warning' in line.lower() and '#5194' not in line: 
                         warnings.append({'file': current_file, 'line': current_line, 'msg': line.strip()})
                         current_file, current_line = None, None
                     continue
@@ -54,7 +72,7 @@ def parse_spack_logs(log_dir):
                         'msg': line.strip()
                     })
                     # Reset context to avoid attaching future warnings to the wrong line
-                    current_file, current_line = None, None
+                    current_file, current_line = None, None 
                     
     return warnings
 

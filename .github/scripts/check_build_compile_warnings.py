@@ -59,7 +59,7 @@ def parse_spack_logs(log_dir):
                     current_file = current_file.strip()
                     
                     # Intel compiler often prints warning on the same line as the path
-                    if 'warning' in line.lower() and '#5194' not in line: 
+                    if 'warning' in line.lower(): 
                         warnings.append({'file': current_file, 'line': current_line, 'msg': line.strip()})
                         current_file, current_line = None, None
                     continue

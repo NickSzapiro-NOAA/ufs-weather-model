@@ -91,11 +91,7 @@ if __name__ == "__main__":
     # 1. Save the full list of legacy warnings to a file for monitoring
     with open("all_compiler_warnings.txt", "w") as f:
         for w in all_warnings:
-            # 1. Print warning in friendly format for developers
-            print(f"File: {w['file']} | Line: {w['line']}")
-            print(f"Message: {w['msg']}\n")
-        
-            # 2. Write friendly format for GitHub inline PR comment
+            # This ONLY writes to the artifact text file, it does not print to the screen
             f.write(f"{w['file']}:{w['line']} {w['msg']}\n")
     
     new_warnings = []
@@ -119,7 +115,11 @@ if __name__ == "__main__":
         
     print(f"FAILED: Found {len(new_warnings)} new warnings introduced in this PR!\n")
     for w in new_warnings:
-        # Native GitHub inline PR comment
+        # 1. Print a human-readable version so developers can read the raw text logs
+        print(f"File: {w['file']} | Line: {w['line']}")
+        print(f"Message: {w['msg']}\n")
+        
+        # 2. Native GitHub inline PR comment (GitHub intercepts this specific syntax)
         print(f"::error file={w['file']},line={w['line']}::{w['msg']}")
         
     sys.exit(1)

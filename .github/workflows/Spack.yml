@@ -20,7 +20,7 @@ jobs:
             os: "ubuntu-24.04",
             app: "S2SWA",
             ccpp_suites: "FV3_GFS_v17_coupled_p8,FV3_GFS_v17_coupled_p8_ugwpv1",
-            other-variants: ' ^esmf@8.8.0',
+            other-variants: ' +debug ^esmf@8.8.0',
           }
         - {
             os: "ubuntu-24.04",
@@ -57,6 +57,18 @@ jobs:
         # Set to save to a different cache key than the restored one (in order to add new packages etc.).
         #  Be sure to unset it after a new cache is generated or a new one will be created each time!
         repo-save-key-suffix: ''
+        # Add verbose to see compiler warnings in the console
+        spack-install-flags: -v
+
+    - name: "Upload Spack Build Logs"
+      if: always() # Run this even if the build fails
+      uses: actions/upload-artifact@v4
+      with:
+        name: spack-build-logs-${{ matrix.config.app }}
+        path: |
+          **/spack-build-out.txt
+          **/spack-build-env.txt
+          **/spack-configure-args.txt
 
   # The recipe-check job validates the Spack recipe by making sure each CMake
   # build option is represented. If this check fails due to the addition of a
@@ -73,3 +85,47 @@ jobs:
       with:
         recipe-file: package/spack/package.py
         cmakelists-txt: package/CMakeLists.txt
+
+  # -------------------------------------------------------------------------
+  # Parse build logs and annotate GitHub PR with new compiler warnings
+  # -------------------------------------------------------------------------
+  check-warnings:
+    name: Check New Compiler Warnings
+    runs-on: ubuntu-24.04
+    needs: [Spack]
+    if: (success() || failure()) # && github.event_name == 'pull_request'
+    
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6 # Updated to v6 to natively use Node 24
+        with:
+          fetch-depth: 0 
+
+      - name: Download Spack Build Logs
+        uses: actions/download-artifact@v4 # Ensure this is pulling the latest v4 patch
+        with:
+          pattern: spack-build-logs-*
+          path: ./spack-logs
+
+      - name: Run Native Warning Check
+        env:
+          GITHUB_BASE_REF: ${{ github.base_ref }}
+        run: |
+          echo "Fetching target branch for diff comparison..."
+          git fetch origin ${{ github.base_ref }}
+
+          echo "--- Build log files downloaded for check-warnings ---"
+          find ./spack-logs -type f
+          
+          echo "Running custom Python warning parser..."
+          python ${{ github.workspace }}/.github/scripts/check_build_compile_warnings.py ./spack-logs
+
+      - name: Upload Legacy Warnings Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legacy-compiler-warnings
+          path: all_compiler_warnings.txt

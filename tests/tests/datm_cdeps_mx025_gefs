@@ -13,14 +13,13 @@ export LIST_FILES="RESTART/20111001.120000.MOM.res.nc \
                    RESTART/iced.2011-10-01-43200.nc \
                    RESTART/DATM_GEFS_NEW.cpl.r.2011-10-01-43200.nc"
 
-export atm_datamode=GEFS
-
-export DATM_SRC=GEFS_NEW
-export IATM=1760
-export JATM=880
+export IATM=1536
+export JATM=768
 export ATM_NX_GLB=$IATM
 export ATM_NY_GLB=$JATM
 export ATMRES=${IATM}x${JATM}
+export DATM_SRC=GEFS_NEW
 export FILEBASE_DATM=gefs
 export MESH_ATM=mesh.datm.1536x768.nc
 export stream_files="INPUT/${FILEBASE_DATM}.201110.nc"
+export STREAM_OFFSET=-21600

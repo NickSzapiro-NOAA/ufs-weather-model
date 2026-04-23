@@ -4,7 +4,7 @@ import os, sys, re, subprocess, glob
 def get_changed_lines(base_ref):
     """Returns a dict of { 'filename': set(changed_line_numbers) } for the current PR."""
     cmd = ["git", "diff", "--unified=0", f"origin/{base_ref}...HEAD"]
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
     
     changed = {}
     current_file = None

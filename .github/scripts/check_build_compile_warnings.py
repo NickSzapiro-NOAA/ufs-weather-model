@@ -4,24 +4,55 @@ import os, sys, re, subprocess, glob
 def get_changed_lines(base_ref):
     """Returns a dict of { 'filename': set(changed_line_numbers) } for the current PR."""
     cmd = ["git", "diff", "--unified=0", f"origin/{base_ref}...HEAD"]
-    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    result = subprocess.run(cmd, capture_output=True, text=True)
     
     changed = {}
     current_file = None
+    old_hash = None
     
     for line in result.stdout.splitlines():
+        # 1. Standard repository changes
         if line.startswith("+++ b/"):
-            # Remove the 'b/' prefix from the git diff path
             current_file = line[6:]
             changed[current_file] = set()
         elif line.startswith("@@ ") and current_file:
-            # Parse the diff hunk header: @@ -old,cnt +new,cnt @@
             m = re.search(r'\+([0-9]+)(?:,([0-9]+))?', line)
             if m:
                 start = int(m.group(1))
                 count = int(m.group(2)) if m.group(2) else 1
                 for i in range(start, start + count):
                     changed[current_file].add(i)
+                    
+        # 2. Submodule updates! 
+        elif line.startswith("-Subproject commit "):
+            old_hash = line.split()[2]
+        elif line.startswith("+Subproject commit ") and current_file and old_hash:
+            new_hash = line.split()[2]
+            sub_path = current_file
+            
+            print(f"📦 Detected submodule update in '{sub_path}'. Recursively tracking lines...")
+            
+            # Run git diff internally inside the submodule
+            sub_cmd = ["git", "-C", sub_path, "diff", "--unified=0", f"{old_hash}...{new_hash}"]
+            sub_result = subprocess.run(sub_cmd, capture_output=True, text=True)
+            
+            sub_file = None
+            for sub_line in sub_result.stdout.splitlines():
+                if sub_line.startswith("+++ b/"):
+                    # Reconstruct the full path (e.g. CICE/src/ice_domain.F90)
+                    sub_file = f"{sub_path}/{sub_line[6:]}"
+                    changed[sub_file] = set()
+                elif sub_line.startswith("@@ ") and sub_file:
+                    m = re.search(r'\+([0-9]+)(?:,([0-9]+))?', sub_line)
+                    if m:
+                        start = int(m.group(1))
+                        count = int(m.group(2)) if m.group(2) else 1
+                        for i in range(start, start + count):
+                            changed[sub_file].add(i)
+            
+            # Reset the hash tracker for the next submodule
+            old_hash = None 
+
     return changed
 
 def parse_spack_logs(log_dir):

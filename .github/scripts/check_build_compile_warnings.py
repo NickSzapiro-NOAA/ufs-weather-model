@@ -29,7 +29,7 @@ def get_changed_lines(repo_path, diff_args, path_prefix=""):
         
     changed = {}
     current_file = None
-    old_hash = None
+    old_hash = ""
     
     for line in result.stdout.splitlines():
         if line.startswith("+++ b/"):
@@ -105,7 +105,7 @@ def get_changed_lines(repo_path, diff_args, path_prefix=""):
                     changed[filepath] = set()
                 changed[filepath].update(lines)
             
-            old_hash = None 
+            old_hash = "" 
 
     return changed
 

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import os, sys, re, subprocess, glob
 
-def get_changed_lines(repo_path, old_ref, new_ref, path_prefix=""):
+def get_changed_lines(repo_path, diff_args, path_prefix=""):
     """Recursively parses diffs, seamlessly traversing nested submodules and fork changes."""
-    cmd = ["git", "-C", repo_path, "diff", "--unified=0", f"{old_ref}...{new_ref}"]
+    # diff_args is passed as a list so we can dynamically swap between "A...B" and "A" "B"
+    cmd = ["git", "-C", repo_path, "diff", "--unified=0"] + diff_args
     result = subprocess.run(cmd, capture_output=True, text=True)
     
     changed = {}
@@ -11,10 +12,8 @@ def get_changed_lines(repo_path, old_ref, new_ref, path_prefix=""):
     old_hash = None
     
     for line in result.stdout.splitlines():
-        # 1. Standard repository changes
         if line.startswith("+++ b/"):
             current_file = line[6:]
-            # Append the parent directories so the final path matches the Spack logs!
             changed[f"{path_prefix}{current_file}"] = set()
             
         elif line.startswith("@@ ") and current_file:
@@ -25,7 +24,7 @@ def get_changed_lines(repo_path, old_ref, new_ref, path_prefix=""):
                 for i in range(start, start + count):
                     changed[f"{path_prefix}{current_file}"].add(i)
                     
-        # 2. Submodule updates! 
+        # Submodule updates 
         elif line.startswith("-Subproject commit "):
             old_hash = line.split()[2]
         elif line.startswith("+Subproject commit ") and current_file and old_hash:
@@ -35,40 +34,39 @@ def get_changed_lines(repo_path, old_ref, new_ref, path_prefix=""):
             
             print(f"📦 Traversing nested submodule: '{path_prefix}{sub_name}'...")
             
-            # 1. Initialize this specific submodule directory
             subprocess.run(["git", "-C", repo_path, "submodule", "update", "--init", sub_name], capture_output=True)
             
-            # 2. Dynamically extract URLs from THIS specific repo's .gitmodules file at the exact commits
             old_url, new_url = "", ""
             
-            old_gm = subprocess.run(["git", "-C", repo_path, "show", f"{old_ref}:.gitmodules"], capture_output=True, text=True)
+            # Use diff_args[0].split("...")[0] to grab the base reference for the old .gitmodules
+            base_ref_for_gm = diff_args[0].split("...")[0] if "..." in diff_args[0] else old_hash
+            
+            old_gm = subprocess.run(["git", "-C", repo_path, "show", f"{base_ref_for_gm}:.gitmodules"], capture_output=True, text=True)
             if old_gm.returncode == 0:
                 temp_old = os.path.join(repo_path, ".gitmodules_old_temp")
                 with open(temp_old, "w") as f: f.write(old_gm.stdout)
                 url_cmd = subprocess.run(["git", "config", "--file", temp_old, f"submodule.{sub_name}.url"], capture_output=True, text=True)
                 old_url = url_cmd.stdout.strip()
             
-            new_gm = subprocess.run(["git", "-C", repo_path, "show", f"{new_ref}:.gitmodules"], capture_output=True, text=True)
+            new_gm = subprocess.run(["git", "-C", repo_path, "show", "HEAD:.gitmodules"], capture_output=True, text=True)
             if new_gm.returncode == 0:
                 temp_new = os.path.join(repo_path, ".gitmodules_new_temp")
                 with open(temp_new, "w") as f: f.write(new_gm.stdout)
                 url_cmd = subprocess.run(["git", "config", "--file", temp_new, f"submodule.{sub_name}.url"], capture_output=True, text=True)
                 new_url = url_cmd.stdout.strip()
             
-            # 3. Fetch from the dynamically resolved forks
             if old_url:
                 subprocess.run(["git", "-C", sub_path_full, "fetch", old_url, old_hash], capture_output=True)
             if new_url:
                 subprocess.run(["git", "-C", sub_path_full, "fetch", new_url, new_hash], capture_output=True)
             
-            # 4. RECURSION! Dive into the submodule and merge its changes into our main dictionary
-            sub_changed = get_changed_lines(sub_path_full, old_hash, new_hash, f"{path_prefix}{sub_name}/")
+            # RECURSION: Pass the hashes as TWO SEPARATE items in the list for a direct tree comparison!
+            sub_changed = get_changed_lines(sub_path_full, [old_hash, new_hash], f"{path_prefix}{sub_name}/")
             for filepath, lines in sub_changed.items():
                 if filepath not in changed:
                     changed[filepath] = set()
                 changed[filepath].update(lines)
             
-            # Reset hash tracker
             old_hash = None 
 
     return changed
@@ -134,8 +132,18 @@ if __name__ == "__main__":
     base_branch = "develop"
     
     print(f"Checking diff against origin/{base_branch}...")
-    # Start the recursion at the root folder ("."), diffing the base branch against HEAD
-    changed_lines = get_changed_lines(".", f"origin/{base_branch}", "HEAD")
+    
+    # 1. Main PR diff uses the three-dot syntax as a single string in the list
+    changed_lines = get_changed_lines(".", [f"origin/{base_branch}...HEAD"])
+    
+    # 2. DEBUG PRINT: Show exactly what files and lines the script mapped
+    print("\n--- DEBUG: MODIFIED FILES DETECTED ---")
+    if not changed_lines:
+        print("No modified code files found in diff.")
+    for f, lines in changed_lines.items():
+        print(f"  - {f} ({len(lines)} lines modified)")
+    print("--------------------------------------\n")
+    
     all_warnings = parse_spack_logs(log_directory)
     
     # 1. Save the full list of legacy warnings to a file for monitoring

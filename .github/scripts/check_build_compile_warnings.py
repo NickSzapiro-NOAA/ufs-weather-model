@@ -3,10 +3,13 @@ import os, sys, re, subprocess, glob
 
 def get_changed_lines(repo_path, diff_args, path_prefix=""):
     """Recursively parses diffs, seamlessly traversing nested submodules and fork changes."""
-    # diff_args is passed as a list so we can dynamically swap between "A...B" and "A" "B"
     cmd = ["git", "-C", repo_path, "diff", "--unified=0"] + diff_args
     result = subprocess.run(cmd, capture_output=True, text=True)
     
+    # NEW: Catch and print failures for the main diff!
+    if result.returncode != 0:
+        print(f"⚠️ GIT DIFF ERROR in '{repo_path}': {result.stderr.strip()}")
+        
     changed = {}
     current_file = None
     old_hash = None
@@ -34,11 +37,12 @@ def get_changed_lines(repo_path, diff_args, path_prefix=""):
             
             print(f"📦 Traversing nested submodule: '{path_prefix}{sub_name}'...")
             
-            subprocess.run(["git", "-C", repo_path, "submodule", "update", "--init", sub_name], capture_output=True)
+            # NEW: Catch init failures
+            init_cmd = subprocess.run(["git", "-C", repo_path, "submodule", "update", "--init", sub_name], capture_output=True, text=True)
+            if init_cmd.returncode != 0:
+                print(f"   ⚠️ Submodule Init failed: {init_cmd.stderr.strip()}")
             
             old_url, new_url = "", ""
-            
-            # Use diff_args[0].split("...")[0] to grab the base reference for the old .gitmodules
             base_ref_for_gm = diff_args[0].split("...")[0] if "..." in diff_args[0] else old_hash
             
             old_gm = subprocess.run(["git", "-C", repo_path, "show", f"{base_ref_for_gm}:.gitmodules"], capture_output=True, text=True)
@@ -47,6 +51,8 @@ def get_changed_lines(repo_path, diff_args, path_prefix=""):
                 with open(temp_old, "w") as f: f.write(old_gm.stdout)
                 url_cmd = subprocess.run(["git", "config", "--file", temp_old, f"submodule.{sub_name}.url"], capture_output=True, text=True)
                 old_url = url_cmd.stdout.strip()
+            else:
+                print(f"   ⚠️ Could not read old .gitmodules: {old_gm.stderr.strip()}")
             
             new_gm = subprocess.run(["git", "-C", repo_path, "show", "HEAD:.gitmodules"], capture_output=True, text=True)
             if new_gm.returncode == 0:
@@ -55,12 +61,18 @@ def get_changed_lines(repo_path, diff_args, path_prefix=""):
                 url_cmd = subprocess.run(["git", "config", "--file", temp_new, f"submodule.{sub_name}.url"], capture_output=True, text=True)
                 new_url = url_cmd.stdout.strip()
             
+            # NEW: Catch and print fetch failures
             if old_url:
-                subprocess.run(["git", "-C", sub_path_full, "fetch", old_url, old_hash], capture_output=True)
+                print(f"   ⬇️ Fetching old hash {old_hash[:7]} from {old_url}")
+                f1 = subprocess.run(["git", "-C", sub_path_full, "fetch", old_url, old_hash], capture_output=True, text=True)
+                if f1.returncode != 0:
+                    print(f"   ⚠️ Fetch old failed: {f1.stderr.strip()}")
             if new_url:
-                subprocess.run(["git", "-C", sub_path_full, "fetch", new_url, new_hash], capture_output=True)
+                print(f"   ⬇️ Fetching new hash {new_hash[:7]} from {new_url}")
+                f2 = subprocess.run(["git", "-C", sub_path_full, "fetch", new_url, new_hash], capture_output=True, text=True)
+                if f2.returncode != 0:
+                    print(f"   ⚠️ Fetch new failed: {f2.stderr.strip()}")
             
-            # RECURSION: Pass the hashes as TWO SEPARATE items in the list for a direct tree comparison!
             sub_changed = get_changed_lines(sub_path_full, [old_hash, new_hash], f"{path_prefix}{sub_name}/")
             for filepath, lines in sub_changed.items():
                 if filepath not in changed:

@@ -1,12 +1,29 @@
 #!/usr/bin/env python3
 import os, sys, re, subprocess, glob
 
+def get_submodule_url(gitmodules_file, sub_path):
+    """Extracts the exact URL for a submodule path from a .gitmodules file, regardless of its internal alias."""
+    if not os.path.exists(gitmodules_file):
+        return ""
+        
+    # Find the internal name by matching the file path
+    name_cmd = subprocess.run(["git", "config", "--file", gitmodules_file, "--get-regexp", r"^submodule\..*\.path$"], capture_output=True, text=True)
+    
+    for line in name_cmd.stdout.splitlines():
+        # Line format looks like: submodule.cice.path CICE-interface/CICE
+        if line.strip().endswith(f" {sub_path}"):
+            internal_key = line.split(".path")[0]  # Extracts 'submodule.cice'
+            url_cmd = subprocess.run(["git", "config", "--file", gitmodules_file, f"{internal_key}.url"], capture_output=True, text=True)
+            return url_cmd.stdout.strip()
+            
+    return ""
+
 def get_changed_lines(repo_path, diff_args, path_prefix=""):
     """Recursively parses diffs, seamlessly traversing nested submodules and fork changes."""
     cmd = ["git", "-C", repo_path, "diff", "--unified=0"] + diff_args
     result = subprocess.run(cmd, capture_output=True, text=True)
     
-    # NEW: Catch and print failures for the main diff!
+    # Catch and print failures for the main diff!
     if result.returncode != 0:
         print(f"⚠️ GIT DIFF ERROR in '{repo_path}': {result.stderr.strip()}")
         
@@ -37,42 +54,51 @@ def get_changed_lines(repo_path, diff_args, path_prefix=""):
             
             print(f"📦 Traversing nested submodule: '{path_prefix}{sub_name}'...")
             
-            # NEW: Catch init failures
+            # Catch init failures
             init_cmd = subprocess.run(["git", "-C", repo_path, "submodule", "update", "--init", sub_name], capture_output=True, text=True)
             if init_cmd.returncode != 0:
                 print(f"   ⚠️ Submodule Init failed: {init_cmd.stderr.strip()}")
             
             old_url, new_url = "", ""
-            base_ref_for_gm = diff_args[0].split("...")[0] if "..." in diff_args[0] else old_hash
             
-            old_gm = subprocess.run(["git", "-C", repo_path, "show", f"{base_ref_for_gm}:.gitmodules"], capture_output=True, text=True)
+            # CRITICAL FIX: Decouple the parent's repo refs from the child's submodule hashes
+            if len(diff_args) == 2:
+                parent_old_ref, parent_new_ref = diff_args[0], diff_args[1]
+            else:
+                parent_old_ref = diff_args[0].split("...")[0] if "..." in diff_args[0] else "HEAD"
+                parent_new_ref = "HEAD"
+            
+            old_gm = subprocess.run(["git", "-C", repo_path, "show", f"{parent_old_ref}:.gitmodules"], capture_output=True, text=True)
             if old_gm.returncode == 0:
-                temp_old = os.path.join(repo_path, ".gitmodules_old_temp")
+                # Use a unique temp file name to prevent overwriting during deep recursion
+                temp_old = os.path.join(repo_path, f".gitmodules_old_{sub_name.replace('/', '_')}")
                 with open(temp_old, "w") as f: f.write(old_gm.stdout)
-                url_cmd = subprocess.run(["git", "config", "--file", temp_old, f"submodule.{sub_name}.url"], capture_output=True, text=True)
-                old_url = url_cmd.stdout.strip()
+                old_url = get_submodule_url(temp_old, sub_name)
             else:
                 print(f"   ⚠️ Could not read old .gitmodules: {old_gm.stderr.strip()}")
             
-            new_gm = subprocess.run(["git", "-C", repo_path, "show", "HEAD:.gitmodules"], capture_output=True, text=True)
+            new_gm = subprocess.run(["git", "-C", repo_path, "show", f"{parent_new_ref}:.gitmodules"], capture_output=True, text=True)
             if new_gm.returncode == 0:
-                temp_new = os.path.join(repo_path, ".gitmodules_new_temp")
+                temp_new = os.path.join(repo_path, f".gitmodules_new_{sub_name.replace('/', '_')}")
                 with open(temp_new, "w") as f: f.write(new_gm.stdout)
-                url_cmd = subprocess.run(["git", "config", "--file", temp_new, f"submodule.{sub_name}.url"], capture_output=True, text=True)
-                new_url = url_cmd.stdout.strip()
+                new_url = get_submodule_url(temp_new, sub_name)
             
-            # NEW: Catch and print fetch failures
+            # Catch and print fetch failures, with aggressive fallback for all branches
             if old_url:
                 print(f"   ⬇️ Fetching old hash {old_hash[:7]} from {old_url}")
                 f1 = subprocess.run(["git", "-C", sub_path_full, "fetch", old_url, old_hash], capture_output=True, text=True)
                 if f1.returncode != 0:
-                    print(f"   ⚠️ Fetch old failed: {f1.stderr.strip()}")
+                    print(f"   ⚠️ Direct hash fetch failed. Falling back to full branch fetch: {f1.stderr.strip()}")
+                    subprocess.run(["git", "-C", sub_path_full, "fetch", old_url, "+refs/heads/*:refs/remotes/temp_old/*"], capture_output=True)
+                    
             if new_url:
                 print(f"   ⬇️ Fetching new hash {new_hash[:7]} from {new_url}")
                 f2 = subprocess.run(["git", "-C", sub_path_full, "fetch", new_url, new_hash], capture_output=True, text=True)
                 if f2.returncode != 0:
-                    print(f"   ⚠️ Fetch new failed: {f2.stderr.strip()}")
+                    print(f"   ⚠️ Direct hash fetch failed. Falling back to full branch fetch: {f2.stderr.strip()}")
+                    subprocess.run(["git", "-C", sub_path_full, "fetch", new_url, "+refs/heads/*:refs/remotes/temp_new/*"], capture_output=True)
             
+            # Recursively append changes
             sub_changed = get_changed_lines(sub_path_full, [old_hash, new_hash], f"{path_prefix}{sub_name}/")
             for filepath, lines in sub_changed.items():
                 if filepath not in changed:
@@ -193,4 +219,3 @@ if __name__ == "__main__":
         print(f"::error file={w['file']},line={w['line']}::{w['msg']}")
         
     sys.exit(1)
-  

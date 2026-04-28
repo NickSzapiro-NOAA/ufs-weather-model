@@ -431,3 +431,19 @@ If you are using this log as a pull request verification, please commit 'test_ch
 Result: FAILURE
 
 ====END OF URSA REGRESSION TESTING LOG====
+
+PASS -- COMPILE 'atm_fbh_intel' [07:10, 05:43] ( 4 warnings 464 remarks )
+PASS -- TEST 'cpld_regional_atm_fbh_intel' [22:24, 19:36](1129 MB)
+
+SYNOPSIS:
+Starting Date/Time: 20260428 18:16:51
+Ending Date/Time: 20260428 18:47:46
+Total Time: 00h:31m:05s
+Compiles Completed: 1/1
+Tests Completed: 1/1
+
+NOTES:
+A file 'test_changes.list' was generated but is empty.
+If you are using this log as a pull request verification, please commit 'test_changes.list'.
+
+Result: SUCCESS

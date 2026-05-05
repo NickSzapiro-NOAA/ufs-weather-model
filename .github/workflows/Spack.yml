@@ -34,6 +34,12 @@ jobs:
             ccpp_suites: "FV3_HAFS_v1_gfdlmp_tedmf,FV3_HAFS_v1_gfdlmp_tedmf_nonsst,FV3_HAFS_v1_thompson,FV3_HAFS_v1_thompson_nonsst",
             other-variants: ' +debug +32bit ^esmf@8.8.0',
           }
+        - {
+            os: "ubuntu-24.04",
+            app: "S2SW",
+            ccpp_suites: "FV3_GFS_v17_coupled_p8_ugwpv1",
+            other-variants: ' +debug +32bit +pdlib ^esmf@8.8.0',
+          }
 
     runs-on: ${{ matrix.config.os }}
     permissions:

@@ -181,7 +181,7 @@ class UfsWeatherModel(CMakePackage):
         elif spec.platform == "darwin" and spec.satisfies("%gcc"):
             env.set("CMAKE_Platform", "macosx.gnu")
         else:
-            msg = "The host system {0} and compiler {0} "
+            msg = "The host system {0} and compiler {1} "
             msg += "are not supported by UFS."
             raise InstallError(msg.format(spec.platform, self.compiler.name))
 
@@ -216,14 +216,8 @@ class UfsWeatherModel(CMakePackage):
 
         args.append(self.define("CMAKE_MODULE_PATH", self.spec["esmf"].prefix.cmake))
 
-        # Explicitly tell WW3's FindSCOTCH.cmake where the Spack library lives
+        # TODO: Why is it difficult to find scotch (also https://github.com/NOAA-EMC/WW3/issues/1021) ?
         if "+pdlib" in self.spec:
-            args.append(self.define("SCOTCH_DIR", self.spec["scotch"].prefix))
-
-        return args
-
-    # TODO: Why is it difficult to find scotch (also https://github.com/NOAA-EMC/WW3/issues/1021) ?
-    if "+pdlib" in self.spec:
             scotch = self.spec["scotch"]
             args.append(self.define("SCOTCH_DIR", scotch.prefix))
             
@@ -243,10 +237,12 @@ class UfsWeatherModel(CMakePackage):
             args.append(self.define("scotcherr_lib", join_path(lib_dir, f"libscotcherr.{ext}")))
             args.append(self.define("ptscotch_lib", join_path(lib_dir, f"libptscotch.{ext}")))
             args.append(self.define("ptscotcherr_lib", join_path(lib_dir, f"libptscotcherr.{ext}")))
-
+        
+        return args
+    
     @run_after("install")
     def install_additional_files(self):
-        mkdirp(prefix.bin)
+        mkdirp(self.prefix.bin)
         if self.spec.satisfies("@develop"):
             ufs_src = join_path(self.build_directory, "ufs_model")
         else:

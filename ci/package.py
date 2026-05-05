@@ -237,6 +237,34 @@ class UfsWeatherModel(CMakePackage):
             args.append(self.define("scotcherr_lib", join_path(lib_dir, f"libscotcherr.{ext}")))
             args.append(self.define("ptscotch_lib", join_path(lib_dir, f"libptscotch.{ext}")))
             args.append(self.define("ptscotcherr_lib", join_path(lib_dir, f"libptscotcherr.{ext}")))
+
+            # Inject the ParMETIS compatibility wrappers provided by PT-SCOTCH
+            args.append(self.define("ptscotchparmetis_lib", join_path(lib_dir, f"libptscotchparmetis.{ext}")))
+            
+            # Find packages also usually look for the include directories
+            args.append(self.define("ptscotchparmetis_inc", scotch.prefix.include))
+            args.append(self.define("scotch_inc", scotch.prefix.include))
+            args.append(self.define("ptscotch_inc", scotch.prefix.include))
+
+            # --- DEBUGGING: Print Scotch contents to the CI build log ---
+            print("\n" + "="*10)
+            print("DEBUG: SCOTCH DIRECTORY CONTENTS")
+            print("="*10)
+            print(f"Prefix: {scotch.prefix}")
+            print(f"Lib Dir ({lib_dir}):")
+            try:
+                for f in os.listdir(lib_dir):
+                    print(f"  - {f}")
+            except Exception as e:
+                print(f"  Error reading lib dir: {e}")
+                
+            print(f"Include Dir ({scotch.prefix.include}):")
+            try:
+                for f in os.listdir(scotch.prefix.include):
+                    print(f"  - {f}")
+            except Exception as e:
+                print(f"  Error reading include dir: {e}")
+            print("="*10 + "\n")
         
         return args
     

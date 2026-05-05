@@ -156,7 +156,9 @@ class UfsWeatherModel(CMakePackage):
     with when("@develop app=ATMAERO"):
         depends_on("mapl")
         depends_on("gftl-shared")
-    depends_on("scotch+mpi+metis", when="+pdlib")
+    # Cap Scotch to avoid the 7.0.5/7.0.6 API mismatch with WW3's SCOTCH_707 macro
+    depends_on("scotch@:7.0.4 +mpi+metis", when="+pdlib")
+    # depends_on("scotch+mpi+metis", when="+pdlib")
 
     depends_on("w3nco", when="@:2.0.0")
     depends_on("python", type="build", when="@:2.0.0")

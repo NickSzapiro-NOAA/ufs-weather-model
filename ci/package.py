@@ -216,14 +216,22 @@ class UfsWeatherModel(CMakePackage):
 
         args.append(self.define("CMAKE_MODULE_PATH", self.spec["esmf"].prefix.cmake))
 
+        # Explicitly tell WW3's FindSCOTCH.cmake where the Spack library lives
+        if "+pdlib" in self.spec:
+            args.append(self.define("SCOTCH_DIR", self.spec["scotch"].prefix))
+
         return args
 
     # This patch can be removed once https://github.com/NOAA-EMC/WW3/issues/1021
     # is resolved.
-    @when("+pdlib ^scotch+shared")
-    def patch(self):
-        filter_file(r"(lib[^ ]+)\.a", r"\1.so", "WW3/cmake/FindSCOTCH.cmake")
-        filter_file("STATIC", "SHARED", "WW3/cmake/FindSCOTCH.cmake")
+    @run_after("patch")
+    def patch_find_scotch(self):
+        if "+pdlib" in self.spec and "^scotch+shared" in self.spec:
+            # Use .dylib if CI ever runs on macOS, otherwise use .so for Linux
+            shared_ext = "dylib" if self.spec.satisfies("platform=darwin") else "so"
+            
+            filter_file(r"(lib[^ ]+)\.a", rf"\1.{shared_ext}", "WW3/cmake/FindSCOTCH.cmake")
+            filter_file("STATIC", "SHARED", "WW3/cmake/FindSCOTCH.cmake")
 
     @run_after("install")
     def install_additional_files(self):

@@ -226,12 +226,13 @@ class UfsWeatherModel(CMakePackage):
     # is resolved.
     @run_after("patch")
     def patch_find_scotch(self):
-        if "+pdlib" in self.spec and "^scotch+shared" in self.spec:
-            # Use .dylib if CI ever runs on macOS, otherwise use .so for Linux
-            shared_ext = "dylib" if self.spec.satisfies("platform=darwin") else "so"
-            
-            filter_file(r"(lib[^ ]+)\.a", rf"\1.{shared_ext}", "WW3/cmake/FindSCOTCH.cmake")
-            filter_file("STATIC", "SHARED", "WW3/cmake/FindSCOTCH.cmake")
+        if "+pdlib" in self.spec:
+            # 1. Idiomatic library names (finds .so, .dylib, or .a)
+            filter_file(r"NAMES\s+lib([^\s]+)\.a", r"NAMES \1 lib\1.a", "WW3/cmake/FindSCOTCH.cmake")
+            # 2. Allow Spack's CMAKE_PREFIX_PATH to find libs in lib64/ etc.
+            filter_file(r"NO_DEFAULT_PATH", "", "WW3/cmake/FindSCOTCH.cmake")
+            # 3. Use UNKNOWN imported library type to support both shared and static
+            filter_file(r"STATIC\s+IMPORTED", "UNKNOWN IMPORTED", "WW3/cmake/FindSCOTCH.cmake")
 
     @run_after("install")
     def install_additional_files(self):

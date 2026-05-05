@@ -157,7 +157,7 @@ class UfsWeatherModel(CMakePackage):
         depends_on("mapl")
         depends_on("gftl-shared")
     # Cap Scotch to avoid the 7.0.5/7.0.6 API mismatch with WW3's SCOTCH_707 macro
-    depends_on("scotch@:7.0.4 +mpi+metis", when="+pdlib")
+    depends_on("scotch@:7.0.4 +mpi+metis~shared", when="+pdlib")
     # depends_on("scotch+mpi+metis", when="+pdlib")
 
     depends_on("w3nco", when="@:2.0.0")
@@ -252,6 +252,17 @@ class UfsWeatherModel(CMakePackage):
             args.append(self.define("ptscotchparmetis_inc", scotch.prefix.include))
             args.append(self.define("scotch_inc", scotch.prefix.include))
             args.append(self.define("ptscotch_inc", scotch.prefix.include))
+            
+            # Explicitly define the full SCOTCH_LIBRARIES list so the top-level 
+            # UFS executable doesn't forget to link the error handlers.
+            scotch_libs = ";".join([
+                join_path(lib_dir, pt_parmetis_name),
+                join_path(lib_dir, f"libptscotch.{ext}"),
+                join_path(lib_dir, f"libptscotcherr.{ext}"),
+                join_path(lib_dir, f"libscotch.{ext}"),
+                join_path(lib_dir, f"libscotcherr.{ext}")
+            ])
+            args.append(self.define("SCOTCH_LIBRARIES", scotch_libs))
 
             # --- DEBUGGING: Print Scotch contents to the CI build log ---
             print("\n" + "="*10)

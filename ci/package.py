@@ -238,8 +238,13 @@ class UfsWeatherModel(CMakePackage):
             args.append(self.define("ptscotch_lib", join_path(lib_dir, f"libptscotch.{ext}")))
             args.append(self.define("ptscotcherr_lib", join_path(lib_dir, f"libptscotcherr.{ext}")))
 
-            # Inject the ParMETIS compatibility wrappers provided by PT-SCOTCH
-            args.append(self.define("ptscotchparmetis_lib", join_path(lib_dir, f"libptscotchparmetis.{ext}")))
+            # Scotch 7+ names this libptscotchparmetisv3, older versions might not.
+            # We dynamically check which one exists.
+            pt_parmetis_name = f"libptscotchparmetisv3.{ext}"
+            if not os.path.exists(join_path(lib_dir, pt_parmetis_name)):
+                pt_parmetis_name = f"libptscotchparmetis.{ext}"
+                
+            args.append(self.define("ptscotchparmetis_lib", join_path(lib_dir, pt_parmetis_name)))
             
             # Find packages also usually look for the include directories
             args.append(self.define("ptscotchparmetis_inc", scotch.prefix.include))

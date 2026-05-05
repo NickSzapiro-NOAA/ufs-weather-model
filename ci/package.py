@@ -222,17 +222,27 @@ class UfsWeatherModel(CMakePackage):
 
         return args
 
-    # This patch can be removed once https://github.com/NOAA-EMC/WW3/issues/1021
-    # is resolved.
-    @run_after("patch")
-    def patch_find_scotch(self):
-        if "+pdlib" in self.spec:
-            # 1. Idiomatic library names (finds .so, .dylib, or .a)
-            filter_file(r"NAMES\s+lib([^\s]+)\.a", r"NAMES \1 lib\1.a", "WW3/cmake/FindSCOTCH.cmake")
-            # 2. Allow Spack's CMAKE_PREFIX_PATH to find libs in lib64/ etc.
-            filter_file(r"NO_DEFAULT_PATH", "", "WW3/cmake/FindSCOTCH.cmake")
-            # 3. Use UNKNOWN imported library type to support both shared and static
-            filter_file(r"STATIC\s+IMPORTED", "UNKNOWN IMPORTED", "WW3/cmake/FindSCOTCH.cmake")
+    # TODO: Why is it difficult to find scotch (also https://github.com/NOAA-EMC/WW3/issues/1021) ?
+    if "+pdlib" in self.spec:
+            scotch = self.spec["scotch"]
+            args.append(self.define("SCOTCH_DIR", scotch.prefix))
+            
+            # --- Bypass WW3's FindSCOTCH.cmake entirely ---
+            # Ubuntu 24.04 puts files in lib64, but WW3 hardcodes /lib.
+            # We locate the correct dir and pass the exact file paths to CMake.
+            import os
+            lib_dir = scotch.prefix.lib64 if os.path.exists(scotch.prefix.lib64) else scotch.prefix.lib
+            
+            # Determine library extension based on shared/static and OS
+            ext = "so" if "^scotch+shared" in self.spec else "a"
+            if self.spec.satisfies("platform=darwin") and "^scotch+shared" in self.spec:
+                ext = "dylib"
+
+            # Inject the paths directly into the CMake cache
+            args.append(self.define("scotch_lib", join_path(lib_dir, f"libscotch.{ext}")))
+            args.append(self.define("scotcherr_lib", join_path(lib_dir, f"libscotcherr.{ext}")))
+            args.append(self.define("ptscotch_lib", join_path(lib_dir, f"libptscotch.{ext}")))
+            args.append(self.define("ptscotcherr_lib", join_path(lib_dir, f"libptscotcherr.{ext}")))
 
     @run_after("install")
     def install_additional_files(self):

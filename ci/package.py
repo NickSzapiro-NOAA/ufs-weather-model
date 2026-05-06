@@ -158,7 +158,7 @@ class UfsWeatherModel(CMakePackage):
         depends_on("gftl-shared")
     # Cap Scotch to avoid the 7.0.5/7.0.6 API mismatch with WW3's SCOTCH_707 macro
     # Force Spack to use CMake to build Scotch (exports proper SCOTCH:: targets)
-    depends_on("scotch@:7.0.4 +mpi+metis build_system=cmake", when="+pdlib")
+    depends_on("scotch@:7.0.4 +mpi+metis~shared build_system=cmake", when="+pdlib")
     # depends_on("scotch@:7.0.4 +mpi+metis~shared", when="+pdlib")
     # depends_on("scotch+mpi+metis", when="+pdlib")
 

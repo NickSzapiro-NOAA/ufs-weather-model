@@ -157,7 +157,9 @@ class UfsWeatherModel(CMakePackage):
         depends_on("mapl")
         depends_on("gftl-shared")
     # Cap Scotch to avoid the 7.0.5/7.0.6 API mismatch with WW3's SCOTCH_707 macro
-    depends_on("scotch@:7.0.4 +mpi+metis~shared", when="+pdlib")
+    # Force Spack to use CMake to build Scotch (exports proper SCOTCH:: targets)
+    depends_on("scotch@:7.0.4 +mpi+metis build_system=cmake", when="+pdlib")
+    # depends_on("scotch@:7.0.4 +mpi+metis~shared", when="+pdlib")
     # depends_on("scotch+mpi+metis", when="+pdlib")
 
     depends_on("w3nco", when="@:2.0.0")
@@ -218,71 +220,17 @@ class UfsWeatherModel(CMakePackage):
 
         args.append(self.define("CMAKE_MODULE_PATH", self.spec["esmf"].prefix.cmake))
 
-        # TODO: Why is it difficult to find scotch (also https://github.com/NOAA-EMC/WW3/issues/1021) ?
-        if "+pdlib" in self.spec:
-            scotch = self.spec["scotch"]
-            args.append(self.define("SCOTCH_DIR", scotch.prefix))
-            
-            # --- Bypass WW3's FindSCOTCH.cmake entirely ---
-            # Ubuntu 24.04 puts files in lib64, but WW3 hardcodes /lib.
-            # We locate the correct dir and pass the exact file paths to CMake.
-            import os
-            lib_dir = scotch.prefix.lib64 if os.path.exists(scotch.prefix.lib64) else scotch.prefix.lib
-            
-            # Determine library extension based on shared/static and OS
-            ext = "so" if "^scotch+shared" in self.spec else "a"
-            if self.spec.satisfies("platform=darwin") and "^scotch+shared" in self.spec:
-                ext = "dylib"
-
-            # Inject the paths directly into the CMake cache
-            args.append(self.define("scotch_lib", join_path(lib_dir, f"libscotch.{ext}")))
-            args.append(self.define("scotcherr_lib", join_path(lib_dir, f"libscotcherr.{ext}")))
-            args.append(self.define("ptscotch_lib", join_path(lib_dir, f"libptscotch.{ext}")))
-            args.append(self.define("ptscotcherr_lib", join_path(lib_dir, f"libptscotcherr.{ext}")))
-
-            # Scotch 7+ names this libptscotchparmetisv3, older versions might not.
-            # We dynamically check which one exists.
-            pt_parmetis_name = f"libptscotchparmetisv3.{ext}"
-            if not os.path.exists(join_path(lib_dir, pt_parmetis_name)):
-                pt_parmetis_name = f"libptscotchparmetis.{ext}"
-                
-            args.append(self.define("ptscotchparmetis_lib", join_path(lib_dir, pt_parmetis_name)))
-            
-            # Find packages also usually look for the include directories
-            args.append(self.define("ptscotchparmetis_inc", scotch.prefix.include))
-            args.append(self.define("scotch_inc", scotch.prefix.include))
-            args.append(self.define("ptscotch_inc", scotch.prefix.include))
-            
-            # Explicitly define the full SCOTCH_LIBRARIES list so the top-level 
-            # UFS executable doesn't forget to link the error handlers.
-            scotch_libs = ";".join([
-                join_path(lib_dir, pt_parmetis_name),
-                join_path(lib_dir, f"libptscotch.{ext}"),
-                join_path(lib_dir, f"libptscotcherr.{ext}"),
-                join_path(lib_dir, f"libscotch.{ext}"),
-                join_path(lib_dir, f"libscotcherr.{ext}")
-            ])
-            args.append(self.define("SCOTCH_LIBRARIES", scotch_libs))
-
-            # --- DEBUGGING: Print Scotch contents to the CI build log ---
-            print("\n" + "="*10)
-            print("DEBUG: SCOTCH DIRECTORY CONTENTS")
-            print("="*10)
-            print(f"Prefix: {scotch.prefix}")
-            print(f"Lib Dir ({lib_dir}):")
-            try:
-                for f in os.listdir(lib_dir):
-                    print(f"  - {f}")
-            except Exception as e:
-                print(f"  Error reading lib dir: {e}")
-                
-            print(f"Include Dir ({scotch.prefix.include}):")
-            try:
-                for f in os.listdir(scotch.prefix.include):
-                    print(f"  - {f}")
-            except Exception as e:
-                print(f"  Error reading include dir: {e}")
-            print("="*10 + "\n")
+        # This patch can be removed once https://github.com/NOAA-EMC/WW3/issues/1021
+        # is resolved.
+        @when("+pdlib")
+        def patch(self):
+          filter_file(
+            "PTSCOTCHparmetis::PTSCOTCHparmetis",
+            "SCOTCH::ptscotchparmetisv3 SCOTCH::scotcherr SCOTCH::scotcherrexit",
+            "WW3/model/src/CMakeLists.txt"
+          )
+          import pathlib
+          pathlib.Path.unlink("WW3/cmake/FindSCOTCH.cmake",missing_ok=True)
         
         return args
     

@@ -228,7 +228,7 @@ class UfsWeatherModel(CMakePackage):
     def patch(self):
         filter_file(
             "PTSCOTCHparmetis::PTSCOTCHparmetis",
-            "SCOTCH::ptscotchparmetisv3 SCOTCH::ptscotch SCOTCH::ptscotcherr SCOTCH::scotch SCOTCH::scotcherr SCOTCH::scotcherrexit",
+            "SCOTCH::ptscotchparmetisv3 SCOTCH::ptscotch SCOTCH::scotch SCOTCH::scotcherr",
             "WW3/model/src/CMakeLists.txt"
         )
         

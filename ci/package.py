@@ -219,21 +219,25 @@ class UfsWeatherModel(CMakePackage):
             args.append(self.define_from_variant("QUAD_PRECISION", "quad_precision"))
 
         args.append(self.define("CMAKE_MODULE_PATH", self.spec["esmf"].prefix.cmake))
+        
+        return args
 
-        # This patch can be removed once https://github.com/NOAA-EMC/WW3/issues/1021
-        # is resolved.
-        @when("+pdlib")
-        def patch(self):
-          filter_file(
+    # This patch can be removed once https://github.com/NOAA-EMC/WW3/issues/1021
+    # is resolved.
+    @when("+pdlib")
+    def patch(self):
+        filter_file(
             "PTSCOTCHparmetis::PTSCOTCHparmetis",
             "SCOTCH::ptscotchparmetisv3 SCOTCH::scotcherr SCOTCH::scotcherrexit",
             "WW3/model/src/CMakeLists.txt"
-          )
-          import pathlib
-          pathlib.Path.unlink("WW3/cmake/FindSCOTCH.cmake",missing_ok=True)
+        )
         
-        return args
-    
+        # Delete problematic FindSCOTCH.cmake script (Python 3.6 compatible)
+        import os
+        find_script = "WW3/cmake/FindSCOTCH.cmake"
+        if os.path.exists(find_script):
+            os.remove(find_script)
+
     @run_after("install")
     def install_additional_files(self):
         mkdirp(self.prefix.bin)
@@ -241,6 +245,8 @@ class UfsWeatherModel(CMakePackage):
             ufs_src = join_path(self.build_directory, "ufs_model")
         else:
             ufs_src = join_path(self.build_directory, "NEMS.exe")
-        ufs_dst = join_path(prefix.bin, "ufs_weather_model")
+            
+        # Fixed: using self.prefix.bin
+        ufs_dst = join_path(self.prefix.bin, "ufs_weather_model")
         install(ufs_src, ufs_dst)
         set_executable(ufs_dst)

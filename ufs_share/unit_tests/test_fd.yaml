@@ -1,0 +1,10 @@
+field_dictionary:
+  entries:
+    - StandardName: test_temp
+      qc_min: 150.5
+      qc_max: 350.5
+    - StandardName: test_fraction
+      qc_min: 0.0
+      qc_max: 1.0
+    - StandardName: test_unbounded
+      description: This variable has no limits defined

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(UFS_QC_Coupling LANGUAGES Fortran)
+project(ufs_share LANGUAGES Fortran)
 
 # ----------------------------------------------------------------------------
 # 1. Initialization & Dependencies

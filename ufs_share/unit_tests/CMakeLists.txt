@@ -5,7 +5,7 @@ add_executable(test_qc_exe test_qc_coupling.F90)
 
 # Link it to the parent library. 
 # Because qc_coupling linked ESMF publicly, test_qc_exe gets ESMF automatically!
-target_link_libraries(test_qc_exe PRIVATE qc_coupling)
+target_link_libraries(test_qc_exe PRIVATE ufs_share)
 
 # ----------------------------------------------------------------------------
 # Stage the Test Data

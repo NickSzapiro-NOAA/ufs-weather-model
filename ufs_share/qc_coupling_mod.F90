@@ -6,7 +6,7 @@ module qc_coupling_mod
   ! Public API
   public :: init_qc_registry
   public :: apply_qc_check
-  public :: get_limits        ! Exposed for unit testing and direct queries
+  public :: get_limits        ! Exposed for unit tests and physics queries
   
   ! Configurable QC Actions 
   integer, parameter, public :: QC_ACTION_IGNORE = 0
@@ -16,7 +16,7 @@ module qc_coupling_mod
 
   ! Internal registry structure
   type :: qc_rule
-    character(len=64)  :: var_name
+    character(len=ESMF_MAXSTR) :: var_name
     real(ESMF_KIND_R8) :: qc_min
     real(ESMF_KIND_R8) :: qc_max
   end type qc_rule
@@ -24,7 +24,7 @@ module qc_coupling_mod
   ! Memory-resident dictionary of QC limits
   type(qc_rule), allocatable, save :: qc_registry(:)
   
-  ! Thread-local guard to prevent redundant file I/O on the same MPI PET
+  ! Thread-local guard
   logical, save :: is_initialized = .false.
 
   interface apply_qc_check
@@ -38,60 +38,87 @@ contains
 
   ! ==============================================================================
   ! SUBROUTINE: init_qc_registry
+  ! Parses a Fortran namelist file using a safe two-pass read to extract limits.
   ! ==============================================================================
-  subroutine init_qc_registry(yaml_file, rc)
-    character(len=*), intent(in)  :: yaml_file
+  subroutine init_qc_registry(nml_file, rc)
+    character(len=*), intent(in)  :: nml_file
     integer,          intent(out) :: rc
     
-    type(ESMF_HConfig)         :: config
-    type(qc_rule), allocatable :: temp_registry(:)
-    integer                    :: num_entries, i, valid_count
-    logical                    :: isPresent
-    character(len=8)           :: idx_str
-    character(len=256)         :: base_path
+    ! Single scalar variables bound to the namelist
+    character(len=ESMF_MAXSTR) :: var_name
+    real(ESMF_KIND_R8) :: qc_min
+    real(ESMF_KIND_R8) :: qc_max
+
+    integer :: iunit, ios, i, valid_count
+    character(len=ESMF_MAXSTR) :: log_msg
+
+    namelist /qc_rule_nml/ var_name, qc_min, qc_max
 
     rc = ESMF_SUCCESS
     if (is_initialized) return
 
-    config = ESMF_HConfigCreate(yaml_file, rc=rc)
-    if (rc /= ESMF_SUCCESS) return
-
-    call ESMF_HConfigGetAttribute(config, num_entries, label="field_dictionary::entries", rc=rc)
-    allocate(qc_registry(num_entries))
-    valid_count = 0
-
-    do i = 1, num_entries
-      write(idx_str, '(I0)') i
-      base_path = "field_dictionary::entries::" // trim(adjustl(idx_str))
-
-      call ESMF_HConfigGetAttribute(config, isPresent=isPresent, &
-           label=trim(base_path)//"::qc_min", rc=rc)
-      
-      if (isPresent) then
-        valid_count = valid_count + 1
-        call ESMF_HConfigGetAttribute(config, qc_registry(valid_count)%var_name, &
-             label=trim(base_path)//"::StandardName", rc=rc)
-        call ESMF_HConfigGetAttribute(config, qc_registry(valid_count)%qc_min, &
-             label=trim(base_path)//"::qc_min", rc=rc)
-        call ESMF_HConfigGetAttribute(config, qc_registry(valid_count)%qc_max, &
-             label=trim(base_path)//"::qc_max", rc=rc)
-      end if
-    end do
-
-    ! Resize registry to drop empty rows
-    if (valid_count > 0) then
-      allocate(temp_registry(valid_count))
-      temp_registry = qc_registry(1:valid_count)
-      call move_alloc(temp_registry, qc_registry) 
-
-      if (size(qc_registry) > 1) then
-        call quicksort_registry(1, size(qc_registry))
-      end if
-    else
-      deallocate(qc_registry)
+    open(newunit=iunit, file=trim(nml_file), status='old', iostat=ios)
+    if (ios /= 0) then
+       call ESMF_LogWrite("QC FATAL: Could not open "//trim(nml_file), ESMF_LOGMSG_ERROR, rc=rc)
+       rc = ESMF_RC_FILE_OPEN
+       return
     end if
 
-    call ESMF_HConfigDestroy(config, rc=rc)
+    ! ---------------------------------------------------------
+    ! PASS 1: Count the number of valid namelist blocks
+    ! ---------------------------------------------------------
+    valid_count = 0
+    do
+      read(iunit, nml=qc_rule_nml, iostat=ios)
+      if (ios < 0) exit  ! EOF reached
+      if (ios > 0) then
+         call ESMF_LogWrite("QC FATAL: Syntax error in QC namelist pass 1.", ESMF_LOGMSG_ERROR, rc=rc)
+         rc = ESMF_RC_FILE_READ
+         close(iunit)
+         return
+      end if
+      valid_count = valid_count + 1
+    end do
+
+    if (valid_count == 0) then
+      close(iunit)
+      is_initialized = .true.
+      return
+    end if
+
+    ! ---------------------------------------------------------
+    ! PASS 2: Allocate exact memory and populate
+    ! ---------------------------------------------------------
+    allocate(qc_registry(valid_count))
+    rewind(iunit)
+
+    do i = 1, valid_count
+      ! Reset scalars to defaults to prevent bleed-through between blocks
+      var_name = ''
+      qc_min   = -huge(1.0_ESMF_KIND_R8)
+      qc_max   =  huge(1.0_ESMF_KIND_R8)
+
+      read(iunit, nml=qc_rule_nml, iostat=ios)
+      if (ios /= 0) then
+         call ESMF_LogWrite("QC FATAL: Read error in QC namelist pass 2.", ESMF_LOGMSG_ERROR, rc=rc)
+         rc = ESMF_RC_FILE_READ
+         close(iunit)
+         return
+      end if
+      
+      qc_registry(i)%var_name = trim(var_name)
+      qc_registry(i)%qc_min   = qc_min
+      qc_registry(i)%qc_max   = qc_max
+    end do
+
+    close(iunit)
+
+    ! Alphabetize the cleanly allocated array for binary searching
+    if (valid_count > 1) call quicksort_registry(1, valid_count)
+
+    write(log_msg, '(A,I0,A)') "QC INIT: Successfully loaded ", valid_count, " rules."
+    call ESMF_LogWrite(trim(log_msg), ESMF_LOGMSG_INFO, rc=rc)
+
     is_initialized = .true.
   end subroutine init_qc_registry
 
@@ -102,7 +129,7 @@ contains
     integer, intent(in) :: first, last
     type(qc_rule)       :: temp
     integer             :: i, j
-    character(len=64)   :: pivot
+    character(len=ESMF_MAXSTR) :: pivot
 
     if (first >= last) return
 
@@ -140,7 +167,7 @@ contains
     logical,            intent(out) :: is_known
     
     integer           :: low, high, mid
-    character(len=64) :: target_name
+    character(len=ESMF_MAXSTR) :: target_name
 
     is_known = .false.
     if (.not. allocated(qc_registry)) return

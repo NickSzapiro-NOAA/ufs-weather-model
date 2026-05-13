@@ -52,9 +52,12 @@ cd "${PATHRT}"
 unset MODEL_CONFIGURE
 unset UFS_CONFIGURE
 
+# shellcheck disable=SC1090
 [[ -e ${RUNDIR_ROOT}/run_test_${TEST_ID}.env ]] && source "${RUNDIR_ROOT}/run_test_${TEST_ID}.env"
 source default_vars.sh
+# shellcheck disable=SC1090
 [[ -e ${RUNDIR_ROOT}/run_test_${TEST_ID}.env ]] && source "${RUNDIR_ROOT}/run_test_${TEST_ID}.env"
+# shellcheck disable=SC1090
 source "tests/${TEST_NAME}"
 
 rm -f "${PATHRT}/fail_test_${TEST_ID}"
@@ -111,15 +114,6 @@ case ${MACHINE_ID} in
     module load hdf5-D/1.14.0
     module load nccmp-D/1.9.0.1
     ;;
-  s4)
-    module use /data/prod/jedi/spack-stack/spack-stack-1.4.1/envs/ufs-pio-2.5.10/install/modulefiles/Core
-    module load stack-intel/2021.5.0 stack-intel-oneapi-mpi/2021.5.0
-    module load miniconda/3.9.12
-    module load nccmp/1.9.0.1
-    ;;
-  noaacloud|frontera)
-    echo "No special nccmp load necessary"
-    ;;
   gaeac5)
     module use /ncrc/proj/epic/spack-stack/spack-stack-1.6.0/envs/unified-env/install/modulefiles/Core
     module load stack-intel/2023.2.0 stack-cray-mpich/8.1.28
@@ -160,8 +154,13 @@ else
 fi
 
 # Set IAU Global workflow related tags to ' '
-export HIDE_AIAU=' '
-export HIDE_LIAU=' '
+if [[ ${GFSv17opn} == .true. ]] ; then
+    export HIDE_AIAU=' '
+    export HIDE_LIAU='!'
+else
+    export HIDE_AIAU=' '
+    export HIDE_LIAU=' '
+fi
 
 if [[ ${DATM_CDEPS} = 'true' ]] || [[ ${FV3} = 'true' ]] || [[ ${S2S} = 'true' ]] || [[ ${MPAS} = 'true' ]]; then
   if [[ ${HAFS} = 'false' ]] || [[ ${FV3} = 'true' && ${HAFS} = 'true' ]]; then
@@ -290,11 +289,14 @@ fi
 cp "${PATHRT}/parm/fd_ufs.yaml" fd_ufs.yaml
 
 # Set up the run directory
+# shellcheck disable=SC1091
 source ./fv3_run
 
 if [[ ${CPLWAV} == .true. ]]; then
-    atparse < "${PATHRT}/parm/ww3_shel.nml.IN" > ww3_shel.nml
-    cp "${PATHRT}/parm/ww3_points.list" .
+    if [[ ${GFSv17opn} == .false. ]]; then
+        atparse < "${PATHRT}/parm/ww3_shel.nml.IN" > ww3_shel.nml
+        cp "${PATHRT}/parm/ww3_points.list" .
+    fi
 fi
 
 if [[ ${CPLCHM} == .true. ]]; then
@@ -504,7 +506,7 @@ if [[ ${skip_check_results} == false ]]; then
 
       else
         if [[ ${i##*.} == nc* ]] ; then
-          if [[ " orion hercules hera ursa wcoss2 acorn derecho gaeac5 gaeac6 jet s4 noaacloud frontera " =~ ${MACHINE_ID} ]]; then
+          if [[ " orion hercules hera ursa wcoss2 acorn derecho gaeac5 gaeac6 noaacloud " =~ ${MACHINE_ID} ]]; then
             printf "USING NCCMP.." >> "${RT_LOG}"
             printf "USING NCCMP.."
               nccmp_args=(-d -S -q -f -B --Attribute=checksum --warn=format)

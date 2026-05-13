@@ -128,6 +128,8 @@ export fbh_omp_num_threads=1
 
 export histaux_enabled=.false.
 export BMIC=.false.
+
+export GFSv17opn=.false.
 export SFS=.false.
 
 export EXCLUSIVE_NODES=.false.
@@ -266,78 +268,6 @@ elif [[ ${MACHINE_ID} = linux ]]; then
   export ICE_tasks_cpl_thrd=10
   export WAV_tasks_cpl_thrd=12
 
-elif [[ ${MACHINE_ID} = jet ]]; then
-
-  export TPN=24
-
-  export INPES_dflt=3
-  export JNPES_dflt=8
-  export INPES_thrd=3
-  export JNPES_thrd=4
-  export INPES_c384=6
-  export JNPES_c384=12
-  export THRD_c384=1
-  export INPES_c768=8
-  export JNPES_c768=16
-  export THRD_c768=2
-  export WRTTASK_PER_GROUP_c384=84
-  export WRTTASK_PER_GROUP_c384gdas=88
-
-  export THRD_cpl_atmw_gdas=2
-  export INPES_cpl_atmw_gdas=6
-  export JNPES_cpl_atmw_gdas=8
-  export WPG_cpl_atmw_gdas=24
-  export WAV_tasks_atmw_gdas=240
-
-  # run only in weekly test
-  export THRD_cpl_bmrk=2
-  export INPES_cpl_bmrk=16
-  export JNPES_cpl_bmrk=16
-  export WPG_cpl_bmrk=48
-  export OCN_tasks_cpl_bmrk=100
-  export ICE_tasks_cpl_bmrk=48
-  export WAV_tasks_cpl_bmrk=100
-  export WLCLK_cpl_bmrk=120
-
-  # run only in weekly test
-  export THRD_cpl_c192=2
-  export INPES_cpl_c192=12
-  export JNPES_cpl_c192=16
-  export WPG_cpl_c192=24
-  export OCN_tasks_cpl_c192=100
-  export ICE_tasks_cpl_c192=48
-  export WAV_tasks_cpl_c192=80
-  export WLCLK_cpl_c192=120
-
-elif [[ ${MACHINE_ID} = s4 ]]; then
-
-  export TPN=32
-
-  export INPES_dflt=3
-  export JNPES_dflt=8
-  export INPES_thrd=3
-  export JNPES_thrd=4
-  export INPES_c384=6
-  export JNPES_c384=8
-  export THRD_c384=2
-  export INPES_c768=8
-  export JNPES_c768=16
-  export THRD_c768=1
-
-  export THRD_cpl_atmw_gdas=2
-  export INPES_cpl_atmw_gdas=6
-  export JNPES_cpl_atmw_gdas=8
-  export WPG_cpl_atmw_gdas=24
-  export WAV_tasks_atmw_gdas=248
-
-  export THRD_cpl_bmrk=2
-  export INPES_cpl_bmrk=6;
-  export JNPES_cpl_bmrk=8
-  export WPG_cpl_bmrk=24
-  export OCN_tasks_cpl_bmrk=120
-  export ICE_tasks_cpl_bmrk=48
-  export WAV_tasks_cpl_bmrk=80
-
 elif [[ ${MACHINE_ID} = gaeac5 ]]; then
 
   export TPN=128
@@ -438,11 +368,6 @@ elif [[ ${MACHINE_ID} = noaacloud ]] ; then
     export ICE_tasks_cpl_thrd=10
     export WAV_tasks_cpl_thrd=12
 
-elif [[ ${MACHINE_ID} = frontera ]]; then
-
-  TPN=56
-  export EXCLUSIVE_NODES=.true.
-
 else
 
   echo "Unknown MACHINE_ID ${MACHINE_ID}"
@@ -483,6 +408,7 @@ export FV3_RUN=control_run.IN
 export INPUT_NML=control.nml.IN
 export CCPP_SUITE=FV3_GFS_v16
 
+export DOGP_CLDOPTICS_LUT=.false.
 export DOGP_LWSCAT=.false.
 export IAER=111
 export ICLIQ_SW=1
@@ -529,14 +455,7 @@ export_mpas ()
     export_gfs_physics
     # ufs.configure defaults
     export UFS_CONFIGURE=ufs.configure.atm.IN
-    export MODEL_CONFIGURE=mpasatm_configure.IN
     export atm_model=mpas
-
-    export DIAG_TABLE=diag_table_rrfs_a
-    export FIELD_TABLE=field_table_regional_rrfs_a
-    export FV3_RUN=rrfs_mpas_run.IN
-    export INPUT_NML=control_mpas.nml.IN
-    export CCPP_SUITE=MPAS_RRFS
 
     #
     export MPAS=true
@@ -569,14 +488,14 @@ export_mpas ()
 
     export DAYS=1
     export ENS_NUM=1
-    export SYEAR=2016 #mpasatm_configure.IN
-    export SMONTH=10 #mpasatm_configure.IN
-    export SDAY=03 #mpasatm_configure.IN
-    export SHOUR=00 #mpasatm_configure.IN
-    export SECS=$(( SHOUR*3600 )) #mpasatm_configure.IN
-    export FHMAX=$(( DAYS*24 )) #mpasatm_configure.IN
+    export SYEAR=2016
+    export SMONTH=10
+    export SDAY=03
+    export SHOUR=00
+    export SECS=$(( SHOUR*3600 ))
+    export FHMAX=$(( DAYS*24 ))
     export FHCYC=0
-    export FHROT=0 #mpasatm_configure.IN
+    export FHROT=0
     export LDIAG3D=.false.
     export QDIAG3D=.false.
     export PRINT_DIFF_PGR=.false.
@@ -615,7 +534,6 @@ export_mpas ()
     export LNDP_TYPE=0
     export N_VAR_LNDP=0
 
-
     export INPES=${INPES_dflt}
     export JNPES=${JNPES_dflt}
 
@@ -632,6 +550,36 @@ export_mpas ()
     export ZSTANDARD_LEVEL=0
 
     export DOMAINS_STACK_SIZE=3000000
+}
+export_mpas_rrfs ()
+{
+    # RRFS agnostic MPAS settings
+    export_mpas
+
+    # RRFS specific MPAS settings.
+    export DIAG_TABLE=diag_table_mpas
+    export FIELD_TABLE=field_table_rrfs_mpas
+    export FV3_RUN=rrfs_mpas_run.IN
+    export INPUT_NML=control_rrfs_mpas.nml.IN
+    export CCPP_SUITE=MPAS_RRFS
+
+    MODEL_CONFIGURE=mpasrrfs_configure.IN
+}
+
+export_mpas_gfs ()
+{
+    # GFS agnostic MPAS settings.
+    export_mpas
+
+    # GFS specific MPAS setting
+    export DIAG_TABLE=diag_table_mpas
+    export FIELD_TABLE=field_table_gfsv17_mpas
+    export FV3_RUN=gfs_mpas_run.IN
+    export INPUT_NML=control_gfs_mpas.nml.IN
+    # Use regional physics for now.
+    export CCPP_SUITE=MPAS_RRFS
+
+    MODEL_CONFIGURE=mpasgfs_configure.IN
 }
 
 export_gfs_physics ()
@@ -660,6 +608,7 @@ export_gfs_physics ()
     export HYBEDMF=.false.
     # RRTMGP
     export DO_RRTMGP=.false.
+    export DOGP_CLDOPTICS_LUT=.true.
     export DOGP_LWSCAT=.true.
     export DOGP_SGS_CNV=.true.
     export USE_LW_JACOBIAN=.false.
@@ -999,8 +948,9 @@ export TTENDLIM=-999
 
 # Radiation
 export DO_RRTMGP=.false.
+export DOGP_CLDOPTICS_LUT=.true.
 export DOGP_LWSCAT=.true.
-export DOGP_SGS_CNV=.false.
+export DOGP_SGS_CNV=.true.
 export USE_LW_JACOBIAN=.false.
 export DAMP_LW_FLUXADJ=.false.
 export RRTMGP_LW_PHYS_BLKSZ=2
@@ -1735,12 +1685,11 @@ export_fire_behavior() {
 }
 
 
-# Defaults for the coupled 5-component
+# Defaults for the global coupled
 export_cmeps() {
-  export UFS_CONFIGURE=ufs.configure.s2swa_fast.IN
+  export UFS_CONFIGURE=ufs.configure.s2sw_fast.IN
   export med_model=cmeps
   export atm_model=fv3
-  export chm_model=gocart
   export ocn_model=mom6
   export ice_model=cice6
   export wav_model=ww3
@@ -1898,8 +1847,9 @@ export LSEASPRAY=.true.
 
 # RRTMGP
 export DO_RRTMGP=.false.
+export DOGP_CLDOPTICS_LUT=.true.
 export DOGP_LWSCAT=.true.
-export DOGP_SGS_CNV=.false.
+export DOGP_SGS_CNV=.true.
 
 # CA
 export DO_CA=.true.
@@ -1932,7 +1882,7 @@ export CPL=.true.
 export CPLWAV=.true.
 export CPLWAV2ATM=.true.
 export USE_MED_FLUX=.false.
-export CPLCHM=.true.
+export CPLCHM=.false.
 export CPLLND=.false.
 
 # for FV3: default values will be changed if doing a warm-warm restart

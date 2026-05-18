@@ -149,5 +149,6 @@ if [[ $MACHINE_ID = gaeac6 ]]; then
 fi
 if [[ $MACHINE_ID = ursa ]]; then
    export EXCLUSIVE_NODES=.true.
+   export MEM_PER_NODE="300G"
 fi   
 

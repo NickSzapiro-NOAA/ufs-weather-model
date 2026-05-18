@@ -224,7 +224,7 @@ elif [[ ${MACHINE_ID} = hera ]]; then
 elif [[ ${MACHINE_ID} = ursa ]]; then
 
   export TPN=192
-
+  export MEM_PER_NODE="288000M"
   export INPES_dflt=3
   export JNPES_dflt=8
   export INPES_thrd=3

@@ -36,3 +36,11 @@ if [[ $POSTAPP = 'lam' ]]; then
     cp ${PATHRT}/parm/postxconfig-NT-fv3lam.txt postxconfig-NT_FH00.txt
     cp ${PATHRT}/../UFSATM/upp/parm/params_grib2_tbl_new params_grib2_tbl_new
 fi
+
+#TEMPO
+if [ $IMP_PHYSICS = 88 ]; then
+  cp /scratch4/BMC/wrfruc/jensen/for_ftp/qr_acr_qs_data_tempo_v3 .
+  cp /scratch4/BMC/wrfruc/jensen/for_ftp/qr_acr_qg_data_tempo_v3 .
+  cp /scratch4/BMC/wrfruc/jensen/for_ftp/freeze_water_data_tempo_v3 .
+  cp /scratch4/BMC/wrfruc/jensen/for_ftp/ccn_activate.bin .
+fi

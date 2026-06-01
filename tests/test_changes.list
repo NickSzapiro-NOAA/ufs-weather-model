@@ -1,1 +1,2 @@
-cpld_regional_atm_fbh intel
+control_gfs_mpas gnu
+control_gfs_mpas_debug gnu

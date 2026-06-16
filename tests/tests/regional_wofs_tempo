@@ -6,7 +6,7 @@
 
 export TEST_DESCR="Compare FV3_WoFS_v0 hi-res 3km results with previous trunk version"
 
-export CNTL_DIR=fv3_regional_wofs
+export CNTL_DIR=fv3_regional_wofs_tempo
 
 export LIST_FILES="dynf000.nc \
                    dynf006.nc \
@@ -67,4 +67,5 @@ export NSTF_NAME="2, 1, 0, 0, 0"
 
 if [[ ${MACHINE_ID} = ursa ]]; then
    export EXCLUSIVE_NODES=.true.
+   export MEM_PER_NODE="300G"
 fi 

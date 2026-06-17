@@ -39,8 +39,6 @@ fi
 
 #TEMPO
 if [ $IMP_PHYSICS = 88 ]; then
-  cp /scratch4/BMC/wrfruc/jensen/for_ftp/qr_acr_qs_data_tempo_v3 .
-  cp /scratch4/BMC/wrfruc/jensen/for_ftp/qr_acr_qg_data_tempo_v3 .
-  cp /scratch4/BMC/wrfruc/jensen/for_ftp/freeze_water_data_tempo_v3 .
+cp @[INPUTDATA_ROOT]/FV3_input_data_TEMPO/* .
   cp /scratch4/BMC/wrfruc/jensen/for_ftp/ccn_activate.bin .
 fi

@@ -175,7 +175,7 @@ fi
 #TEMPO
 if [ $IMP_PHYSICS = 88 ]; then
   cp @[INPUTDATA_ROOT]/FV3_input_data_TEMPO/* .
-  cp /scratch4/BMC/wrfruc/jensen/for_ftp/ccn_activate.bin .
+  cp @[INPUTDATA_ROOT]/FV3_fix/CCN_ACTIVATE.BIN .
 fi
 
 #prognostic aerosols

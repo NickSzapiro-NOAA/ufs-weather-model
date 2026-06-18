@@ -71,6 +71,8 @@ export skip_check_results=true
 export RTVERBOSE=false
 DEFINE_CONF_FILE=false
 TESTS_FILE="${PATHRT}/rt_container.conf"
+ECF_HOST=''
+ECF_PORT=''
 
 ###############################################################################
 # Parse command-line options

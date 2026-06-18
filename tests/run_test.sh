@@ -456,7 +456,28 @@ fi
 export OMP_ENV=${OMP_ENV:-""}
 if [[ ${SCHEDULER} = 'none' ]]; then
   ulimit -s unlimited
-  if [[ ${CI_TEST} = 'true' ]]; then
+  if [[ ${MACHINE_ID} = 'container' ]]; then
+    # Locate container runtime on the host.
+    if command -v apptainer &>/dev/null; then
+      CONTAINERBIN=apptainer
+    elif command -v singularity &>/dev/null; then
+      CONTAINERBIN=singularity
+    else
+      echo "ERROR: neither apptainer nor singularity found on this host" >&2
+      exit 1
+    fi
+    BIND_FLAGS=""
+    if [[ -n "${CONTAINER_BIND:-}" ]]; then
+      IFS=',' read -r -a _bind_dirs <<< "${CONTAINER_BIND}"
+      for _dir in "${_bind_dirs[@]}"; do
+        BIND_FLAGS="${BIND_FLAGS} -B ${_dir}"
+      done
+    fi
+    echo "NOTE: running ${TASKS} MPI tasks interactively — ensure the host can accommodate this count"
+    # shellcheck disable=SC2086
+    redirect_out_err ${MPI_LAUNCH} --mpi=pmi2 -n "${TASKS}" \
+      ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" ./fv3.exe
+  elif [[ ${CI_TEST} = 'true' ]]; then
     eval "${OMP_ENV}" redirect_out_err mpiexec -n "${TASKS}" ./fv3.exe
   else
     redirect_out_err mpiexec -n "${TASKS}" ./fv3.exe

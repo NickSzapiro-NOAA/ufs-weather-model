@@ -200,16 +200,18 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
     # Header line 2: TPN | SCHEDULER | USE_ROCOTO | ACCNR | PARTITION | QUEUE
     # ------------------------------------------------------------------
     if [[ ${header_lines_read} -eq 1 ]]; then
-        IFS='|' read -r f1 f2 f3 f4 f5 f6 _rest <<< "${line}"
+        IFS='|' read -r f1 f2 f3 f4 f5 f6 f7 _rest <<< "${line}"
         TPN=$(trim "${f1:-40}")
         SCHEDULER=$(trim "${f2:-slurm}")
         USE_ROCOTO=$(trim "${f3:-false}")
         ACCNR=$(trim "${f4:-}")
         PARTITION=$(trim "${f5:-}")
         QUEUE=$(trim "${f6:-}")
+        MPI_LAUNCH=$(trim "${f7:-mpirun}")
         header_lines_read=2
         echo "TPN=${TPN}  SCHEDULER=${SCHEDULER}  USE_ROCOTO=${USE_ROCOTO}"
         echo "ACCNR=${ACCNR}  PARTITION=${PARTITION}  QUEUE=${QUEUE}"
+        [[ "${SCHEDULER}" == none ]] && echo "MPI_LAUNCH=${MPI_LAUNCH}"
         continue
     fi
 
@@ -359,7 +361,7 @@ fi
 
 export MACHINE_ID=container
 export RT_COMPILER TPN CONTAINER_IMG CONTAINER_BIND
-export SCHEDULER USE_ROCOTO ACCNR PARTITION QUEUE
+export SCHEDULER USE_ROCOTO ACCNR PARTITION QUEUE MPI_LAUNCH
 export DISKNM INPUTDATA_ROOT PATHRT PATHTR RUNDIR_ROOT LOG_DIR
 export RTPWD NEW_BASELINE
 
@@ -450,6 +452,7 @@ export QUEUE=${QUEUE}
 export TPN=${TPN}
 export CONTAINER_IMG=${CONTAINER_IMG}
 export CONTAINER_BIND=${CONTAINER_BIND}
+export MPI_LAUNCH=${MPI_LAUNCH}
 export RTVERBOSE=${RTVERBOSE}
 export WLCLK=120
 ENV_EOF
@@ -544,6 +547,7 @@ export QUEUE=${QUEUE}
 export TPN=${TPN}
 export CONTAINER_IMG=${CONTAINER_IMG}
 export CONTAINER_BIND=${CONTAINER_BIND}
+export MPI_LAUNCH=${MPI_LAUNCH}
 export RTPWD=${RTPWD}
 export NEW_BASELINE=${NEW_BASELINE}
 export INPUTDATA_ROOT=${INPUTDATA_ROOT}

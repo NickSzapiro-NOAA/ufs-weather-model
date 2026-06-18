@@ -69,7 +69,7 @@ mkdir -p "${RUNDIR}"
 cd "${RUNDIR}"
 
 if [[ ${SCHEDULER} = 'pbs' ]]; then
-  if [[ -e ${PATHRT}/fv3_conf/compile_qsub.IN_${MACHINE_ID} ]]; then 
+  if [[ -e ${PATHRT}/fv3_conf/compile_qsub.IN_${MACHINE_ID} ]]; then
     atparse < "${PATHRT}/fv3_conf/compile_qsub.IN_${MACHINE_ID}" > job_card
   else
     echo "Looking for fv3_conf/compile_qsub.IN_${MACHINE_ID} but it is not found. Exiting"
@@ -82,6 +82,14 @@ elif [[ ${SCHEDULER} = 'slurm' ]]; then
     echo "Looking for fv3_conf/compile_slurm.IN_${MACHINE_ID} but it is not found. Exiting"
     exit 1
   fi
+elif [[ ${SCHEDULER} = 'none' ]]; then
+  # No job scheduler — write an inline compile script (no scheduler headers).
+  cat > job_card << COMPILE_EOF
+#!/bin/bash
+set -eux
+"${PATHRT}/compile.sh" "${MACHINE_ID}" "${MAKE_OPT}" "${COMPILE_ID}" "${RT_COMPILER}"
+COMPILE_EOF
+  chmod u+x job_card
 fi
 
 ################################################################################
@@ -89,7 +97,28 @@ fi
 ################################################################################
 
 if [[ ${ROCOTO} = 'false' ]]; then
-  submit_and_wait job_card
+  if [[ ${SCHEDULER} = 'none' ]]; then
+    # Run compile interactively inside the container.
+    if command -v apptainer &>/dev/null; then
+      CONTAINERBIN=apptainer
+    elif command -v singularity &>/dev/null; then
+      CONTAINERBIN=singularity
+    else
+      echo "ERROR: neither apptainer nor singularity found on this host" >&2
+      exit 1
+    fi
+    BIND_FLAGS=""
+    if [[ -n "${CONTAINER_BIND:-}" ]]; then
+      IFS=',' read -r -a _bind_dirs <<< "${CONTAINER_BIND}"
+      for _dir in "${_bind_dirs[@]}"; do
+        BIND_FLAGS="${BIND_FLAGS} -B ${_dir}"
+      done
+    fi
+    # shellcheck disable=SC2086
+    ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" "${RUNDIR}/job_card"
+  else
+    submit_and_wait job_card
+  fi
 else
   chmod u+x job_card
   redirect_out_err ./job_card

@@ -164,9 +164,11 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
         CONTAINER_IMG=$(trim "${f2:-}")
         CONTAINER_BIND=$(trim "${f3:-}")
         header_lines_read=1
-        echo "RT_COMPILER=${RT_COMPILER}"
-        echo "CONTAINER_IMG=${CONTAINER_IMG}"
-        echo "BIND_DIRS=${CONTAINER_BIND}"
+        if [[ "${RTVERBOSE}" == true ]]; then
+            echo "RT_COMPILER=${RT_COMPILER}"
+            echo "CONTAINER_IMG=${CONTAINER_IMG}"
+            echo "BIND_DIRS=${CONTAINER_BIND}"
+        fi
         continue
     fi
 
@@ -200,10 +202,12 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
         fi
         unset _wf_host
         header_lines_read=2
-        echo "TPN=${TPN}  SCHEDULER=${SCHEDULER}  WORKFLOW=${WORKFLOW}"
-        echo "ACCNR=${ACCNR}  PARTITION=${PARTITION}  QUEUE=${QUEUE}"
-        [[ "${SCHEDULER}" == none ]] && echo "MPI_LAUNCH=${MPI_LAUNCH}"
-        [[ "${ECFLOW}" == true ]]    && echo "ECF_HOST=${ECF_HOST}  ECF_PORT=${ECF_PORT}"
+        if [[ "${RTVERBOSE}" == true ]]; then
+            echo "TPN=${TPN}  SCHEDULER=${SCHEDULER}  WORKFLOW=${WORKFLOW}"
+            echo "ACCNR=${ACCNR}  PARTITION=${PARTITION}  QUEUE=${QUEUE}"
+            [[ "${SCHEDULER}" == none ]] && echo "MPI_LAUNCH=${MPI_LAUNCH}"
+            [[ "${ECFLOW}" == true ]]    && echo "ECF_HOST=${ECF_HOST}  ECF_PORT=${ECF_PORT}"
+        fi
         continue
     fi
 
@@ -213,7 +217,7 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
     if [[ ${header_lines_read} -eq 2 ]]; then
         DISKNM=$(trim "${line}")
         header_lines_read=3
-        echo "DISKNM=${DISKNM}"
+        [[ "${RTVERBOSE}" == true ]] && echo "DISKNM=${DISKNM}"
         continue
     fi
 
@@ -223,7 +227,7 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
     if [[ ${header_lines_read} -eq 3 ]]; then
         INPUTDATA_ROOT=$(trim "${line}")
         header_lines_read=4
-        echo "INPUTDATA_ROOT=${INPUTDATA_ROOT}"
+        [[ "${RTVERBOSE}" == true ]] && echo "INPUTDATA_ROOT=${INPUTDATA_ROOT}"
         continue
     fi
 
@@ -233,7 +237,7 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
     if [[ ${header_lines_read} -eq 4 ]]; then
         RUNDIR_ROOT=$(trim "${line}")
         header_lines_read=5
-        echo "RUNDIR_ROOT=${RUNDIR_ROOT}"
+        [[ "${RTVERBOSE}" == true ]] && echo "RUNDIR_ROOT=${RUNDIR_ROOT}"
         continue
     fi
 
@@ -271,10 +275,12 @@ if [[ ${#compile_ids[@]} -eq 0 ]]; then
 fi
 
 echo ""
-echo "Found ${#compile_ids[@]} compile configuration(s):"
-for i in "${!compile_ids[@]}"; do
-    echo "  $((i+1)): ${compile_ids[$i]}  [${make_opts[$i]}]"
-done
+echo "Found ${#compile_ids[@]} compile configuration(s)."
+if [[ "${RTVERBOSE}" == true ]]; then
+    for i in "${!compile_ids[@]}"; do
+        echo "  $((i+1)): ${compile_ids[$i]}  [${make_opts[$i]}]"
+    done
+fi
 echo ""
 
 ###############################################################################
@@ -318,8 +324,7 @@ fi
 LOG_DIR="${RUNDIR_ROOT}/logs"
 mkdir -p "${LOG_DIR}"
 
-echo "LOG_DIR=${LOG_DIR}"
-echo ""
+[[ "${RTVERBOSE}" == true ]] && echo "LOG_DIR=${LOG_DIR}"
 
 # When -d is set, run_test.sh reads keep_tests.tmp to decide which dirs to keep.
 # An empty file means every test dir gets removed.
@@ -360,16 +365,17 @@ fi
 # Print active flags and confirm before starting
 ###############################################################################
 
-echo "Active flags:"
-[[ "${delete_rundir}" == true ]]   && echo "  -d  delete run directories after each test"
-[[ "${RUN_SINGLE_TEST}" == true ]] && echo "  -n  single test: ${SRT_NAME}"
-[[ "${COMPILE_ONLY}" == true ]]    && echo "  -o  compile only, skip tests"
-[[ "${RTVERBOSE}" == true ]]       && echo "  -v  verbose output"
-echo ""
-
-read -r -n 1 -s -p "Configuration above — press any key to start, or Ctrl-C to abort... "
-echo ""
-echo ""
+if [[ "${RTVERBOSE}" == true ]]; then
+    echo "Active flags:"
+    [[ "${delete_rundir}" == true ]]   && echo "  -d  delete run directories after each test"
+    [[ "${RUN_SINGLE_TEST}" == true ]] && echo "  -n  single test: ${SRT_NAME}"
+    [[ "${COMPILE_ONLY}" == true ]]    && echo "  -o  compile only, skip tests"
+    echo "  -v  verbose output"
+    echo ""
+    read -r -n 1 -s -p "Configuration above — press any key to start, or Ctrl-C to abort... "
+    echo ""
+    echo ""
+fi
 
 ###############################################################################
 # Tracking

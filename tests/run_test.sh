@@ -473,6 +473,24 @@ if [[ ${SCHEDULER} = 'none' ]]; then
         BIND_FLAGS="${BIND_FLAGS} -B ${_dir}"
       done
     fi
+    # Pass runtime environment into the container via APPTAINER/SINGULARITY ENV_ variables.
+    CONTAINER="${CONTAINERBIN^^}"  # APPTAINER or SINGULARITY
+    export "${CONTAINER}_SHELL=/bin/bash"
+    export "${CONTAINER}ENV_FI_PROVIDER=tcp"
+    if [[ "${RT_COMPILER}" == intel ]]; then
+      [[ -n "${FI_PROVIDER_PATH:-}" ]] && export "${CONTAINER}ENV_FI_PROVIDER_PATH=${FI_PROVIDER_PATH}"
+    elif [[ "${RT_COMPILER}" == gnu ]]; then
+      export "${CONTAINER}ENV_PMIX_MCA_gds=hash"
+      export "${CONTAINER}ENV_PMIX_MCA_psec=native"
+      export "${CONTAINER}ENV_OMPI_MCA_btl=^openib"
+      if ip link show eth0 &>/dev/null; then
+        export "${CONTAINER}ENV_OMPI_MCA_btl_tcp_if_include=eth0"
+        export "${CONTAINER}ENV_OMPI_MCA_oob_tcp_if_include=eth0"
+      fi
+      export "${CONTAINER}ENV_OMPI_MCA_pml=ob1"
+      export "${CONTAINER}ENV_OMPI_MCA_btl_vader_single_copy_mechanism=none"
+      export "${CONTAINER}ENV_OMPI_MCA_mca_base_component_show_load_errors=0"
+    fi
     echo "NOTE: running ${TASKS} MPI tasks interactively — ensure the host can accommodate this count"
     # shellcheck disable=SC2086
     redirect_out_err ${MPI_LAUNCH} --mpi=pmi2 -n "${TASKS}" \

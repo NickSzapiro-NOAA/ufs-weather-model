@@ -9,6 +9,7 @@
 @[EXCLUSIVE_NODES_OPT]
 
 set -eux
+PMI="--mpi=pmix"
 echo -n " $( date +%s )," > job_timestamp.txt
 
 set +x
@@ -59,8 +60,29 @@ if [[ -n "@[CONTAINER_BIND]" ]]; then
   done
 fi
 
+# Pass runtime environment into the container via APPTAINER/SINGULARITY ENV_ variables.
+# Variables named ${CONTAINER}ENV_* on the host are automatically propagated into the
+# container by apptainer/singularity (with the prefix stripped).
+CONTAINER="${CONTAINERBIN^^}"  # APPTAINER or SINGULARITY
+export "${CONTAINER}_SHELL=/bin/bash"
+export "${CONTAINER}ENV_FI_PROVIDER=tcp"
+if [[ "@[RT_COMPILER]" == intel ]]; then
+  [[ -n "${FI_PROVIDER_PATH:-}" ]] && export "${CONTAINER}ENV_FI_PROVIDER_PATH=${FI_PROVIDER_PATH}"
+elif [[ "@[RT_COMPILER]" == gnu ]]; then
+  export "${CONTAINER}ENV_PMIX_MCA_gds=hash"
+  export "${CONTAINER}ENV_PMIX_MCA_psec=native"
+  export "${CONTAINER}ENV_OMPI_MCA_btl=^openib"
+  if ip link show eth0 &>/dev/null; then
+    export "${CONTAINER}ENV_OMPI_MCA_btl_tcp_if_include=eth0"
+    export "${CONTAINER}ENV_OMPI_MCA_oob_tcp_if_include=eth0"
+  fi
+  export "${CONTAINER}ENV_OMPI_MCA_pml=ob1"
+  export "${CONTAINER}ENV_OMPI_MCA_btl_vader_single_copy_mechanism=none"
+  export "${CONTAINER}ENV_OMPI_MCA_mca_base_component_show_load_errors=0"
+fi
+
 # shellcheck disable=SC2086
-mpirun -n @[UFS_TASKS] --hostfile $PBS_NODEFILE \
+mpirun ${PMI} -n @[UFS_TASKS] --hostfile $PBS_NODEFILE \
   ${CONTAINERBIN} exec ${BIND_FLAGS} "@[CONTAINER_IMG]" ./fv3.exe
 
 echo "Model ended:    " $(date)

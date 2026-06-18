@@ -305,6 +305,12 @@ else
     RTPWD="${DISKNM}"
 fi
 
+# Derive INPUTDATA_ROOT sub-paths (same convention as rt.sh).
+# All three can be overridden by setting the variable before invoking this script.
+INPUTDATA_ROOT_WW3=${INPUTDATA_ROOT_WW3:-${INPUTDATA_ROOT}/WW3_input_data_20250807}
+INPUTDATA_LM4=${INPUTDATA_LM4:-${INPUTDATA_ROOT}/LM4_input_data}
+INPUTDATA_GFSv17opn=${INPUTDATA_GFSv17opn:-${DISKNM}/NEMSfv3gfs/GFSv17opn_20251014}
+
 # Load the test list for -b (baseline from file)
 declare -a BASELINE_TESTS=()
 if [[ -n "${NEW_BASELINES_FILE}" ]]; then
@@ -362,7 +368,8 @@ fi
 export MACHINE_ID=container
 export RT_COMPILER TPN CONTAINER_IMG CONTAINER_BIND
 export SCHEDULER USE_ROCOTO ACCNR PARTITION QUEUE MPI_LAUNCH
-export DISKNM INPUTDATA_ROOT PATHRT PATHTR RUNDIR_ROOT LOG_DIR
+export DISKNM INPUTDATA_ROOT INPUTDATA_ROOT_WW3 INPUTDATA_LM4 INPUTDATA_GFSv17opn
+export PATHRT PATHTR RUNDIR_ROOT LOG_DIR
 export RTPWD NEW_BASELINE
 
 # run_compile.sh and run_test.sh check ROCOTO (not USE_ROCOTO).
@@ -551,6 +558,9 @@ export MPI_LAUNCH=${MPI_LAUNCH}
 export RTPWD=${RTPWD}
 export NEW_BASELINE=${NEW_BASELINE}
 export INPUTDATA_ROOT=${INPUTDATA_ROOT}
+export INPUTDATA_ROOT_WW3=${INPUTDATA_ROOT_WW3}
+export INPUTDATA_LM4=${INPUTDATA_LM4}
+export INPUTDATA_GFSv17opn=${INPUTDATA_GFSv17opn}
 export CNTL_DIR=${TEST_NAME}
 export RT_SUFFIX=
 export BL_SUFFIX=

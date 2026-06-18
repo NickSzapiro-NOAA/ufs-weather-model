@@ -493,8 +493,8 @@ if [[ ${skip_check_results} == false ]]; then
     # --- regression test comparison
     #
     for i in ${LIST_FILES} ; do
-      printf %s " Comparing ${i} ....." >> "${RT_LOG}"
-      printf %s " Comparing ${i} ....."
+      echo " Comparing ${i} ....." >> "${RT_LOG}"
+      echo " Comparing ${i} ....."
 
       if [[ ! -f ${RUNDIR}/${i} ]] ; then
 
@@ -511,26 +511,26 @@ if [[ ${skip_check_results} == false ]]; then
       else
         if [[ ${i##*.} == nc* ]] ; then
           if [[ " orion hercules hera ursa wcoss2 acorn derecho gaeac5 gaeac6 noaacloud " =~ ${MACHINE_ID} ]]; then
-            printf "USING NCCMP.." >> "${RT_LOG}"
-            printf "USING NCCMP.."
+            echo "USING NCCMP.." >> "${RT_LOG}"
+            echo "USING NCCMP.."
               nccmp_args=(-d -S -q -f -B --Attribute=checksum --warn=format)
               if [[ ${CMP_DATAONLY} == false ]]; then nccmp_args+=("-g"); fi
               if [[ -n "${nccmp_exclude// }" ]]; then nccmp_args+=("${nccmp_exclude}"); fi
               if [[ -n "${nccmp_exclude_attr// }" ]]; then nccmp_args+=("${nccmp_exclude_attr}"); fi
               nccmp "${nccmp_args[@]}" "${RTPWD}/${CNTL_DIR}_${RT_COMPILER}/${i}" "${RUNDIR}/${i}" > "${i}_nccmp.log" 2>&1 && d=$? || d=$?
               if [[ ${d} -ne 0 && ${d} -ne 1 ]]; then
-                printf "....ERROR" >> "${RT_LOG}"
-                printf "....ERROR"
+                echo "....ERROR" >> "${RT_LOG}"
+                echo "....ERROR"
                 test_status='FAIL'
               fi
           fi
         else
-          printf "USING CMP.." >> "${RT_LOG}"
-          printf "USING CMP.."
+          echo "USING CMP.." >> "${RT_LOG}"
+          echo "USING CMP.."
           cmp "${RTPWD}/${CNTL_DIR}_${RT_COMPILER}/${i}" "${RUNDIR}/${i}" >/dev/null 2>&1 && d=$? || d=$?
           if [[ ${d} -eq 2 ]]; then
-            printf "....ERROR" >> "${RT_LOG}"
-            printf "....ERROR"
+            echo "....ERROR" >> "${RT_LOG}"
+            echo "....ERROR"
             test_status='FAIL'
           fi
 
@@ -557,8 +557,8 @@ if [[ ${skip_check_results} == false ]]; then
     echo;echo "Moving baseline ${TEST_ID} files ...." >> "${RT_LOG}"
 
     for i in ${LIST_FILES} ; do
-      printf %s " Moving ${i} ....."
-      printf %s " Moving ${i} ....."   >> "${RT_LOG}"
+      echo " Moving ${i} ....."
+      echo " Moving ${i} ....."   >> "${RT_LOG}"
       if [[ -f ${RUNDIR}/${i} ]] ; then
         mkdir -p "${NEW_BASELINE}/${CNTL_DIR}_${RT_COMPILER}/$(dirname "${i}")"
         cp "${RUNDIR}/${i}" "${NEW_BASELINE}/${CNTL_DIR}_${RT_COMPILER}/${i}"

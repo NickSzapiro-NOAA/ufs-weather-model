@@ -69,7 +69,11 @@ case ${MACHINE_ID} in
       module reset
     elif [[ ${MACHINE_ID} == container ]]; then
       # shellcheck disable=SC1091
-      source /usr/lmod/lmod/init/bash
+      if [[ -e /usr/share/lmod/lmod/init/bash ]]; then
+        source /usr/share/lmod/lmod/init/bash
+      else
+        source /usr/lmod/lmod/init/bash
+      fi
       module purge
     elif [[ ${MACHINE_ID} == hercules ]]; then
       module purge

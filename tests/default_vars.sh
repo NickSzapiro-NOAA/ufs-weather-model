@@ -368,6 +368,30 @@ elif [[ ${MACHINE_ID} = noaacloud ]] ; then
     export ICE_tasks_cpl_thrd=10
     export WAV_tasks_cpl_thrd=12
 
+elif [[ ${MACHINE_ID} = container ]]; then
+
+  # Running in a container.  TPN is provided at runtime from rt_container.conf
+  # via the job .env file; use it if already set, otherwise fall back to 40.
+  export TPN=${TPN:-40}
+
+  # Decomposition defaults similar to a typical 40-task-per-node system.
+  export INPES_dflt=3
+  export JNPES_dflt=8
+  export INPES_thrd=3
+  export JNPES_thrd=4
+  export INPES_c384=6
+  export JNPES_c384=8
+  export THRD_c384=2
+  export INPES_c768=8
+  export JNPES_c768=16
+  export THRD_c768=2
+
+  export THRD_cpl_atmw_gdas=2
+  export INPES_cpl_atmw_gdas=6
+  export JNPES_cpl_atmw_gdas=8
+  export WPG_cpl_atmw_gdas=24
+  export WAV_tasks_atmw_gdas=248
+
 else
 
   echo "Unknown MACHINE_ID ${MACHINE_ID}"

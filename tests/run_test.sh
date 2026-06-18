@@ -97,6 +97,10 @@ cp "${PATHRT}/fv3_${COMPILE_ID}.exe" "fv3.exe"
 mkdir -p modulefiles
 if [[ ${MACHINE_ID} == linux ]]; then
   cp "${PATHRT}/modules.fv3_${COMPILE_ID}" "./modulefiles/modules.fv3"
+elif [[ ${MACHINE_ID} == container ]]; then
+  # For container runs the host-side module is the user-supplied runtime
+  # modulefile; the compile-time spack-stack module lives inside the container.
+  cp "${PATHTR}/modulefiles/ufs_container.runtime.lua" "./modulefiles/modules.fv3.lua"
 else
   cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua" "./modulefiles/modules.fv3.lua"
 fi

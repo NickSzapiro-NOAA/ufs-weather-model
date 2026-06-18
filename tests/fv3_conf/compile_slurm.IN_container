@@ -1,0 +1,55 @@
+#!/bin/bash
+#SBATCH -e err
+#SBATCH -o out
+#SBATCH --account=@[ACCNR]
+#SBATCH --qos=@[QUEUE]
+#SBATCH --partition=@[PARTITION]
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=@[TPN]
+#SBATCH --exclusive
+#SBATCH --time=120
+#SBATCH --job-name="@[JBNME]"
+
+set -eux
+date_s_start=$(date +%s)
+date_start=$(date)
+echo -n "${date_s_start}," > job_timestamp.txt
+echo "Compile started: ${date_start}"
+
+# Locate the container runtime on the host.
+if command -v apptainer &>/dev/null; then
+  CONTAINERBIN=apptainer
+elif command -v singularity &>/dev/null; then
+  CONTAINERBIN=singularity
+else
+  echo "ERROR: neither apptainer nor singularity found on this host" >&2
+  exit 1
+fi
+
+# Build bind-mount flags from the comma-separated CONTAINER_BIND list.
+BIND_FLAGS=""
+if [[ -n "@[CONTAINER_BIND]" ]]; then
+  IFS=',' read -r -a _bind_dirs <<< "@[CONTAINER_BIND]"
+  for _dir in "${_bind_dirs[@]}"; do
+    BIND_FLAGS="${BIND_FLAGS} -B ${_dir}"
+  done
+fi
+
+# Write the compile script that will run inside the container.
+# atparse has already substituted @[...] tokens before this script runs,
+# so all paths and options below are literal values at execution time.
+cat > container_compile.sh << 'COMPILE_EOF'
+#!/bin/bash
+set -eux
+"@[PATHRT]/compile.sh" "container" "@[MAKE_OPT]" "@[COMPILE_ID]" "@[RT_COMPILER]"
+COMPILE_EOF
+chmod u+x container_compile.sh
+
+# Execute the compile inside the container.
+# shellcheck disable=SC2086
+${CONTAINERBIN} exec ${BIND_FLAGS} "@[CONTAINER_IMG]" "${PWD}/container_compile.sh"
+
+date_end=$(date)
+echo "Compile ended: ${date_end}"
+date_s_end=$(date +%s)
+echo -n "${date_s_end}," >> job_timestamp.txt

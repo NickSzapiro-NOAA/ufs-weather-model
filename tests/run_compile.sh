@@ -96,8 +96,11 @@ fi
 # Submit compile job
 ################################################################################
 
-if [[ ${ROCOTO} = 'false' ]]; then
+if [[ ${ROCOTO} = 'false' && ${ECFLOW:-false} = 'false' ]]; then
   if [[ ${SCHEDULER} = 'none' ]]; then
+    # Load the host-side runtime module (makes apptainer/singularity and host MPI available).
+    module use "${PATHTR}/modulefiles"
+    module load ufs_container.runtime
     # Run compile interactively inside the container.
     if command -v apptainer &>/dev/null; then
       CONTAINERBIN=apptainer
@@ -114,8 +117,11 @@ if [[ ${ROCOTO} = 'false' ]]; then
         BIND_FLAGS="${BIND_FLAGS} -B ${_dir}"
       done
     fi
-    # shellcheck disable=SC2086
-    ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" "${RUNDIR}/job_card"
+    # Write timestamps around the interactive exec so job_timestamp.txt exists
+    # for the logging step below (mirrors what the job card writes for slurm/pbs).
+    echo -n "$( date +%s )," > job_timestamp.txt
+    ${CONTAINERBIN} exec -e ${BIND_FLAGS} "${CONTAINER_IMG}" "${RUNDIR}/job_card"
+    echo -n " $( date +%s )," >> job_timestamp.txt
   else
     submit_and_wait job_card
   fi

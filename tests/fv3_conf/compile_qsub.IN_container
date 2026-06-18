@@ -32,6 +32,10 @@ if [[ -n "@[CONTAINER_BIND]" ]]; then
   done
 fi
 
+# Load the host-side runtime module (makes apptainer/singularity and host MPI available).
+module use "@[PATHTR]/modulefiles"
+module load ufs_container.runtime
+
 # Write the compile script that will run inside the container.
 # atparse has already substituted @[...] tokens before this script runs,
 # so all paths and options below are literal values at execution time.
@@ -43,8 +47,8 @@ COMPILE_EOF
 chmod u+x container_compile.sh
 
 # Execute the compile inside the container.
-# shellcheck disable=SC2086
-${CONTAINERBIN} exec ${BIND_FLAGS} "@[CONTAINER_IMG]" "${PWD}/container_compile.sh"
+# -e (--cleanenv) ensures a clean environment inside the container.
+${CONTAINERBIN} exec -e ${BIND_FLAGS} "@[CONTAINER_IMG]" "${PWD}/container_compile.sh"
 
 date_end=$(date)
 echo "Compile ended: ${date_end}"

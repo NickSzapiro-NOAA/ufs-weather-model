@@ -98,9 +98,10 @@ mkdir -p modulefiles
 if [[ ${MACHINE_ID} == linux ]]; then
   cp "${PATHRT}/modules.fv3_${COMPILE_ID}" "./modulefiles/modules.fv3"
 elif [[ ${MACHINE_ID} == container ]]; then
-  # For container runs the host-side module is the user-supplied runtime
-  # modulefile; the compile-time spack-stack module lives inside the container.
-  cp "${PATHTR}/modulefiles/ufs_container.runtime.lua" "./modulefiles/modules.fv3.lua"
+  # Host-side runtime modulefile (loaded on the host before the container launches).
+  cp "${PATHTR}/modulefiles/ufs_container.runtime.lua"  "./modulefiles/modules.fv3.lua"
+  # Inside-container compiler modulefile (loaded by fv3_container_run.sh inside the container).
+  cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua"          "./modulefiles/modules.fv3_${COMPILE_ID}.lua"
 else
   cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua" "./modulefiles/modules.fv3.lua"
 fi
@@ -492,9 +493,24 @@ if [[ ${SCHEDULER} = 'none' ]]; then
       export "${CONTAINER}ENV_OMPI_MCA_mca_base_component_show_load_errors=0"
     fi
     echo "NOTE: running ${TASKS} MPI tasks interactively — ensure the host can accommodate this count"
-    # shellcheck disable=SC2086
+    # Write a wrapper script that runs inside the container.
+    # Unquoted heredoc: ${COMPILE_ID} is expanded and baked into the script at write time.
+    # \$@ is escaped so it writes literally as "$@" rather than expanding now.
+    # ./modulefiles is already populated by run_test.sh setup above.
+    cat > fv3_container_run.sh << RUN_EOF
+#!/bin/bash
+set -eux
+MACHINE_ID=container
+source ./module-setup.sh
+module purge
+module use ./modulefiles
+module load modules.fv3_${COMPILE_ID}
+module list
+exec "\$@"
+RUN_EOF
+    chmod u+x fv3_container_run.sh
     redirect_out_err ${MPI_LAUNCH} --mpi=pmi2 -n "${TASKS}" \
-      ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" ./fv3.exe
+      ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" "${PWD}/fv3_container_run.sh" ./fv3.exe
   elif [[ ${CI_TEST} = 'true' ]]; then
     eval "${OMP_ENV}" redirect_out_err mpiexec -n "${TASKS}" ./fv3.exe
   else
@@ -503,7 +519,7 @@ if [[ ${SCHEDULER} = 'none' ]]; then
 
 else
 
-  if [[ ${ROCOTO} = 'false' ]]; then
+  if [[ ${ROCOTO} = 'false' && ${ECFLOW:-false} = 'false' ]]; then
     submit_and_wait job_card
   else
     chmod u+x job_card

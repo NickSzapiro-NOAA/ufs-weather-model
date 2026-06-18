@@ -47,19 +47,15 @@ usage() {
     echo "Usage: $(basename "$0") [options] [rt_container.conf]"
     echo ""
     echo "Options:"
-    echo "  -a <account>  scheduler account/project (overrides conf header line 2)"
-    echo "  -b <file>     create new baselines only for tests listed in <file>"
-    echo "  -c            create new baseline results"
     echo "  -d            delete run directories after each test completes"
     echo "  -h            display this help"
-    echo "  -k            keep RUNDIR_ROOT after rt_container.sh completes"
     echo "  -l <file>     use <file> as the configuration file"
-    echo "  -m            compare against newly created baselines (requires prior -c run)"
     echo "  -n <name>     run only the single test named <name>"
     echo "  -o            compile only, skip all tests"
-    echo "  -r            use Rocoto workflow manager (overrides conf header line 2)"
     echo "  -v            verbose output (set -x)"
-    echo "  -w            skip comparing results against baselines"
+    echo ""
+    echo "Configuration file may also be given as a positional argument."
+    echo "Default: rt_container.conf in the same directory as this script."
     echo ""
 }
 
@@ -67,19 +63,12 @@ usage() {
 # Flag defaults
 ###############################################################################
 
-CREATE_BASELINE=false
-KEEP_RUNDIR=false
 export delete_rundir=false
 COMPILE_ONLY=false
-RTPWD_NEW_BASELINE=false
-NEW_BASELINES_FILE=''
 RUN_SINGLE_TEST=false
 SRT_NAME=''
-export skip_check_results=false
+export skip_check_results=true
 export RTVERBOSE=false
-OVERRIDE_ACCNR=''
-OVERRIDE_ROCOTO=false
-ECFLOW=false
 DEFINE_CONF_FILE=false
 TESTS_FILE="${PATHRT}/rt_container.conf"
 
@@ -87,21 +76,21 @@ TESTS_FILE="${PATHRT}/rt_container.conf"
 # Parse command-line options
 ###############################################################################
 
-while getopts ":a:b:cdhl:kmn:orvw" opt; do
+# getopts handles only single-character flags; scan for --help before it runs.
+for _arg in "$@"; do
+    [[ "${_arg}" == "--help" ]] && { usage; exit 0; }
+    [[ "${_arg}" == "--"    ]] && break
+done
+unset _arg
+
+while getopts ":dhl:n:ov" opt; do
     case ${opt} in
-        a) OVERRIDE_ACCNR=${OPTARG} ;;
-        b) NEW_BASELINES_FILE=${OPTARG} ;;
-        c) CREATE_BASELINE=true ;;
         d) export delete_rundir=true ;;
         h) usage; exit 0 ;;
-        k) KEEP_RUNDIR=true ;;
         l) DEFINE_CONF_FILE=true; TESTS_FILE=${OPTARG} ;;
-        m) RTPWD_NEW_BASELINE=true ;;
         n) RUN_SINGLE_TEST=true; SRT_NAME=${OPTARG} ;;
         o) COMPILE_ONLY=true ;;
-        r) OVERRIDE_ROCOTO=true ;;
         v) export RTVERBOSE=true ;;
-        w) export skip_check_results=true ;;
         \?) usage; echo "ERROR: invalid option -${OPTARG}" >&2; exit 1 ;;
         :)  usage; echo "ERROR: option -${OPTARG} requires an argument" >&2; exit 1 ;;
         *)  usage; echo "ERROR: unknown arguments" >&2; exit 1 ;;
@@ -112,23 +101,6 @@ shift $((OPTIND - 1))
 # Positional arg (conf file) after options overrides default but not -l
 if [[ "${DEFINE_CONF_FILE}" == false && -n "${1:-}" ]]; then
     TESTS_FILE="$1"
-fi
-
-###############################################################################
-# Validate flag combinations
-###############################################################################
-
-if [[ "${CREATE_BASELINE}" == true && "${RTPWD_NEW_BASELINE}" == true ]]; then
-    echo "ERROR: -c and -m are mutually exclusive" >&2; exit 1
-fi
-if [[ -n "${NEW_BASELINES_FILE}" && "${RUN_SINGLE_TEST}" == true ]]; then
-    echo "ERROR: -b and -n cannot be used together" >&2; exit 1
-fi
-if [[ -n "${NEW_BASELINES_FILE}" && ! -s "${NEW_BASELINES_FILE}" ]]; then
-    echo "ERROR: baseline file is empty: ${NEW_BASELINES_FILE}" >&2; exit 1
-fi
-if [[ "${KEEP_RUNDIR}" == true && "${delete_rundir}" == true ]]; then
-    echo "ERROR: -k and -d cannot be used together" >&2; exit 1
 fi
 
 if [[ "${RTVERBOSE}" == true ]]; then
@@ -197,21 +169,39 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
     fi
 
     # ------------------------------------------------------------------
-    # Header line 2: TPN | SCHEDULER | USE_ROCOTO | ACCNR | PARTITION | QUEUE
+    # Header line 2: TPN | SCHEDULER | WORKFLOW | ACCNR | PARTITION | QUEUE | MPI_LAUNCH | ECF_HOST | ECF_PORT
     # ------------------------------------------------------------------
     if [[ ${header_lines_read} -eq 1 ]]; then
         IFS='|' read -r f1 f2 f3 f4 f5 f6 f7 _rest <<< "${line}"
         TPN=$(trim "${f1:-40}")
         SCHEDULER=$(trim "${f2:-slurm}")
-        USE_ROCOTO=$(trim "${f3:-false}")
         ACCNR=$(trim "${f4:-}")
         PARTITION=$(trim "${f5:-}")
         QUEUE=$(trim "${f6:-}")
         MPI_LAUNCH=$(trim "${f7:-mpirun}")
+        # WORKFLOW field may carry an optional ECF_HOST suffix: "ecflow,hostname"
+        # If no hostname is given, ECF_HOST defaults to $(hostname).
+        # ECF_PORT is always computed as uid+1500.
+        IFS=',' read -r _wf_name _wf_host <<< "$(trim "${f3:-none}")"
+        WORKFLOW=$(trim "${_wf_name}"); unset _wf_name
+        case "${WORKFLOW}" in
+            rocoto) ROCOTO=true;  ECFLOW=false ;;
+            ecflow) ROCOTO=false; ECFLOW=true  ;;
+            none)   ROCOTO=false; ECFLOW=false ;;
+            *) echo "ERROR: WORKFLOW must be rocoto, ecflow[,hostname], or none — got '${WORKFLOW}'" >&2; exit 1 ;;
+        esac
+        if [[ "${ECFLOW}" == true ]]; then
+            _conf_host=$(trim "${_wf_host:-}")
+            ECF_HOST=${ECF_HOST:-${_conf_host:-$(hostname)}}
+            ECF_PORT=$(( $(id -u) + 1500 ))
+            unset _conf_host
+        fi
+        unset _wf_host
         header_lines_read=2
-        echo "TPN=${TPN}  SCHEDULER=${SCHEDULER}  USE_ROCOTO=${USE_ROCOTO}"
+        echo "TPN=${TPN}  SCHEDULER=${SCHEDULER}  WORKFLOW=${WORKFLOW}"
         echo "ACCNR=${ACCNR}  PARTITION=${PARTITION}  QUEUE=${QUEUE}"
         [[ "${SCHEDULER}" == none ]] && echo "MPI_LAUNCH=${MPI_LAUNCH}"
+        [[ "${ECFLOW}" == true ]]    && echo "ECF_HOST=${ECF_HOST}  ECF_PORT=${ECF_PORT}"
         continue
     fi
 
@@ -286,36 +276,17 @@ done
 echo ""
 
 ###############################################################################
-# Apply command-line overrides (after conf is parsed)
+# Derived paths (after conf is parsed)
 ###############################################################################
 
-# -a overrides ACCNR from conf
-[[ -n "${OVERRIDE_ACCNR}" ]] && ACCNR="${OVERRIDE_ACCNR}"
-
-# -r overrides USE_ROCOTO from conf
-[[ "${OVERRIDE_ROCOTO}" == true ]] && USE_ROCOTO=true
-
-# Baseline paths:
-#   NEW_BASELINE — where new baselines are written when -c is active
-#   RTPWD        — where run_test.sh looks for baseline files to compare
-NEW_BASELINE="${RUNDIR_ROOT}/REGRESSION_TEST"
-if [[ "${RTPWD_NEW_BASELINE}" == true ]]; then
-    RTPWD="${NEW_BASELINE}"
-else
-    RTPWD="${DISKNM}"
-fi
+# RTPWD — where run_test.sh looks for baseline files to compare against.
+RTPWD="${DISKNM}"
 
 # Derive INPUTDATA_ROOT sub-paths (same convention as rt.sh).
 # All three can be overridden by setting the variable before invoking this script.
 INPUTDATA_ROOT_WW3=${INPUTDATA_ROOT_WW3:-${INPUTDATA_ROOT}/WW3_input_data_20250807}
 INPUTDATA_LM4=${INPUTDATA_LM4:-${INPUTDATA_ROOT}/LM4_input_data}
 INPUTDATA_GFSv17opn=${INPUTDATA_GFSv17opn:-${DISKNM}/NEMSfv3gfs/GFSv17opn_20251014}
-
-# Load the test list for -b (baseline from file)
-declare -a BASELINE_TESTS=()
-if [[ -n "${NEW_BASELINES_FILE}" ]]; then
-    readarray -t BASELINE_TESTS < "${NEW_BASELINES_FILE}"
-fi
 
 ###############################################################################
 # Validate prerequisites
@@ -348,13 +319,6 @@ mkdir -p "${LOG_DIR}"
 echo "LOG_DIR=${LOG_DIR}"
 echo ""
 
-# When creating baselines, prepare the destination directory.
-if [[ "${CREATE_BASELINE}" == true || -n "${NEW_BASELINES_FILE}" ]]; then
-    mkdir -p "${NEW_BASELINE}"
-    echo "NEW_BASELINE=${NEW_BASELINE}"
-    echo ""
-fi
-
 # When -d is set, run_test.sh reads keep_tests.tmp to decide which dirs to keep.
 # An empty file means every test dir gets removed.
 if [[ "${delete_rundir}" == true ]]; then
@@ -367,14 +331,10 @@ fi
 
 export MACHINE_ID=container
 export RT_COMPILER TPN CONTAINER_IMG CONTAINER_BIND
-export SCHEDULER USE_ROCOTO ACCNR PARTITION QUEUE MPI_LAUNCH
+export SCHEDULER WORKFLOW ROCOTO ECFLOW ACCNR PARTITION QUEUE MPI_LAUNCH ECF_HOST ECF_PORT
 export DISKNM INPUTDATA_ROOT INPUTDATA_ROOT_WW3 INPUTDATA_LM4 INPUTDATA_GFSv17opn
 export PATHRT PATHTR RUNDIR_ROOT LOG_DIR
-export RTPWD NEW_BASELINE
-
-# run_compile.sh and run_test.sh check ROCOTO (not USE_ROCOTO).
-export ROCOTO="${USE_ROCOTO}"
-export ECFLOW="${ECFLOW}"
+export RTPWD
 
 ###############################################################################
 # Source atparse (used by run_compile.sh/run_test.sh; sourced here so the
@@ -384,21 +344,25 @@ export ECFLOW="${ECFLOW}"
 source "${PATHRT}/atparse.bash"
 
 ###############################################################################
+# Load the host-side runtime module when a workflow manager is requested.
+# Users place the Rocoto or ECFlow module loads inside ufs_container.runtime.lua
+# so those tools are available on the submit host before job submission begins.
+###############################################################################
+
+if [[ "${WORKFLOW}" == rocoto || "${WORKFLOW}" == ecflow ]]; then
+    module use "${PATHTR}/modulefiles"
+    module load ufs_container.runtime
+fi
+
+###############################################################################
 # Print active flags and confirm before starting
 ###############################################################################
 
 echo "Active flags:"
-[[ -n "${OVERRIDE_ACCNR}" ]]          && echo "  -a  account override: ${ACCNR}"
-[[ -n "${NEW_BASELINES_FILE}" ]]       && echo "  -b  baselines from file: ${NEW_BASELINES_FILE}"
-[[ "${CREATE_BASELINE}" == true ]]     && echo "  -c  create new baselines in: ${NEW_BASELINE}"
-[[ "${delete_rundir}" == true ]]       && echo "  -d  delete run directories after each test"
-[[ "${KEEP_RUNDIR}" == true ]]         && echo "  -k  keep RUNDIR_ROOT after completion"
-[[ "${RTPWD_NEW_BASELINE}" == true ]]  && echo "  -m  compare against: ${NEW_BASELINE}"
-[[ "${RUN_SINGLE_TEST}" == true ]]     && echo "  -n  single test: ${SRT_NAME}"
-[[ "${COMPILE_ONLY}" == true ]]        && echo "  -o  compile only, skip tests"
-[[ "${OVERRIDE_ROCOTO}" == true ]]     && echo "  -r  Rocoto workflow enabled"
-[[ "${RTVERBOSE}" == true ]]           && echo "  -v  verbose output"
-[[ "${skip_check_results}" == true ]]  && echo "  -w  skip baseline comparison"
+[[ "${delete_rundir}" == true ]]   && echo "  -d  delete run directories after each test"
+[[ "${RUN_SINGLE_TEST}" == true ]] && echo "  -n  single test: ${SRT_NAME}"
+[[ "${COMPILE_ONLY}" == true ]]    && echo "  -o  compile only, skip tests"
+[[ "${RTVERBOSE}" == true ]]       && echo "  -v  verbose output"
 echo ""
 
 read -r -n 1 -s -p "Configuration above — press any key to start, or Ctrl-C to abort... "
@@ -438,12 +402,19 @@ for i in "${!compile_ids[@]}"; do
     echo "====================================================================="
 
     # ------------------------------------------------------------------
-    # Write the compile environment file (sourced by run_compile.sh).
-    # env file is sourced twice in run_compile.sh (before and after
-    # default_vars.sh), so variables here survive the defaults reset.
+    # Skip compile if the executable already exists in PATHRT.
     # ------------------------------------------------------------------
-    mkdir -p "${RUNDIR_ROOT}"
-    cat > "${RUNDIR_ROOT}/${JBNME}.env" << ENV_EOF
+    if [[ -f "${PATHRT}/fv3_${COMPILE_ID}.exe" ]]; then
+        echo "Found existing ${PATHRT}/fv3_${COMPILE_ID}.exe — skipping compile"
+        echo ""
+    else
+        # ------------------------------------------------------------------
+        # Write the compile environment file (sourced by run_compile.sh).
+        # env file is sourced twice in run_compile.sh (before and after
+        # default_vars.sh), so variables here survive the defaults reset.
+        # ------------------------------------------------------------------
+        mkdir -p "${RUNDIR_ROOT}"
+        cat > "${RUNDIR_ROOT}/${JBNME}.env" << ENV_EOF
 export MACHINE_ID=container
 export PATHTR=${PATHTR}
 export PATHRT=${PATHRT}
@@ -451,8 +422,11 @@ export RUNDIR_ROOT=${RUNDIR_ROOT}
 export LOG_DIR=${LOG_DIR}
 export RT_COMPILER=${RT_COMPILER}
 export SCHEDULER=${SCHEDULER}
-export ROCOTO=${USE_ROCOTO}
+export WORKFLOW=${WORKFLOW}
+export ROCOTO=${ROCOTO}
 export ECFLOW=${ECFLOW}
+export ECF_HOST=${ECF_HOST}
+export ECF_PORT=${ECF_PORT}
 export ACCNR=${ACCNR}
 export PARTITION=${PARTITION}
 export QUEUE=${QUEUE}
@@ -464,30 +438,31 @@ export RTVERBOSE=${RTVERBOSE}
 export WLCLK=120
 ENV_EOF
 
-    # ------------------------------------------------------------------
-    # Submit compile job and wait (submit_and_wait inside run_compile.sh
-    # blocks until the scheduler job completes).
-    # run_compile.sh exits 0 even on failure in non-rocoto mode; check
-    # the fail file instead.
-    # ------------------------------------------------------------------
-    "${PATHRT}/run_compile.sh" \
-        "${PATHRT}" "${RUNDIR_ROOT}" "${MAKE_OPT}" "${COMPILE_ID}" || true
+        # ------------------------------------------------------------------
+        # Submit compile job and wait (submit_and_wait inside run_compile.sh
+        # blocks until the scheduler job completes).
+        # run_compile.sh exits 0 even on failure in non-rocoto mode; check
+        # the fail file instead.
+        # ------------------------------------------------------------------
+        "${PATHRT}/run_compile.sh" \
+            "${PATHRT}" "${RUNDIR_ROOT}" "${MAKE_OPT}" "${COMPILE_ID}" || true
 
-    if [[ -f "${PATHRT}/fail_${JBNME}" ]]; then
-        echo "ERROR: compile failed for COMPILE_ID=${COMPILE_ID}" >&2
-        echo "       See ${PATHRT}/fail_${JBNME} and ${LOG_DIR}/${JBNME}.log" >&2
-        failed_compiles+=("${COMPILE_ID}")
-        continue
+        if [[ -f "${PATHRT}/fail_${JBNME}" ]]; then
+            echo "ERROR: compile failed for COMPILE_ID=${COMPILE_ID}" >&2
+            echo "       See ${PATHRT}/fail_${JBNME} and ${LOG_DIR}/${JBNME}.log" >&2
+            failed_compiles+=("${COMPILE_ID}")
+            continue
+        fi
+
+        if [[ ! -f "${PATHRT}/fv3_${COMPILE_ID}.exe" ]]; then
+            echo "WARNING: fv3_${COMPILE_ID}.exe not found after compile — skipping tests" >&2
+            skipped_tests+=("${COMPILE_ID}:ALL:missing_executable")
+            continue
+        fi
+
+        echo "Compile ${COMPILE_ID} succeeded — ${PATHRT}/fv3_${COMPILE_ID}.exe"
+        echo ""
     fi
-
-    if [[ ! -f "${PATHRT}/fv3_${COMPILE_ID}.exe" ]]; then
-        echo "WARNING: fv3_${COMPILE_ID}.exe not found after compile — skipping tests" >&2
-        skipped_tests+=("${COMPILE_ID}:ALL:missing_executable")
-        continue
-    fi
-
-    echo "Compile ${COMPILE_ID} succeeded — ${PATHRT}/fv3_${COMPILE_ID}.exe"
-    echo ""
 
     # -o: compile only, do not run tests.
     if [[ "${COMPILE_ONLY}" == true ]]; then
@@ -521,23 +496,8 @@ ENV_EOF
         echo "Test: ${TEST_NAME}  (COMPILE_ID=${COMPILE_ID})"
         echo "---------------------------------------------------------------------"
 
-        # Determine whether this test creates baselines.
-        # -c: all tests create baselines.
-        # -b: only tests listed in the file create baselines.
-        CREATE_BASELINE_THIS_TEST=false
-        if [[ "${CREATE_BASELINE}" == true ]]; then
-            CREATE_BASELINE_THIS_TEST=true
-        elif [[ -n "${NEW_BASELINES_FILE}" ]]; then
-            for bl_test in "${BASELINE_TESTS[@]}"; do
-                if [[ "$(trim "${bl_test}")" == "${TEST_NAME}" ]]; then
-                    CREATE_BASELINE_THIS_TEST=true
-                    break
-                fi
-            done
-        fi
-
         # Write the test environment file (sourced by run_test.sh).
-        # RTPWD points to the baseline data directory (DISKNM, or NEW_BASELINE with -m).
+        # RTPWD points to the baseline data directory (DISKNM).
         cat > "${RUNDIR_ROOT}/run_test_${TEST_ID}.env" << ENV_EOF
 export MACHINE_ID=container
 export PATHTR=${PATHTR}
@@ -546,8 +506,11 @@ export RUNDIR_ROOT=${RUNDIR_ROOT}
 export LOG_DIR=${LOG_DIR}
 export RT_COMPILER=${RT_COMPILER}
 export SCHEDULER=${SCHEDULER}
-export ROCOTO=${USE_ROCOTO}
+export WORKFLOW=${WORKFLOW}
+export ROCOTO=${ROCOTO}
 export ECFLOW=${ECFLOW}
+export ECF_HOST=${ECF_HOST}
+export ECF_PORT=${ECF_PORT}
 export ACCNR=${ACCNR}
 export PARTITION=${PARTITION}
 export QUEUE=${QUEUE}
@@ -556,7 +519,6 @@ export CONTAINER_IMG=${CONTAINER_IMG}
 export CONTAINER_BIND=${CONTAINER_BIND}
 export MPI_LAUNCH=${MPI_LAUNCH}
 export RTPWD=${RTPWD}
-export NEW_BASELINE=${NEW_BASELINE}
 export INPUTDATA_ROOT=${INPUTDATA_ROOT}
 export INPUTDATA_ROOT_WW3=${INPUTDATA_ROOT_WW3}
 export INPUTDATA_LM4=${INPUTDATA_LM4}
@@ -564,8 +526,8 @@ export INPUTDATA_GFSv17opn=${INPUTDATA_GFSv17opn}
 export CNTL_DIR=${TEST_NAME}
 export RT_SUFFIX=
 export BL_SUFFIX=
-export CREATE_BASELINE=${CREATE_BASELINE_THIS_TEST}
-export skip_check_results=${skip_check_results}
+export CREATE_BASELINE=false
+export skip_check_results=true
 export delete_rundir=${delete_rundir}
 export RTVERBOSE=${RTVERBOSE}
 export WLCLK=60
@@ -590,12 +552,8 @@ ENV_EOF
 done
 
 ###############################################################################
-# Cleanup RUNDIR_ROOT (unless -k was specified)
+# Cleanup
 ###############################################################################
-
-if [[ "${KEEP_RUNDIR}" == false && ${#failed_tests[@]} -eq 0 && ${#failed_compiles[@]} -eq 0 ]]; then
-    rm -rf "${RUNDIR_ROOT}"
-fi
 
 [[ "${delete_rundir}" == true ]] && rm -f "${PATHRT}/keep_tests.tmp"
 

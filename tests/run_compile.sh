@@ -73,9 +73,19 @@ cd "${RUNDIR}"
 # environment inside the container (mirrors what run_test.sh does for tests).
 if [[ ${MACHINE_ID} = container ]]; then
     mkdir -p modulefiles
-    cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua"  "modulefiles/modules.fv3_${COMPILE_ID}.lua"
-    cp "${PATHTR}/modulefiles/ufs_common.lua"      "modulefiles/ufs_common.lua"
-    cp "${PATHRT}/module-setup.sh"                 "module-setup.sh"
+    if [[ -f "${PATHRT}/modules.fv3_${COMPILE_ID}.lua" ]]; then
+        cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua"               "modulefiles/modules.fv3_${COMPILE_ID}.lua"
+    elif [[ -f "${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua" ]]; then
+        cp "${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua" "modulefiles/modules.fv3_${COMPILE_ID}.lua"
+    else
+        echo "ERROR: no inside-container build module found for COMPILE_ID=${COMPILE_ID}" >&2
+        echo "       Provide ${PATHRT}/modules.fv3_${COMPILE_ID}.lua" >&2
+        echo "       or ${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua" >&2
+        exit 1
+    fi
+    [[ -f "${PATHTR}/modulefiles/ufs_common.lua" ]] && \
+        cp "${PATHTR}/modulefiles/ufs_common.lua" "modulefiles/ufs_common.lua"
+    cp "${PATHRT}/module-setup.sh" "module-setup.sh"
 fi
 
 if [[ ${SCHEDULER} = 'pbs' ]]; then

@@ -102,7 +102,16 @@ elif [[ ${MACHINE_ID} == container ]]; then
   # Host-side runtime modulefile (loaded on the host before the container launches).
   cp "${PATHTR}/modulefiles/ufs_container.runtime.lua"  "./modulefiles/modules.fv3.lua"
   # Inside-container compiler modulefile (loaded by fv3_container_run.sh inside the container).
-  cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua"          "./modulefiles/modules.fv3_${COMPILE_ID}.lua"
+  if [[ -f "${PATHRT}/modules.fv3_${COMPILE_ID}.lua" ]]; then
+    cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua"                "./modulefiles/modules.fv3_${COMPILE_ID}.lua"
+  elif [[ -f "${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua" ]]; then
+    cp "${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua"  "./modulefiles/modules.fv3_${COMPILE_ID}.lua"
+  else
+    echo "ERROR: no inside-container build module found for COMPILE_ID=${COMPILE_ID}" >&2
+    echo "       Provide ${PATHRT}/modules.fv3_${COMPILE_ID}.lua" >&2
+    echo "       or ${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua" >&2
+    exit 1
+  fi
 else
   cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua" "./modulefiles/modules.fv3.lua"
 fi

@@ -8,7 +8,8 @@
 #PBS -l walltime=00:@[WLCLK]:00
 @[EXCLUSIVE_NODES_OPT]
 
-set -eux
+set -eu
+[[ "${RTVERBOSE:-false}" == true ]] && set -x
 PMI="--mpi=pmix"
 echo -n " $( date +%s )," > job_timestamp.txt
 
@@ -29,6 +30,10 @@ if [ "${JOB_SHOULD_FAIL:-NO}" = WHEN_RUNNING ] ; then
     echo "If error checking is working, the metascheduler should mark the job as failed." 1>&2
     false
 fi
+
+# Load the host-side runtime module (makes apptainer/singularity and host MPI available).
+module use "@[PATHTR]/modulefiles"
+module load ufs_container.runtime
 
 # Locate the container runtime on the host.
 if command -v apptainer &>/dev/null; then
@@ -54,6 +59,7 @@ fi
 CONTAINER="${CONTAINERBIN^^}"  # APPTAINER or SINGULARITY
 export "${CONTAINER}_SHELL=/bin/bash"
 export "${CONTAINER}ENV_FI_PROVIDER=tcp"
+export "${CONTAINER}ENV_RTVERBOSE=${RTVERBOSE:-false}"
 if [[ "@[RT_COMPILER]" == intel ]]; then
   [[ -n "${FI_PROVIDER_PATH:-}" ]] && export "${CONTAINER}ENV_FI_PROVIDER_PATH=${FI_PROVIDER_PATH}"
 elif [[ "@[RT_COMPILER]" == gnu ]]; then
@@ -74,7 +80,8 @@ fi
 # ./modulefiles is populated by run_test.sh before this job card runs.
 cat > fv3_container_run.sh << 'RUN_EOF'
 #!/bin/bash
-set -eux
+set -eu
+[[ "${RTVERBOSE:-false}" == true ]] && set -x
 MACHINE_ID=container
 source ./module-setup.sh
 module purge

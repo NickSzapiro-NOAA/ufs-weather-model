@@ -1,6 +1,7 @@
 #!/bin/bash
-set -eux
+set -eu
 set -o pipefail
+[[ "${RTVERBOSE:-false}" == true ]] && set -x
 
 echo "PID=$$"
 SECONDS=0
@@ -68,6 +69,15 @@ rm -rf "${RUNDIR}"
 mkdir -p "${RUNDIR}"
 cd "${RUNDIR}"
 
+# Stage module files the container compile script needs to set up the build
+# environment inside the container (mirrors what run_test.sh does for tests).
+if [[ ${MACHINE_ID} = container ]]; then
+    mkdir -p modulefiles
+    cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua"  "modulefiles/modules.fv3_${COMPILE_ID}.lua"
+    cp "${PATHTR}/modulefiles/ufs_common.lua"      "modulefiles/ufs_common.lua"
+    cp "${PATHRT}/module-setup.sh"                 "module-setup.sh"
+fi
+
 if [[ ${SCHEDULER} = 'pbs' ]]; then
   if [[ -e ${PATHRT}/fv3_conf/compile_qsub.IN_${MACHINE_ID} ]]; then
     atparse < "${PATHRT}/fv3_conf/compile_qsub.IN_${MACHINE_ID}" > job_card
@@ -82,11 +92,18 @@ elif [[ ${SCHEDULER} = 'slurm' ]]; then
     echo "Looking for fv3_conf/compile_slurm.IN_${MACHINE_ID} but it is not found. Exiting"
     exit 1
   fi
-elif [[ ${SCHEDULER} = 'none' ]]; then
+elif [[ ${SCHEDULER} = 'none' && ${MACHINE_ID} = 'container' ]]; then
   # No job scheduler — write an inline compile script (no scheduler headers).
+  # Unquoted heredoc: ${...} variables expand at write time (COMPILE_ID etc. are baked in).
   cat > job_card << COMPILE_EOF
 #!/bin/bash
-set -eux
+set -e
+MACHINE_ID=container
+source ./module-setup.sh
+module purge
+module use ./modulefiles
+module load modules.fv3_${COMPILE_ID}
+module list
 "${PATHRT}/compile.sh" "${MACHINE_ID}" "${MAKE_OPT}" "${COMPILE_ID}" "${RT_COMPILER}"
 COMPILE_EOF
   chmod u+x job_card
@@ -96,8 +113,8 @@ fi
 # Submit compile job
 ################################################################################
 
-if [[ ${ROCOTO} = 'false' && ${ECFLOW:-false} = 'false' ]]; then
-  if [[ ${SCHEDULER} = 'none' ]]; then
+if [[ ${ROCOTO} = 'false' ]]; then
+  if [[ ${MACHINE_ID} = 'container' && ${SCHEDULER} = 'none' ]]; then
     # Load the host-side runtime module (makes apptainer/singularity and host MPI available).
     module use "${PATHTR}/modulefiles"
     module load ufs_container.runtime
@@ -117,6 +134,9 @@ if [[ ${ROCOTO} = 'false' && ${ECFLOW:-false} = 'false' ]]; then
         BIND_FLAGS="${BIND_FLAGS} -B ${_dir}"
       done
     fi
+    CONTAINER="${CONTAINERBIN^^}"
+    export "${CONTAINER}_SHELL=/bin/bash"
+    export "${CONTAINER}ENV_RTVERBOSE=${RTVERBOSE:-false}"
     # Write timestamps around the interactive exec so job_timestamp.txt exists
     # for the logging step below (mirrors what the job card writes for slurm/pbs).
     echo -n "$( date +%s )," > job_timestamp.txt

@@ -2,8 +2,8 @@
 # rt_container.sh — UFS-WM regression test driver for container-based runs.
 #
 # Reads a five-header-line configuration file (default: rt_container.conf in
-# the same directory as this script) and runs compile + test phases for each
-# configuration sequentially:
+# the same directory as this script) and compiles and runs each configuration
+# sequentially — no Rocoto or ECFlow workflow manager is involved:
 #   for each compile configuration:
 #     1. Compile the model inside the container
 #     2. Run every listed test case sequentially, waiting for each to finish
@@ -71,8 +71,6 @@ export skip_check_results=true
 export RTVERBOSE=false
 DEFINE_CONF_FILE=false
 TESTS_FILE="${PATHRT}/rt_container.conf"
-ECF_HOST=''
-ECF_PORT=''
 
 ###############################################################################
 # Parse command-line options
@@ -124,7 +122,7 @@ fi
 # Parse rt_container.conf
 #
 # Header line 1: RT_COMPILER | CONTAINER_IMG | BIND_DIRS
-# Header line 2: TPN | SCHEDULER | USE_ROCOTO | ACCNR | PARTITION | QUEUE
+# Header line 2: TPN | SCHEDULER | ACCNR | PARTITION | QUEUE | MPI_LAUNCH
 # Header line 3: DISKNM
 # Header line 4: INPUTDATA_ROOT
 # Header line 5: RUNDIR_ROOT
@@ -173,40 +171,23 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
     fi
 
     # ------------------------------------------------------------------
-    # Header line 2: TPN | SCHEDULER | WORKFLOW | ACCNR | PARTITION | QUEUE | MPI_LAUNCH | ECF_HOST | ECF_PORT
+    # Header line 2: TPN | SCHEDULER | ACCNR | PARTITION | QUEUE | MPI_LAUNCH
     # ------------------------------------------------------------------
     if [[ ${header_lines_read} -eq 1 ]]; then
-        IFS='|' read -r f1 f2 f3 f4 f5 f6 f7 _rest <<< "${line}"
+        IFS='|' read -r f1 f2 f3 f4 f5 f6 _rest <<< "${line}"
         TPN=$(trim "${f1:-40}")
         SCHEDULER=$(trim "${f2:-slurm}")
-        ACCNR=$(trim "${f4:-}")
-        PARTITION=$(trim "${f5:-}")
-        QUEUE=$(trim "${f6:-}")
-        MPI_LAUNCH=$(trim "${f7:-mpirun}")
-        # WORKFLOW field may carry an optional ECF_HOST suffix: "ecflow,hostname"
-        # If no hostname is given, ECF_HOST defaults to $(hostname).
-        # ECF_PORT is always computed as uid+1500.
-        IFS=',' read -r _wf_name _wf_host <<< "$(trim "${f3:-none}")"
-        WORKFLOW=$(trim "${_wf_name}"); unset _wf_name
-        case "${WORKFLOW}" in
-            rocoto) ROCOTO=true;  ECFLOW=false ;;
-            ecflow) ROCOTO=false; ECFLOW=true  ;;
-            none)   ROCOTO=false; ECFLOW=false ;;
-            *) echo "ERROR: WORKFLOW must be rocoto, ecflow[,hostname], or none — got '${WORKFLOW}'" >&2; exit 1 ;;
-        esac
-        if [[ "${ECFLOW}" == true ]]; then
-            _conf_host=$(trim "${_wf_host:-}")
-            ECF_HOST=${ECF_HOST:-${_conf_host:-$(hostname)}}
-            ECF_PORT=$(( $(id -u) + 1500 ))
-            unset _conf_host
-        fi
-        unset _wf_host
+        ACCNR=$(trim "${f3:-}")
+        PARTITION=$(trim "${f4:-}")
+        QUEUE=$(trim "${f5:-}")
+        MPI_LAUNCH=$(trim "${f6:-mpirun}")
+        ROCOTO=false
+        ECFLOW=false
         header_lines_read=2
         if [[ "${RTVERBOSE}" == true ]]; then
-            echo "TPN=${TPN}  SCHEDULER=${SCHEDULER}  WORKFLOW=${WORKFLOW}"
+            echo "TPN=${TPN}  SCHEDULER=${SCHEDULER}"
             echo "ACCNR=${ACCNR}  PARTITION=${PARTITION}  QUEUE=${QUEUE}"
             [[ "${SCHEDULER}" == none ]] && echo "MPI_LAUNCH=${MPI_LAUNCH}"
-            [[ "${ECFLOW}" == true ]]    && echo "ECF_HOST=${ECF_HOST}  ECF_PORT=${ECF_PORT}"
         fi
         continue
     fi
@@ -275,12 +256,14 @@ if [[ ${#compile_ids[@]} -eq 0 ]]; then
 fi
 
 echo ""
-echo "Found ${#compile_ids[@]} compile configuration(s)."
-if [[ "${RTVERBOSE}" == true ]]; then
-    for i in "${!compile_ids[@]}"; do
-        echo "  $((i+1)): ${compile_ids[$i]}  [${make_opts[$i]}]"
-    done
-fi
+echo "Found ${#compile_ids[@]} compile configuration(s):"
+for i in "${!compile_ids[@]}"; do
+    echo "  $((i+1)): ${compile_ids[$i]}  [${make_opts[$i]}]"
+    while IFS= read -r _t; do
+        [[ -z "${_t}" ]] && continue
+        echo "       - ${_t}"
+    done <<< "${tests_by_compile_id[${compile_ids[$i]}]}"
+done
 echo ""
 
 ###############################################################################
@@ -338,7 +321,7 @@ fi
 
 export MACHINE_ID=container
 export RT_COMPILER TPN CONTAINER_IMG CONTAINER_BIND
-export SCHEDULER WORKFLOW ROCOTO ECFLOW ACCNR PARTITION QUEUE MPI_LAUNCH ECF_HOST ECF_PORT
+export SCHEDULER ROCOTO ECFLOW ACCNR PARTITION QUEUE MPI_LAUNCH
 export DISKNM INPUTDATA_ROOT INPUTDATA_ROOT_WW3 INPUTDATA_LM4 INPUTDATA_GFSv17opn
 export PATHRT PATHTR RUNDIR_ROOT LOG_DIR
 export RTPWD
@@ -349,17 +332,6 @@ export RTPWD
 ###############################################################################
 
 source "${PATHRT}/atparse.bash"
-
-###############################################################################
-# Load the host-side runtime module when a workflow manager is requested.
-# Users place the Rocoto or ECFlow module loads inside ufs_container.runtime.lua
-# so those tools are available on the submit host before job submission begins.
-###############################################################################
-
-if [[ "${WORKFLOW}" == rocoto || "${WORKFLOW}" == ecflow ]]; then
-    module use "${PATHTR}/modulefiles"
-    module load ufs_container.runtime
-fi
 
 ###############################################################################
 # Print active flags and confirm before starting
@@ -430,11 +402,8 @@ export RUNDIR_ROOT=${RUNDIR_ROOT}
 export LOG_DIR=${LOG_DIR}
 export RT_COMPILER=${RT_COMPILER}
 export SCHEDULER=${SCHEDULER}
-export WORKFLOW=${WORKFLOW}
-export ROCOTO=${ROCOTO}
-export ECFLOW=${ECFLOW}
-export ECF_HOST=${ECF_HOST}
-export ECF_PORT=${ECF_PORT}
+export ROCOTO=false
+export ECFLOW=false
 export ACCNR=${ACCNR}
 export PARTITION=${PARTITION}
 export QUEUE=${QUEUE}
@@ -514,11 +483,8 @@ export RUNDIR_ROOT=${RUNDIR_ROOT}
 export LOG_DIR=${LOG_DIR}
 export RT_COMPILER=${RT_COMPILER}
 export SCHEDULER=${SCHEDULER}
-export WORKFLOW=${WORKFLOW}
-export ROCOTO=${ROCOTO}
-export ECFLOW=${ECFLOW}
-export ECF_HOST=${ECF_HOST}
-export ECF_PORT=${ECF_PORT}
+export ROCOTO=false
+export ECFLOW=false
 export ACCNR=${ACCNR}
 export PARTITION=${PARTITION}
 export QUEUE=${QUEUE}

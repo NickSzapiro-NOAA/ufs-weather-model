@@ -1,6 +1,7 @@
 #!/bin/bash
-set -eux
+set -eu
 set -o pipefail
+[[ "${RTVERBOSE:-false}" == true ]] && set -x
 
 echo "PID=$$"
 SECONDS=0

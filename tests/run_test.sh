@@ -502,25 +502,24 @@ if [[ ${SCHEDULER} = 'none' ]]; then
       export "${CONTAINER}ENV_OMPI_MCA_btl_vader_single_copy_mechanism=none"
       export "${CONTAINER}ENV_OMPI_MCA_mca_base_component_show_load_errors=0"
     fi
-    echo "NOTE: running ${TASKS} MPI tasks interactively — ensure the host can accommodate this count"
+    MPI_LAUNCH=${MPI_LAUNCH:-mpirun}
+    echo "NOTE: running ${TASKS} MPI tasks interactively on a single node via ${MPI_LAUNCH}"
     # Write a wrapper script that runs inside the container.
-    # Unquoted heredoc: ${COMPILE_ID} is expanded and baked into the script at write time.
-    # \$@ is escaped so it writes literally as "$@" rather than expanding now.
+    # Unquoted heredoc: ${COMPILE_ID}, ${MPI_LAUNCH}, and ${TASKS} are baked in at write time.
     # ./modulefiles is already populated by run_test.sh setup above.
     cat > fv3_container_run.sh << RUN_EOF
 #!/bin/bash
-set -eux
+set -e
 MACHINE_ID=container
 source ./module-setup.sh
 module purge
 module use ./modulefiles
 module load modules.fv3_${COMPILE_ID}
 module list
-exec "\$@"
+${MPI_LAUNCH} -n ${TASKS} ./fv3.exe
 RUN_EOF
     chmod u+x fv3_container_run.sh
-    redirect_out_err ${MPI_LAUNCH} --mpi=pmi2 -n "${TASKS}" \
-      ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" "${PWD}/fv3_container_run.sh" ./fv3.exe
+    redirect_out_err ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" "${PWD}/fv3_container_run.sh"
   elif [[ ${CI_TEST} = 'true' ]]; then
     eval "${OMP_ENV}" redirect_out_err mpiexec -n "${TASKS}" ./fv3.exe
   else

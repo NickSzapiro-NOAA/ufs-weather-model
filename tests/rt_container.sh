@@ -307,6 +307,12 @@ fi
 LOG_DIR="${RUNDIR_ROOT}/logs"
 mkdir -p "${LOG_DIR}"
 
+# Create a convenience symlink $PATHRT/run_dir -> RUNDIR_ROOT, unless the user
+# already set RUNDIR_ROOT to that exact path.
+if [[ "${RUNDIR_ROOT}" != "${PATHRT}/run_dir" ]]; then
+    ln -sfn "${RUNDIR_ROOT}" "${PATHRT}/run_dir"
+fi
+
 [[ "${RTVERBOSE}" == true ]] && echo "LOG_DIR=${LOG_DIR}"
 
 # When -d is set, run_test.sh reads keep_tests.tmp to decide which dirs to keep.

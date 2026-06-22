@@ -10,7 +10,6 @@
 
 set -eu
 [[ "${RTVERBOSE:-false}" == true ]] && set -x
-PMI="--mpi=pmix"
 echo -n " $( date +%s )," > job_timestamp.txt
 
 echo "Model started:  " $(date)
@@ -92,7 +91,7 @@ exec "$@"
 RUN_EOF
 chmod u+x fv3_container_run.sh
 
-mpirun ${PMI} -n @[UFS_TASKS] --hostfile $PBS_NODEFILE \
+@[MPI_LAUNCH] -n @[UFS_TASKS] --hostfile $PBS_NODEFILE \
   ${CONTAINERBIN} exec ${BIND_FLAGS} "@[CONTAINER_IMG]" "${PWD}/fv3_container_run.sh" ./fv3.exe
 
 echo "Model ended:    " $(date)

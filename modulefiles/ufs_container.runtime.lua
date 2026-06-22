@@ -16,8 +16,10 @@
 
 -- -- Gaea-c6 (GFDL) — apptainer is in PATH by default; no module needed.
 
--- -- Derecho (NCAR) — load the apptainer module
+-- -- Derecho (NCAR) — load apptainer, host GNU compilers, and host OpenMPI
 -- load("apptainer")
+-- load("gcc/14.3.0")
+-- load("openmpi/5.0.9")
 
 -- -- NOAA cloud — singularity is in PATH by default; no module needed
 

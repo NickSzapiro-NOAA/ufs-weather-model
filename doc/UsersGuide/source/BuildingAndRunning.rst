@@ -4,6 +4,17 @@
 Building and Running the UFS Weather Model
 ******************************************
 
+.. note::
+
+   For instructions on using software containers to build and run the UFS Weather Model
+   on any community platform, see :numref:`Chapter %s <container-rt-tests>`.
+   The container workflow provides a portable, reproducible software environment and
+   does not require a site-specific software stack. The Regression Test (RT) framework
+   is adopted there as a convenient starting point for compiling the model and running
+   test cases. Users will likely need to modify the testing configuration for their own
+   computing platform, and are encouraged to tailor it further to suit their own modeling
+   goals beyond running pre-defined tests.
+
 ===================================
 Supported Platforms & Compilers
 ===================================
@@ -145,9 +156,11 @@ Compiling the model will take place within the ``ufs-weather-model`` directory c
 Building the Weather Model
 ==========================
 
-.. note:: 
+.. note::
 
-   The most straightforward way to run the UFS WM is to use the regression testing (RT) framework. The RT framework will load modulefiles, build (compile) the desired WM configuration, and run the test(s). Users can create new tests or modify existing tests to correspond to the WM configuration(s) they wish to run. This section is provided for those who do not want to use the RT framework to run the WM. However, most users should skip to :numref:`Section %s <rt-config>` to learn more about RT configuration or :numref:`Section %s <run-wm>` to build/run the WM with the RT framework. 
+   The most straightforward way to run the UFS WM is to use the regression testing (RT) framework. The RT framework will load modulefiles, build (compile) the desired WM configuration, and run the test(s). Users can create new tests or modify existing tests to correspond to the WM configuration(s) they wish to run. This section is provided for those who do not want to use the RT framework to run the WM. However, most users should skip to :numref:`Section %s <rt-config>` to learn more about RT configuration or :numref:`Section %s <run-wm>` to build/run the WM with the RT framework.
+
+   A container-based workflow is also available (see :numref:`Chapter %s <container-rt-tests>`). It follows a similar RT framework but uses the container-oriented scripts ``rt_container.sh`` and ``rt_container.conf`` in place of ``rt.sh`` and ``rt.conf``. The container workflow is suitable for use on any community platform and expects users to adapt the configuration file, runtime modulefiles, and batch submission scripts to fit their compute environment.
 
 ----------------------------
 Loading the Required Modules

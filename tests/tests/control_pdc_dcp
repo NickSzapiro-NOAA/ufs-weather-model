@@ -1,0 +1,8 @@
+source ${PATHRT}/tests/control_pdc
+
+export TEST_DESCR+=" dcp test"
+
+temp=$INPES
+INPES=$JNPES
+JNPES=$temp
+

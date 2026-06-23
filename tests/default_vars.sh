@@ -938,6 +938,7 @@ export DRY_MASS=98320.0
 export CONSV_TE=1.
 export PRINT_FREQ=6
 export NO_DYCORE=.false.
+export PDC=.false.
 
 export FILTERED_TERRAIN=.true.
 export GFS_DWINDS=.true.

@@ -14,10 +14,10 @@ need to install :term:`spack-stack` or host-specific modules.
 The Regression Test (:term:`RT`) framework is adopted as a convenient starting point to
 help users familiarize themselves with the UFS WM and to provide a simple build-and-run
 workflow. Users may need to modify the configuration to suit their computing platform
-standards and job scheduler (if any), and to adjust the locations of staged input data,
+standards and job scheduler (if any). It may also be necessary to adjust the locations of staged input data,
 the container image, and the runtime directory, as well as host-system modules. Users are
 encouraged to further tailor the containerized RT workflow to fit their own modeling needs
-beyond running pre-defined test cases.
+beyond running predefined test cases.
 
 The workflow uses a standalone driver script, ``tests/rt_container.sh``, and a companion
 configuration file, ``tests/rt_container.conf``. The driver compiles the model inside the
@@ -41,7 +41,16 @@ Prerequisites
 Singularity/Apptainer
 -----------------------
 
-Users must have **Singularity** or **Apptainer** installed on their compute platform. On many HPC systems, Singularity/Apptainer is available as a loadable module:
+Users must have **Singularity** or **Apptainer** software installed on their compute platform. `Singularity/Apptainer <https://en.wikipedia.org/wiki/Apptainer#History>`_ container software is widely used in HPC environments to provide portable and reproducible software environments. It provides OS-level virtualization by packaging an application, its dependencies, and selected runtime environment components into a container image.  For MPI workflows, the host HPC system typically coordinates process launch and task initialization through its scheduler and runtime services, allowing the containerized application to integrate with compute nodes, interconnects, and parallel file systems.
+
+
+For further information of container software, see:
+*SingularityCE* `https://sylabs.io/singularity/ <https://sylabs.io/singularity/>`_ and
+*Apptainer* `https://apptainer.org/ <https://apptainer.org/>`_
+
+
+On many HPC systems, Singularity/Apptainer is available as a loadable module:
+
 
 .. code-block:: console
 
@@ -93,7 +102,7 @@ Further information on Singularity/Apptainer is available at:
 Container Image
 ---------------
 
-The container RT workflow requires a pre-built software-stack Singularity/Apptainer image (``*.sif``). Both GNU-based and Intel-based images are supported.
+The container RT workflow requires a Singularity/Apptainer image (``*.sif``). Both GNU-based and Intel-based images are supported.
 
 .. note::
 
@@ -171,6 +180,8 @@ Set an environment variable for convenience:
    # Intel image (Hercules, Orion, Ursa, Gaea-C6, NOAA Cloud)
    export CONTAINER_IMG=<container-dir>/rocky9-oneapi2024.2-ss192.sif
 
+where ``<container-dir>`` is replaced with the actual path to the container directory on the user's system.
+
 .. _container-rt-image-build:
 
 Building a Container Image on Other Systems
@@ -192,7 +203,7 @@ On systems where a pre-staged image is not available, build a Singularity/Apptai
 
 **Option 1: Build a GNU-based container from Docker Hub**
 
-On most platforms (Ursa, Gaea-C6, Hercules, Orion, NOAA Cloud):
+On most platforms where the container does not already exist, run:
 
 .. code-block:: console
 
@@ -341,7 +352,22 @@ Two Lmod modulefiles must be created in ``modulefiles/`` before running the cont
 ``ufs_container.runtime.lua`` — Host-Side Runtime Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This modulefile is loaded **on the host** by ``rt_container.sh`` and by the compile and run job cards. Its purpose is to make the ``apptainer`` or ``singularity`` command and the host MPI libraries available in the job environment.
+This modulefile is loaded **on the host** by ``rt_container.sh`` and by the compile and run job cards. Its purpose is to make the ``apptainer`` or ``singularity`` command and the host MPI libraries available in the job environment. 
+
+A key requirement for the container workflow is compatibility between the MPI environment used by the containerized application and the host system’s MPI/runtime infrastructure. 
+
+The required level of compatibility depends on the launch method. Scheduler-based launch, such as Slurm's ``srun``, requires compatibility with the host Process Management Interface (*PMI*) or *PMIx*. Host MPI launch, such as ``mpirun`` or ``mpiexec`` on PBS-based systems, requires ABI compatibility between the MPI libraries used by the containerized application and the corresponding MPI libraries on the host. 
+
+
+On Slurm-based systems, ``srun`` starts MPI ranks across the allocated compute nodes, with each rank launching one container instance. MPI communication from the containerized application then uses the host system’s communication stack.
+
+Using ``srun --mpi=pmi2`` requests PMI2 services for MPI initialization. The GNU-based image with OpenMPI 4.1.6 supports PMI2, allowing the containerized application to initialize ranks without relying on host compilers or MPI libraries inside the container. The GNU-based image with OpenMPI 5.0.7 supports PMIx. Use ``srun --mpi=pmix`` when PMIx is available on the host. PMI2 and PMIx provide process mapping and initialization data for MPI. To check availability, run ``srun --mpi=list`` and confirm that ``pmi2`` or ``pmix`` appears.
+
+To check whether PMI2 or PMIx is available on the host system, run ``srun --mpi=list`` and confirm that pmi2 or pmix appears in the output.
+
+.. warning::
+
+   Mismatched MPI implementations, incompatible MPI versions, or incompatible PMI/PMIx support may lead to runtime failures, hangs, or incorrect behavior.
 
 A minimal example for Hercules or Orion, where only the Singularity module needs to be loaded:
 
@@ -353,8 +379,8 @@ A minimal example for Hercules or Orion, where only the Singularity module needs
 
    load("singularity")
 
-On Derecho, Apptainer is a loadable module and must be accompanied by the host GNU compiler
-and OpenMPI that match the container image:
+On Derecho, Apptainer module needs to be loaded. 
+Derecho has a PBS Pro job scheduler, whicg uses a host MPI launcher such as ``mpirun`` or ``mpiexec``. This requires loading GNU and OpenMPI host modules that are ABI-compatible with the container, as well as the apptainer module:
 
 .. code-block:: lua
 
@@ -366,7 +392,8 @@ and OpenMPI that match the container image:
    load("gcc/14.3.0")
    load("openmpi/5.0.9")
 
-Adapt the module names to match the target platform. On platforms where
+
+Adapt the module names as needed. On systems where
 Singularity/Apptainer is already in ``PATH`` (e.g., Gaea-C6, NOAA Cloud), this file
 may be left empty or only load supplementary host libraries needed by the MPI launcher.
 
@@ -464,7 +491,7 @@ Header Line Fields
    * - ``CONTAINER_IMG``
      - Absolute path to the Singularity/Apptainer image file (``*.sif``) on the host.
    * - ``BIND_DIRS``
-     - Comma-separated list of host directories to bind-mount into the container.
+     - Comma-separated list of host directories to bind/mount to the container.
        Include all filesystems containing the source tree, input data, and run directory.
        See :numref:`Section %s <container-rt-binddirs>` for typical values on Tier 1 platforms.
 
@@ -504,7 +531,7 @@ Header Line Fields
      - Input data directory (typically ``${DISKNM}/NEMSfv3gfs/input-data-<date>``).
    * - ``RUNDIR_ROOT``
      - Top-level directory where compile and test run directories will be created.
-       This should be a user-writable path outside the source tree (e.g., on a
+       This should be a user-writable path for the runtime directory with the tests (prefererably on a
        scratch or work filesystem). If ``RUNDIR_ROOT`` differs from
        ``${PATHRT}/run_dir``, the driver automatically creates a convenience
        symlink ``tests/run_dir`` pointing to ``RUNDIR_ROOT``.
@@ -544,7 +571,7 @@ All tests are launched by running ``rt_container.sh`` from the ``tests/`` direct
 
 .. code-block:: console
 
-   cd tests
+   cd ${WM_HOME}/tests
    ./rt_container.sh [options] [rt_container.conf]
 
 If no configuration file is specified, ``tests/rt_container.conf`` is used by default.
@@ -611,11 +638,11 @@ Running Interactively (No Scheduler)
 
 When ``SCHEDULER`` is set to ``none``, jobs run directly on the current host — suitable for an allocated compute node or single-workstation development. Request an interactive compute node allocation before running the driver.
 
-On **Slurm** systems:
+On **Slurm** systems the command may look similar to:
 
 .. code-block:: console
 
-   salloc -N 1 -n <cores> -A <account> -t <time> -q <qos> --partition=<partition>
+   salloc -N 1 -n <cores> -A <account> -t <time> -q <qos>--partition=<partition>
 
 On **PBS** systems:
 
@@ -653,13 +680,13 @@ After the driver starts, it creates the following structure under ``RUNDIR_ROOT`
    │   ├── job_card                  # generated compile job script
    │   ├── container_compile.sh      # script executed inside the container
    │   ├── modulefiles/              # modulefile staged for the build
-   │   └── out / err                 # job stdout and stderr
+   │   └── out / err                 # job stdout and stderr files
    └── <test_id>_<compiler>/         # test working directory
        ├── job_card                  # generated test job script
        ├── fv3_container_run.sh      # wrapper executed inside the container
        ├── modulefiles/              # modulefile staged for the run
-       └── out / err                 # job stdout and stderr
+       └── out / err                 # job stdout and stderr files
 
-A convenience symlink ``tests/run_dir`` is created pointing to ``RUNDIR_ROOT``, making it easy to navigate to the run directory without knowing the full path. This symlink is not created if the user has already set ``RUNDIR_ROOT`` to ``${PATHRT}/run_dir``.
+A symlink at ``tests/run_dir`` is created pointing to ``RUNDIR_ROOT``, making it easy to navigate to the run directory without knowing the full path. This symlink is not created if the user has already set ``RUNDIR_ROOT`` to ``${PATHRT}/run_dir``.
 
 A PASS/FAIL summary is printed to the terminal when all tests have finished. The driver exits with status 1 if any compile or test failed, and 0 if all succeeded.

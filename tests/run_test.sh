@@ -468,46 +468,11 @@ export OMP_ENV=${OMP_ENV:-""}
 if [[ ${SCHEDULER} = 'none' ]]; then
   ulimit -s unlimited
   if [[ ${MACHINE_ID} = 'container' ]]; then
-    # Locate container runtime on the host.
-    if command -v apptainer &>/dev/null; then
-      CONTAINERBIN=apptainer
-    elif command -v singularity &>/dev/null; then
-      CONTAINERBIN=singularity
-    else
-      echo "ERROR: neither apptainer nor singularity found on this host" >&2
-      exit 1
-    fi
-    BIND_FLAGS=""
-    if [[ -n "${CONTAINER_BIND:-}" ]]; then
-      IFS=',' read -r -a _bind_dirs <<< "${CONTAINER_BIND}"
-      for _dir in "${_bind_dirs[@]}"; do
-        BIND_FLAGS="${BIND_FLAGS} -B ${_dir}"
-      done
-    fi
-    # Pass runtime environment into the container via APPTAINER/SINGULARITY ENV_ variables.
-    CONTAINER="${CONTAINERBIN^^}"  # APPTAINER or SINGULARITY
-    export "${CONTAINER}_SHELL=/bin/bash"
-    export "${CONTAINER}ENV_FI_PROVIDER=tcp"
-    if [[ "${RT_COMPILER}" == intel ]]; then
-      [[ -n "${FI_PROVIDER_PATH:-}" ]] && export "${CONTAINER}ENV_FI_PROVIDER_PATH=${FI_PROVIDER_PATH}"
-    elif [[ "${RT_COMPILER}" == gnu ]]; then
-      export "${CONTAINER}ENV_PMIX_MCA_gds=hash"
-      export "${CONTAINER}ENV_PMIX_MCA_psec=native"
-      export "${CONTAINER}ENV_OMPI_MCA_btl=^openib"
-      if ip link show eth0 &>/dev/null; then
-        export "${CONTAINER}ENV_OMPI_MCA_btl_tcp_if_include=eth0"
-        export "${CONTAINER}ENV_OMPI_MCA_oob_tcp_if_include=eth0"
-      fi
-      export "${CONTAINER}ENV_OMPI_MCA_pml=ob1"
-      export "${CONTAINER}ENV_OMPI_MCA_btl_vader_single_copy_mechanism=none"
-      export "${CONTAINER}ENV_OMPI_MCA_mca_base_component_show_load_errors=0"
-    fi
     MPI_LAUNCH=${MPI_LAUNCH:-mpirun}
-    echo "NOTE: running ${TASKS} MPI tasks interactively on a single node via ${MPI_LAUNCH}"
-    # Write a wrapper script that runs inside the container.
-    # Unquoted heredoc: ${COMPILE_ID}, ${MPI_LAUNCH}, and ${TASKS} are baked in at write time.
-    # ./modulefiles is already populated by run_test.sh setup above.
-    cat > fv3_container_run.sh << RUN_EOF
+    if [[ "${COMMUNITY_PLATFORM:-false}" == true ]]; then
+      # Community platform: run fv3.exe directly without a container.
+      echo "NOTE: running ${TASKS} MPI tasks on community platform via ${MPI_LAUNCH}"
+      cat > fv3_run.sh << RUN_EOF
 #!/bin/bash
 set -e
 MACHINE_ID=container
@@ -518,8 +483,61 @@ module load modules.fv3_${COMPILE_ID}
 module list
 ${MPI_LAUNCH} -n ${TASKS} ./fv3.exe
 RUN_EOF
-    chmod u+x fv3_container_run.sh
-    redirect_out_err ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" "${PWD}/fv3_container_run.sh"
+      chmod u+x fv3_run.sh
+      redirect_out_err bash "${PWD}/fv3_run.sh"
+    else
+      # Locate container runtime on the host.
+      if command -v apptainer &>/dev/null; then
+        CONTAINERBIN=apptainer
+      elif command -v singularity &>/dev/null; then
+        CONTAINERBIN=singularity
+      else
+        echo "ERROR: neither apptainer nor singularity found on this host" >&2
+        exit 1
+      fi
+      BIND_FLAGS=""
+      if [[ -n "${CONTAINER_BIND:-}" ]]; then
+        IFS=',' read -r -a _bind_dirs <<< "${CONTAINER_BIND}"
+        for _dir in "${_bind_dirs[@]}"; do
+          BIND_FLAGS="${BIND_FLAGS} -B ${_dir}"
+        done
+      fi
+      # Pass runtime environment into the container via APPTAINER/SINGULARITY ENV_ variables.
+      CONTAINER="${CONTAINERBIN^^}"  # APPTAINER or SINGULARITY
+      export "${CONTAINER}_SHELL=/bin/bash"
+      export "${CONTAINER}ENV_FI_PROVIDER=tcp"
+      if [[ "${RT_COMPILER}" == intel ]]; then
+        [[ -n "${FI_PROVIDER_PATH:-}" ]] && export "${CONTAINER}ENV_FI_PROVIDER_PATH=${FI_PROVIDER_PATH}"
+      elif [[ "${RT_COMPILER}" == gnu ]]; then
+        export "${CONTAINER}ENV_PMIX_MCA_gds=hash"
+        export "${CONTAINER}ENV_PMIX_MCA_psec=native"
+        export "${CONTAINER}ENV_OMPI_MCA_btl=^openib"
+        if ip link show eth0 &>/dev/null; then
+          export "${CONTAINER}ENV_OMPI_MCA_btl_tcp_if_include=eth0"
+          export "${CONTAINER}ENV_OMPI_MCA_oob_tcp_if_include=eth0"
+        fi
+        export "${CONTAINER}ENV_OMPI_MCA_pml=ob1"
+        export "${CONTAINER}ENV_OMPI_MCA_btl_vader_single_copy_mechanism=none"
+        export "${CONTAINER}ENV_OMPI_MCA_mca_base_component_show_load_errors=0"
+      fi
+      echo "NOTE: running ${TASKS} MPI tasks interactively on a single node via ${MPI_LAUNCH}"
+      # Write a wrapper script that runs inside the container.
+      # Unquoted heredoc: ${COMPILE_ID}, ${MPI_LAUNCH}, and ${TASKS} are baked in at write time.
+      # ./modulefiles is already populated by run_test.sh setup above.
+      cat > fv3_container_run.sh << RUN_EOF
+#!/bin/bash
+set -e
+MACHINE_ID=container
+source ./module-setup.sh
+module purge
+module use ./modulefiles
+module load modules.fv3_${COMPILE_ID}
+module list
+${MPI_LAUNCH} -n ${TASKS} ./fv3.exe
+RUN_EOF
+      chmod u+x fv3_container_run.sh
+      redirect_out_err ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" "${PWD}/fv3_container_run.sh"
+    fi
   elif [[ ${CI_TEST} = 'true' ]]; then
     eval "${OMP_ENV}" redirect_out_err mpiexec -n "${TASKS}" ./fv3.exe
   else

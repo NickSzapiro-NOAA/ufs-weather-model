@@ -1,23 +1,40 @@
 #!/usr/bin/env bash
-# rt_container.sh — UFS-WM regression test driver for container-based runs.
+# community.sh -
+#    UFS Weather-model test driver for container-based runs (default) or 
+#    runs with natively installed software stack on community platforms ("-C")
 #
-# Reads a five-header-line configuration file (default: rt_container.conf in
-# the same directory as this script) and compiles and runs each configuration
-# sequentially — no Rocoto or ECFlow workflow manager is involved:
-#   for each compile configuration:
-#     1. Compile the model inside the container
-#     2. Run every listed test case sequentially, waiting for each to finish
+# Reads a configuration file (default: community.conf in the same directory)
+#   that include header lines with container or community platform configuration
+#   options, followed by one or more compile configurations/test blocks.  
+#   All the compile jobs and tests run sequentially
+#   NOTE: - no Rocoto or ECFlow workflow manager is involved
+#         - no baseline test created or comparison made
+# 
+#   For each compile configuration:
+#     1. Compile the model inside the software container or on the community platform
+#     2. Run every listed test case sequentially, waiting for each test to finish
 #
-# Scheduler job templates used:
-#   fv3_conf/compile_slurm.IN_container  or  compile_qsub.IN_container
-#   fv3_conf/fv3_slurm.IN_container      or  fv3_qsub.IN_container
-# (machine-specific fv3_slurm.IN_container_<MACHINE_ID> variants, when present,
-#  are checked first by run_test.sh.)
+# Users many need to adapt modulefiles before running:
 #
-# Users must prepare before running:
-#   modulefiles/ufs_container.<compiler>.lua   — inside-container build module
-#   modulefiles/ufs_container.runtime.lua      — host-side runtime module
-# and review/adapt the fv3_conf/*.IN_container templates listed above.
+# container option (MACHINE_ID=container):
+#   modulefiles/ufs_container.runtime.lua   — host-side runtime module 
+#      NOTE: no need to change a modulefile for inside-container build
+#        and run environment, already included in the container image: 
+#        modulefiles/ufs_container.<compiler>.lua
+#
+# community platform (MACHINE_ID=<COMMUNITY>):
+#   modulefiles/ufs_<COMMUNITY>.<compiler>    — community platform module
+#
+# Job scheduler job templates for Slurm or PBS (if job scheduler is used):
+#
+#  container option (MACHINE_ID=container):
+#    fv3_conf/compile_slurm.IN_container  or  compile_qsub.IN_container
+#    fv3_conf/fv3_slurm.IN_container      or  fv3_qsub.IN_container
+#
+#  community platform option (MACHINE_ID=<COMMUNITY>):
+#    fv3_conf/compile_slurm.IN_<COMMUNITY>  or  compile_qsub.IN_<COMMUNITY>
+#    fv3_conf/fv3_slurm.IN_<COMMUNITY>      or  fv3_qsub.IN_<COMMUNITY>
+#
 
 set -uo pipefail
 
@@ -44,18 +61,18 @@ trim() {
 
 usage() {
     echo ""
-    echo "Usage: $(basename "$0") [options] [rt_container.conf]"
+    echo "Usage: $(basename "$0") [options] [community.conf]"
     echo ""
     echo "Options:"
+    echo "  -C            community platform mode: run natively without a container"
     echo "  -d            delete run directories after each test completes"
     echo "  -h            display this help"
-    echo "  -l <file>     use <file> as the configuration file"
     echo "  -n <name>     run only the single test named <name>"
     echo "  -o            compile only, skip all tests"
     echo "  -v            verbose output (set -x)"
     echo ""
     echo "Configuration file may also be given as a positional argument."
-    echo "Default: rt_container.conf in the same directory as this script."
+    echo "Default: community.conf in the same directory as this script."
     echo ""
 }
 
@@ -64,13 +81,13 @@ usage() {
 ###############################################################################
 
 export delete_rundir=false
+COMMUNITY_PLATFORM=false
 COMPILE_ONLY=false
 RUN_SINGLE_TEST=false
 SRT_NAME=''
 export skip_check_results=true
 export RTVERBOSE=false
-DEFINE_CONF_FILE=false
-TESTS_FILE="${PATHRT}/rt_container.conf"
+TESTS_FILE="${PATHRT}/community.conf"
 
 ###############################################################################
 # Parse command-line options
@@ -83,11 +100,11 @@ for _arg in "$@"; do
 done
 unset _arg
 
-while getopts ":dhl:n:ov" opt; do
+while getopts ":Cdhn:ov" opt; do
     case ${opt} in
+        C) COMMUNITY_PLATFORM=true ;;
         d) export delete_rundir=true ;;
         h) usage; exit 0 ;;
-        l) DEFINE_CONF_FILE=true; TESTS_FILE=${OPTARG} ;;
         n) RUN_SINGLE_TEST=true; SRT_NAME=${OPTARG} ;;
         o) COMPILE_ONLY=true ;;
         v) export RTVERBOSE=true ;;
@@ -98,8 +115,8 @@ while getopts ":dhl:n:ov" opt; do
 done
 shift $((OPTIND - 1))
 
-# Positional arg (conf file) after options overrides default but not -l
-if [[ "${DEFINE_CONF_FILE}" == false && -n "${1:-}" ]]; then
+# Positional arg overrides the default conf file.
+if [[ -n "${1:-}" ]]; then
     TESTS_FILE="$1"
 fi
 
@@ -119,13 +136,12 @@ if [[ ! -f "${input_file}" ]]; then
 fi
 
 ###############################################################################
-# Parse rt_container.conf
+# Parse community.conf
 #
-# Header line 1: RT_COMPILER | CONTAINER_IMG | BIND_DIRS
+# Header line 1: MACHINE_ID | RT_COMPILER | CONTAINER_IMG | BIND_DIRS
 # Header line 2: TPN | SCHEDULER | ACCNR | PARTITION | QUEUE | MPI_LAUNCH
-# Header line 3: DISKNM
-# Header line 4: INPUTDATA_ROOT
-# Header line 5: RUNDIR_ROOT
+# Header line 3: RUNDIR_ROOT
+# Header line 4: INPUTDATA_ROOT | INPUTDATA_GFSv17opn
 #
 # Configuration line (after headers): compile_id | MAKE_OPT   (contains '|')
 # Case line         (after headers):  test_case_name           (no '|')
@@ -154,15 +170,17 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
     fi
 
     # ------------------------------------------------------------------
-    # Header line 1: RT_COMPILER | CONTAINER_IMG | BIND_DIRS
+    # Header line 1: MACHINE_ID | RT_COMPILER | CONTAINER_IMG | BIND_DIRS
     # ------------------------------------------------------------------
     if [[ ${header_lines_read} -eq 0 ]]; then
-        IFS='|' read -r f1 f2 f3 _rest <<< "${line}"
-        RT_COMPILER=$(trim "${f1:-}")
-        CONTAINER_IMG=$(trim "${f2:-}")
-        CONTAINER_BIND=$(trim "${f3:-}")
+        IFS='|' read -r f1 f2 f3 f4 _rest <<< "${line}"
+        MACHINE_ID=$(trim "${f1:-container}")
+        RT_COMPILER=$(trim "${f2:-}")
+        CONTAINER_IMG=$(trim "${f3:-}")
+        CONTAINER_BIND=$(trim "${f4:-}")
         header_lines_read=1
         if [[ "${RTVERBOSE}" == true ]]; then
+            echo "MACHINE_ID=${MACHINE_ID}"
             echo "RT_COMPILER=${RT_COMPILER}"
             echo "CONTAINER_IMG=${CONTAINER_IMG}"
             echo "BIND_DIRS=${CONTAINER_BIND}"
@@ -193,32 +211,25 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
     fi
 
     # ------------------------------------------------------------------
-    # Header line 3: DISKNM
+    # Header line 3: RUNDIR_ROOT
     # ------------------------------------------------------------------
     if [[ ${header_lines_read} -eq 2 ]]; then
-        DISKNM=$(trim "${line}")
+        RUNDIR_ROOT=$(trim "${line}")
         header_lines_read=3
-        [[ "${RTVERBOSE}" == true ]] && echo "DISKNM=${DISKNM}"
+        [[ "${RTVERBOSE}" == true ]] && echo "RUNDIR_ROOT=${RUNDIR_ROOT}"
         continue
     fi
 
     # ------------------------------------------------------------------
-    # Header line 4: INPUTDATA_ROOT
+    # Header line 4: INPUTDATA_ROOT | INPUTDATA_GFSv17opn
     # ------------------------------------------------------------------
     if [[ ${header_lines_read} -eq 3 ]]; then
-        INPUTDATA_ROOT=$(trim "${line}")
+        IFS='|' read -r f1 f2 _rest <<< "${line}"
+        INPUTDATA_ROOT=$(trim "${f1:-}")
+        INPUTDATA_GFSv17opn=$(trim "${f2:-}")
         header_lines_read=4
         [[ "${RTVERBOSE}" == true ]] && echo "INPUTDATA_ROOT=${INPUTDATA_ROOT}"
-        continue
-    fi
-
-    # ------------------------------------------------------------------
-    # Header line 5: RUNDIR_ROOT
-    # ------------------------------------------------------------------
-    if [[ ${header_lines_read} -eq 4 ]]; then
-        RUNDIR_ROOT=$(trim "${line}")
-        header_lines_read=5
-        [[ "${RTVERBOSE}" == true ]] && echo "RUNDIR_ROOT=${RUNDIR_ROOT}"
+        [[ "${RTVERBOSE}" == true ]] && echo "INPUTDATA_GFSv17opn=${INPUTDATA_GFSv17opn}"
         continue
     fi
 
@@ -245,8 +256,8 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
 
 done < "${input_file}"
 
-if [[ ${header_lines_read} -lt 5 ]]; then
-    echo "ERROR: fewer than 5 header lines found in ${input_file}" >&2
+if [[ ${header_lines_read} -lt 4 ]]; then
+    echo "ERROR: fewer than 4 header lines found in ${input_file}" >&2
     exit 1
 fi
 
@@ -270,32 +281,38 @@ echo ""
 # Derived paths (after conf is parsed)
 ###############################################################################
 
-# RTPWD — where run_test.sh looks for baseline files to compare against.
-RTPWD="${DISKNM}"
-
 # Derive INPUTDATA_ROOT sub-paths (same convention as rt.sh).
 # All three can be overridden by setting the variable before invoking this script.
 INPUTDATA_ROOT_WW3=${INPUTDATA_ROOT_WW3:-${INPUTDATA_ROOT}/WW3_input_data_20250807}
 INPUTDATA_LM4=${INPUTDATA_LM4:-${INPUTDATA_ROOT}/LM4_input_data}
-INPUTDATA_GFSv17opn=${INPUTDATA_GFSv17opn:-${DISKNM}/NEMSfv3gfs/GFSv17opn_20251014}
+INPUTDATA_GFSv17opn=${INPUTDATA_GFSv17opn:-${INPUTDATA_ROOT}/GFSv17opn_input_data}
 
 ###############################################################################
 # Validate prerequisites
 ###############################################################################
 
-if [[ ! -f "${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua" ]]; then
-    echo "ERROR: modulefiles/ufs_container.${RT_COMPILER}.lua not found under ${PATHTR}" >&2
-    echo "       Provide this modulefile for the inside-container build environment." >&2
-    exit 1
+if [[ "${MACHINE_ID}" == container ]]; then
+    if [[ ! -f "${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua" ]]; then
+        echo "ERROR: modulefiles/ufs_container.${RT_COMPILER}.lua not found under ${PATHTR}" >&2
+        echo "       Provide this modulefile for the inside-container build/run environment." >&2
+        exit 1
+    fi
+    if [[ ! -f "${PATHTR}/modulefiles/ufs_container.runtime.lua" ]]; then
+        echo "ERROR: modulefiles/ufs_container.runtime.lua not found under ${PATHTR}" >&2
+        echo "       Provide this host-side runtime modulefile before running." >&2
+        exit 1
+    fi
 fi
 
-if [[ ! -f "${PATHTR}/modulefiles/ufs_container.runtime.lua" ]]; then
-    echo "ERROR: modulefiles/ufs_container.runtime.lua not found under ${PATHTR}" >&2
-    echo "       Provide this host-side runtime modulefile before running." >&2
-    exit 1
+if [[ "${COMMUNITY_PLATFORM}" = true ]]; then
+    if [[ ! -f "${PATHTR}/modulefiles/ufs_${MACHINE_ID}.${RT_COMPILER}.lua" ]]; then
+        echo "ERROR: modulefiles/ufs_${MACHINE_ID}.${RT_COMPILER}.lua not found under ${PATHTR}" >&2
+        echo "       Provide this modulefile for the community platform build/run environment." >&2
+        exit 1
+    fi
 fi
 
-if [[ ! -f "${CONTAINER_IMG}" ]]; then
+if [[ "${COMMUNITY_PLATFORM}" != true && ! -f "${CONTAINER_IMG}" ]]; then
     echo "ERROR: container image not found: ${CONTAINER_IMG}" >&2
     exit 1
 fi
@@ -325,12 +342,12 @@ fi
 # Export variables used by run_compile.sh, run_test.sh, and atparse
 ###############################################################################
 
-export MACHINE_ID=container
+export MACHINE_ID
+export COMMUNITY_PLATFORM
 export RT_COMPILER TPN CONTAINER_IMG CONTAINER_BIND
 export SCHEDULER ROCOTO ECFLOW ACCNR PARTITION QUEUE MPI_LAUNCH
-export DISKNM INPUTDATA_ROOT INPUTDATA_ROOT_WW3 INPUTDATA_LM4 INPUTDATA_GFSv17opn
+export INPUTDATA_ROOT INPUTDATA_ROOT_WW3 INPUTDATA_LM4 INPUTDATA_GFSv17opn
 export PATHRT PATHTR RUNDIR_ROOT LOG_DIR
-export RTPWD
 
 ###############################################################################
 # Source atparse (used by run_compile.sh/run_test.sh; sourced here so the
@@ -401,7 +418,7 @@ for i in "${!compile_ids[@]}"; do
         # ------------------------------------------------------------------
         mkdir -p "${RUNDIR_ROOT}"
         cat > "${RUNDIR_ROOT}/${JBNME}.env" << ENV_EOF
-export MACHINE_ID=container
+export MACHINE_ID=${MACHINE_ID}
 export PATHTR=${PATHTR}
 export PATHRT=${PATHRT}
 export RUNDIR_ROOT=${RUNDIR_ROOT}
@@ -416,6 +433,7 @@ export QUEUE=${QUEUE}
 export TPN=${TPN}
 export CONTAINER_IMG=${CONTAINER_IMG}
 export CONTAINER_BIND=${CONTAINER_BIND}
+export COMMUNITY_PLATFORM=${COMMUNITY_PLATFORM}
 export MPI_LAUNCH=${MPI_LAUNCH}
 export RTVERBOSE=${RTVERBOSE}
 export WLCLK=120
@@ -480,9 +498,8 @@ ENV_EOF
         echo "---------------------------------------------------------------------"
 
         # Write the test environment file (sourced by run_test.sh).
-        # RTPWD points to the baseline data directory (DISKNM).
         cat > "${RUNDIR_ROOT}/run_test_${TEST_ID}.env" << ENV_EOF
-export MACHINE_ID=container
+export MACHINE_ID=${MACHINE_ID}
 export PATHTR=${PATHTR}
 export PATHRT=${PATHRT}
 export RUNDIR_ROOT=${RUNDIR_ROOT}
@@ -497,8 +514,8 @@ export QUEUE=${QUEUE}
 export TPN=${TPN}
 export CONTAINER_IMG=${CONTAINER_IMG}
 export CONTAINER_BIND=${CONTAINER_BIND}
+export COMMUNITY_PLATFORM=${COMMUNITY_PLATFORM}
 export MPI_LAUNCH=${MPI_LAUNCH}
-export RTPWD=${RTPWD}
 export INPUTDATA_ROOT=${INPUTDATA_ROOT}
 export INPUTDATA_ROOT_WW3=${INPUTDATA_ROOT_WW3}
 export INPUTDATA_LM4=${INPUTDATA_LM4}
@@ -543,7 +560,7 @@ done
 
 echo ""
 echo "====================================================================="
-echo "rt_container.sh finished"
+echo "community.sh finished"
 echo "====================================================================="
 
 if [[ ${#skipped_tests[@]} -gt 0 ]]; then

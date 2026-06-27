@@ -19,14 +19,14 @@ the container image, and the runtime directory, as well as host-system modules. 
 encouraged to further tailor the containerized RT workflow to fit their own modeling needs
 beyond running predefined test cases.
 
-The workflow uses a standalone driver script, ``tests/rt_container.sh``, and a companion
-configuration file, ``tests/rt_container.conf``. The driver compiles the model inside the
+The workflow uses a standalone driver script, ``tests/community.sh``, and a companion
+configuration file, ``tests/community.conf``. The driver compiles the model inside the
 container and then runs each listed test sequentially, waiting for each job to complete
 before starting the next. No Rocoto or ECFlow workflow manager is involved.
 
 .. attention::
 
-   This chapter applies **only** to the container-based workflow driven by ``rt_container.sh``.
+   This chapter applies **only** to the container-based workflow driven by ``community.sh``.
    For the standard (non-container) RT framework driven by ``rt.sh``, see
    :numref:`Section %s <UsingRegressionTest>`.
 
@@ -291,7 +291,7 @@ Bind Directories for Tier 1 Platforms
 
 The following table lists the typical bind directories for NOAA RDHPC Tier 1 platforms.
 These paths should be provided as a comma-separated list in the ``BIND_DIRS`` field of
-``rt_container.conf`` header line 1 (see :numref:`Section %s <container-rt-conf>`):
+``community.conf`` header line 1 (see :numref:`Section %s <container-rt-conf>`):
 
 .. list-table:: Typical bind directories on NOAA RDHPC Tier 1 platforms
    :widths: 25 35 40
@@ -321,7 +321,7 @@ These paths should be provided as a comma-separated list in the ``BIND_DIRS`` fi
 Input and Baseline Data
 -----------------------
 
-The container RT workflow uses the same input datasets as the standard RT framework. On Level 1 and Level 2 systems these are pre-staged; see :numref:`Section %s <DataLocations>` for the ``DISKNM`` and ``INPUTDATA_ROOT`` paths for each platform. These paths are set in ``rt_container.conf`` (see :numref:`Section %s <container-rt-conf>`).
+The container RT workflow uses the same input datasets as the standard RT framework. On Level 1 and Level 2 systems these are pre-staged; see :numref:`Section %s <DataLocations>` for the ``DISKNM`` and ``INPUTDATA_ROOT`` paths for each platform. These paths are set in ``community.conf`` (see :numref:`Section %s <container-rt-conf>`).
 
 For Level 3–4 systems, input data is publicly available in the `UFS WM Data Bucket <https://registry.opendata.aws/noaa-ufs-regtests/>`__.
 
@@ -352,7 +352,7 @@ Two Lmod modulefiles must be created in ``modulefiles/`` before running the cont
 ``ufs_container.runtime.lua`` — Host-Side Runtime Module
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This modulefile is loaded **on the host** by ``rt_container.sh`` and by the compile and run job cards. Its purpose is to make the ``apptainer`` or ``singularity`` command and the host MPI libraries available in the job environment. 
+This modulefile is loaded **on the host** by ``community.sh`` and by the compile and run job cards. Its purpose is to make the ``apptainer`` or ``singularity`` command and the host MPI libraries available in the job environment. 
 
 A key requirement for the container workflow is compatibility between the MPI environment used by the containerized application and the host system’s MPI/runtime infrastructure. 
 
@@ -444,16 +444,16 @@ container on Hercules/Orion):
 .. _container-rt-conf:
 
 ====================================
-Configuring ``rt_container.conf``
+Configuring ``community.conf``
 ====================================
 
-The file ``tests/rt_container.conf`` controls what gets compiled and tested. It begins with five mandatory header lines followed by one or more compile configuration blocks, each with a list of test cases.
+The file ``tests/community.conf`` controls what gets compiled and tested. It begins with five mandatory header lines followed by one or more compile configuration blocks, each with a list of test cases.
 
 The file uses ``|`` as a field separator and ``#`` for comments. Blank lines between configuration blocks are ignored.
 
 .. code-block:: text
 
-   # tests/rt_container.conf — example configuration
+   # tests/community.conf — example configuration
 
    # Header line 1: RT_COMPILER | CONTAINER_IMG | BIND_DIRS
    intel | /work/noaa/epic/role-epic/contrib/containers/rocky9-oneapi2024.2-ss192.sif | /work,/work2,/local
@@ -567,14 +567,14 @@ A blank line between blocks closes the current configuration. Configuration name
 Running the Tests
 ====================
 
-All tests are launched by running ``rt_container.sh`` from the ``tests/`` directory:
+All tests are launched by running ``community.sh`` from the ``tests/`` directory:
 
 .. code-block:: console
 
    cd ${WM_HOME}/tests
-   ./rt_container.sh [options] [rt_container.conf]
+   ./community.sh [options] [community.conf]
 
-If no configuration file is specified, ``tests/rt_container.conf`` is used by default.
+If no configuration file is specified, ``tests/community.conf`` is used by default.
 
 Command-Line Options
 --------------------
@@ -625,11 +625,11 @@ platform-specific environment variables required before launching the container.
 Running with a Job Scheduler (Slurm or PBS)
 --------------------------------------------
 
-When ``SCHEDULER`` is set to ``slurm`` or ``pbs`` in ``rt_container.conf``, set ``ACCNR``, ``PARTITION``, and ``QUEUE`` appropriately and run the driver from a login node:
+When ``SCHEDULER`` is set to ``slurm`` or ``pbs`` in ``community.conf``, set ``ACCNR``, ``PARTITION``, and ``QUEUE`` appropriately and run the driver from a login node:
 
 .. code-block:: console
 
-   ./rt_container.sh
+   ./community.sh
 
 The driver submits each compile and test job to the scheduler and blocks until the job finishes before submitting the next one. Progress is reported on the terminal; full output is captured in ``${RUNDIR_ROOT}/logs/``.
 
@@ -655,7 +655,7 @@ After the allocation is granted (and connecting via ``ssh`` to the compute node 
 .. code-block:: console
 
    cd tests
-   ./rt_container.sh
+   ./community.sh
 
 Set ``MPI_LAUNCH`` in header line 2 to ``mpirun`` or ``mpiexec`` (default: ``mpirun``). The driver starts the container once and then runs MPI tasks entirely inside the container, which is the correct approach for single-node interactive runs.
 

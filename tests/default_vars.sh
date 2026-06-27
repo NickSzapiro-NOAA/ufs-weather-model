@@ -368,13 +368,14 @@ elif [[ ${MACHINE_ID} = noaacloud ]] ; then
     export ICE_tasks_cpl_thrd=10
     export WAV_tasks_cpl_thrd=12
 
-elif [[ ${MACHINE_ID} = container ]]; then
+elif [[ ${MACHINE_ID} = container || ${COMMUNITY_PLATFORM} = 'true' ]]; then
 
-  # Running in a container.  TPN is provided at runtime from rt_container.conf
-  # via the job .env file; use it if already set, otherwise fall back to 40.
-  export TPN=${TPN:-40}
+  # Running in a container.  TPN is provided at runtime from community.conf
+  # via the job .env file; use it if already set, otherwise fall back to 80.
+  export TPN=${TPN:-80}
+  export EXCLUSIVE_NODES=.true.
 
-  # Decomposition defaults similar to a typical 40-task-per-node system.
+  # Decomposition defaults similar to a typical 80-task-per-node system.
   export INPES_dflt=3
   export JNPES_dflt=8
   export INPES_thrd=3

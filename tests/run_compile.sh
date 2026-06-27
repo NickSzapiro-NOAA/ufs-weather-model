@@ -125,32 +125,36 @@ fi
 
 if [[ ${ROCOTO} = 'false' ]]; then
   if [[ ${MACHINE_ID} = 'container' && ${SCHEDULER} = 'none' ]]; then
-    # Load the host-side runtime module (makes apptainer/singularity and host MPI available).
-    module use "${PATHTR}/modulefiles"
-    module load ufs_container.runtime
-    # Run compile interactively inside the container.
-    if command -v apptainer &>/dev/null; then
-      CONTAINERBIN=apptainer
-    elif command -v singularity &>/dev/null; then
-      CONTAINERBIN=singularity
-    else
-      echo "ERROR: neither apptainer nor singularity found on this host" >&2
-      exit 1
-    fi
-    BIND_FLAGS=""
-    if [[ -n "${CONTAINER_BIND:-}" ]]; then
-      IFS=',' read -r -a _bind_dirs <<< "${CONTAINER_BIND}"
-      for _dir in "${_bind_dirs[@]}"; do
-        BIND_FLAGS="${BIND_FLAGS} -B ${_dir}"
-      done
-    fi
-    CONTAINER="${CONTAINERBIN^^}"
-    export "${CONTAINER}_SHELL=/bin/bash"
-    export "${CONTAINER}ENV_RTVERBOSE=${RTVERBOSE:-false}"
-    # Write timestamps around the interactive exec so job_timestamp.txt exists
-    # for the logging step below (mirrors what the job card writes for slurm/pbs).
+    # Write timestamps around the exec so job_timestamp.txt exists for the logging step below.
     echo -n "$( date +%s )," > job_timestamp.txt
-    ${CONTAINERBIN} exec -e ${BIND_FLAGS} "${CONTAINER_IMG}" "${RUNDIR}/job_card"
+    if [[ "${COMMUNITY_PLATFORM:-false}" == true ]]; then
+      # Community platform: run compile job directly without a container.
+      bash "${RUNDIR}/job_card"
+    else
+      # Load the host-side runtime module (makes apptainer/singularity and host MPI available).
+      module use "${PATHTR}/modulefiles"
+      module load ufs_container.runtime
+      # Run compile interactively inside the container.
+      if command -v apptainer &>/dev/null; then
+        CONTAINERBIN=apptainer
+      elif command -v singularity &>/dev/null; then
+        CONTAINERBIN=singularity
+      else
+        echo "ERROR: neither apptainer nor singularity found on this host" >&2
+        exit 1
+      fi
+      BIND_FLAGS=""
+      if [[ -n "${CONTAINER_BIND:-}" ]]; then
+        IFS=',' read -r -a _bind_dirs <<< "${CONTAINER_BIND}"
+        for _dir in "${_bind_dirs[@]}"; do
+          BIND_FLAGS="${BIND_FLAGS} -B ${_dir}"
+        done
+      fi
+      CONTAINER="${CONTAINERBIN^^}"
+      export "${CONTAINER}_SHELL=/bin/bash"
+      export "${CONTAINER}ENV_RTVERBOSE=${RTVERBOSE:-false}"
+      ${CONTAINERBIN} exec -e ${BIND_FLAGS} "${CONTAINER_IMG}" "${RUNDIR}/job_card"
+    fi
     echo -n " $( date +%s )," >> job_timestamp.txt
   else
     submit_and_wait job_card

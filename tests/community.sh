@@ -141,7 +141,7 @@ fi
 # Header line 1: MACHINE_ID | RT_COMPILER | CONTAINER_IMG | BIND_DIRS
 # Header line 2: TPN | SCHEDULER | ACCNR | PARTITION | QUEUE | MPI_LAUNCH
 # Header line 3: RUNDIR_ROOT
-# Header line 4: INPUTDATA_ROOT | INPUTDATA_GFSv17opn
+# Header line 4: INPUTDATA_ROOT | INPUTDATA_ROOT_WW3 | INPUTDATA_LM4 | INPUTDATA_GFSv17opn
 #
 # Configuration line (after headers): compile_id | MAKE_OPT   (contains '|')
 # Case line         (after headers):  test_case_name           (no '|')
@@ -221,14 +221,18 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
     fi
 
     # ------------------------------------------------------------------
-    # Header line 4: INPUTDATA_ROOT | INPUTDATA_GFSv17opn
+    # Header line 4: INPUTDATA_ROOT | INPUTDATA_ROOT_WW3 | INPUTDATA_LM4 | INPUTDATA_GFSv17opn
     # ------------------------------------------------------------------
     if [[ ${header_lines_read} -eq 3 ]]; then
-        IFS='|' read -r f1 f2 _rest <<< "${line}"
+        IFS='|' read -r f1 f2 f3 f4 _rest <<< "${line}"
         INPUTDATA_ROOT=$(trim "${f1:-}")
-        INPUTDATA_GFSv17opn=$(trim "${f2:-}")
+        INPUTDATA_ROOT_WW3=$(trim "${f2:-}")
+        INPUTDATA_LM4=$(trim "${f3:-}")
+        INPUTDATA_GFSv17opn=$(trim "${f4:-}")
         header_lines_read=4
         [[ "${RTVERBOSE}" == true ]] && echo "INPUTDATA_ROOT=${INPUTDATA_ROOT}"
+        [[ "${RTVERBOSE}" == true ]] && echo "INPUTDATA_ROOT_WW3=${INPUTDATA_ROOT_WW3}"
+        [[ "${RTVERBOSE}" == true ]] && echo "INPUTDATA_LM4=${INPUTDATA_LM4}"
         [[ "${RTVERBOSE}" == true ]] && echo "INPUTDATA_GFSv17opn=${INPUTDATA_GFSv17opn}"
         continue
     fi

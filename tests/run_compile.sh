@@ -69,8 +69,7 @@ rm -rf "${RUNDIR}"
 mkdir -p "${RUNDIR}"
 cd "${RUNDIR}"
 
-# Stage module files the container compile script needs to set up the build
-# environment inside the container (mirrors what run_test.sh does for tests).
+# Stage module files for container mode.
 if [[ ${MACHINE_ID} = container ]]; then
     mkdir -p modulefiles
     if [[ -f "${PATHRT}/modules.fv3_${COMPILE_ID}.lua" ]]; then
@@ -83,9 +82,27 @@ if [[ ${MACHINE_ID} = container ]]; then
         echo "       or ${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua" >&2
         exit 1
     fi
+    cp "${PATHTR}/modulefiles/ufs_container.runtime.lua" "modulefiles/ufs_container.runtime.lua"
     [[ -f "${PATHTR}/modulefiles/ufs_common.lua" ]] && \
         cp "${PATHTR}/modulefiles/ufs_common.lua" "modulefiles/ufs_common.lua"
     cp "${PATHRT}/module-setup.sh" "module-setup.sh"
+fi
+
+# Stage module files for community platform mode.
+if [[ "${COMMUNITY_PLATFORM:-false}" == true ]]; then
+    mkdir -p modulefiles
+    if [[ -f "${PATHRT}/modules.fv3_${COMPILE_ID}.lua" ]]; then
+        cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua"                       "modulefiles/modules.fv3_${COMPILE_ID}.lua"
+    elif [[ -f "${PATHTR}/modulefiles/ufs_${MACHINE_ID}.${RT_COMPILER}.lua" ]]; then
+        cp "${PATHTR}/modulefiles/ufs_${MACHINE_ID}.${RT_COMPILER}.lua"    "modulefiles/modules.fv3_${COMPILE_ID}.lua"
+    else
+        echo "ERROR: no community platform build module found for COMPILE_ID=${COMPILE_ID}" >&2
+        echo "       Provide ${PATHRT}/modules.fv3_${COMPILE_ID}.lua" >&2
+        echo "       or ${PATHTR}/modulefiles/ufs_${MACHINE_ID}.${RT_COMPILER}.lua" >&2
+        exit 1
+    fi
+    [[ -f "${PATHTR}/modulefiles/ufs_common.lua" ]] && \
+        cp "${PATHTR}/modulefiles/ufs_common.lua" "modulefiles/ufs_common.lua"
 fi
 
 if [[ ${SCHEDULER} = 'pbs' ]]; then
@@ -117,6 +134,21 @@ module list
 "${PATHRT}/compile.sh" "${MACHINE_ID}" "${MAKE_OPT}" "${COMPILE_ID}" "${RT_COMPILER}"
 COMPILE_EOF
   chmod u+x job_card
+elif [[ ${SCHEDULER} = 'none' && "${COMMUNITY_PLATFORM:-false}" == true ]]; then
+  # Community platform with a custom MACHINE_ID and no job scheduler.
+  # module-setup.sh and module purge are not used; module reset restores the
+  # host default environment before loading the platform-specific build module.
+  cat > job_card << COMPILE_EOF
+#!/bin/bash
+set -e
+MACHINE_ID=${MACHINE_ID}
+module reset
+module use ./modulefiles
+module load modules.fv3_${COMPILE_ID}
+module list
+"${PATHRT}/compile.sh" "${MACHINE_ID}" "${MAKE_OPT}" "${COMPILE_ID}" "${RT_COMPILER}"
+COMPILE_EOF
+  chmod u+x job_card
 fi
 
 ################################################################################
@@ -124,15 +156,16 @@ fi
 ################################################################################
 
 if [[ ${ROCOTO} = 'false' ]]; then
-  if [[ ${MACHINE_ID} = 'container' && ${SCHEDULER} = 'none' ]]; then
+  if [[ ${SCHEDULER} = 'none' ]] && \
+     [[ ${MACHINE_ID} = 'container' || "${COMMUNITY_PLATFORM:-false}" == true ]]; then
     # Write timestamps around the exec so job_timestamp.txt exists for the logging step below.
     echo -n "$( date +%s )," > job_timestamp.txt
     if [[ "${COMMUNITY_PLATFORM:-false}" == true ]]; then
-      # Community platform: run compile job directly without a container.
+      # Community platform: run compile job directly on the host.
       bash "${RUNDIR}/job_card"
     else
-      # Load the host-side runtime module (makes apptainer/singularity and host MPI available).
-      module use "${PATHTR}/modulefiles"
+      # Load the host-side runtime module from the staged copy in the run directory.
+      module use modulefiles
       module load ufs_container.runtime
       # Run compile interactively inside the container.
       if command -v apptainer &>/dev/null; then

@@ -115,6 +115,20 @@ elif [[ ${MACHINE_ID} == container ]]; then
 else
   cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua" "./modulefiles/modules.fv3.lua"
 fi
+
+# Stage module files for community platform mode.
+if [[ "${COMMUNITY_PLATFORM:-false}" == true && ${MACHINE_ID} != container ]]; then
+  if [[ -f "${PATHRT}/modules.fv3_${COMPILE_ID}.lua" ]]; then
+    cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua"                       "./modulefiles/modules.fv3_${COMPILE_ID}.lua"
+  elif [[ -f "${PATHTR}/modulefiles/ufs_${MACHINE_ID}.${RT_COMPILER}.lua" ]]; then
+    cp "${PATHTR}/modulefiles/ufs_${MACHINE_ID}.${RT_COMPILER}.lua"    "./modulefiles/modules.fv3_${COMPILE_ID}.lua"
+  else
+    echo "ERROR: no community platform module found for COMPILE_ID=${COMPILE_ID}" >&2
+    echo "       Provide ${PATHRT}/modules.fv3_${COMPILE_ID}.lua" >&2
+    echo "       or ${PATHTR}/modulefiles/ufs_${MACHINE_ID}.${RT_COMPILER}.lua" >&2
+    exit 1
+  fi
+fi
 cp "${PATHTR}/modulefiles/ufs_common.lua" "./modulefiles/."
 
 # Get the shell file that loads the "module" command and purges modules:
@@ -538,6 +552,22 @@ RUN_EOF
       chmod u+x fv3_container_run.sh
       redirect_out_err ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" "${PWD}/fv3_container_run.sh"
     fi
+  elif [[ "${COMMUNITY_PLATFORM:-false}" == true ]]; then
+    MPI_LAUNCH=${MPI_LAUNCH:-mpirun}
+    echo "NOTE: running ${TASKS} MPI tasks on community platform via ${MPI_LAUNCH}"
+    # module reset restores the host default environment; module-setup.sh is not used.
+    cat > fv3_run.sh << RUN_EOF
+#!/bin/bash
+set -e
+MACHINE_ID=${MACHINE_ID}
+module reset
+module use ./modulefiles
+module load modules.fv3_${COMPILE_ID}
+module list
+${MPI_LAUNCH} -n ${TASKS} ./fv3.exe
+RUN_EOF
+    chmod u+x fv3_run.sh
+    redirect_out_err bash "${PWD}/fv3_run.sh"
   elif [[ ${CI_TEST} = 'true' ]]; then
     eval "${OMP_ENV}" redirect_out_err mpiexec -n "${TASKS}" ./fv3.exe
   else

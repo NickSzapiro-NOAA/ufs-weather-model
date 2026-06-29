@@ -99,13 +99,13 @@ mkdir -p modulefiles
 if [[ ${MACHINE_ID} == linux ]]; then
   cp "${PATHRT}/modules.fv3_${COMPILE_ID}" "./modulefiles/modules.fv3"
 elif [[ ${MACHINE_ID} == container ]]; then
-  # Host-side runtime modulefile (loaded on the host before the container launches).
-  cp "${PATHTR}/modulefiles/ufs_container.runtime.lua"  "./modulefiles/modules.fv3.lua"
-  # Inside-container compiler modulefile (loaded by fv3_container_run.sh inside the container).
+  # Host-side runtime modulefile — loaded on the host before the container launches.
+  cp "${PATHTR}/modulefiles/ufs_container.runtime.lua"  "./modulefiles/modules.fv3.runtime.lua"
+  # Inside-container build/run modulefile — loaded by fv3_container_run.sh inside the container.
   if [[ -f "${PATHRT}/modules.fv3_${COMPILE_ID}.lua" ]]; then
-    cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua"                "./modulefiles/modules.fv3_${COMPILE_ID}.lua"
+    cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua"                "./modulefiles/modules.fv3.lua"
   elif [[ -f "${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua" ]]; then
-    cp "${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua"  "./modulefiles/modules.fv3_${COMPILE_ID}.lua"
+    cp "${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua"  "./modulefiles/modules.fv3.lua"
   else
     echo "ERROR: no inside-container build module found for COMPILE_ID=${COMPILE_ID}" >&2
     echo "       Provide ${PATHRT}/modules.fv3_${COMPILE_ID}.lua" >&2
@@ -116,19 +116,6 @@ else
   cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua" "./modulefiles/modules.fv3.lua"
 fi
 
-# Stage module files for community platform mode.
-if [[ "${COMMUNITY_PLATFORM:-false}" == true && ${MACHINE_ID} != container ]]; then
-  if [[ -f "${PATHRT}/modules.fv3_${COMPILE_ID}.lua" ]]; then
-    cp "${PATHRT}/modules.fv3_${COMPILE_ID}.lua"                       "./modulefiles/modules.fv3_${COMPILE_ID}.lua"
-  elif [[ -f "${PATHTR}/modulefiles/ufs_${MACHINE_ID}.${RT_COMPILER}.lua" ]]; then
-    cp "${PATHTR}/modulefiles/ufs_${MACHINE_ID}.${RT_COMPILER}.lua"    "./modulefiles/modules.fv3_${COMPILE_ID}.lua"
-  else
-    echo "ERROR: no community platform module found for COMPILE_ID=${COMPILE_ID}" >&2
-    echo "       Provide ${PATHRT}/modules.fv3_${COMPILE_ID}.lua" >&2
-    echo "       or ${PATHTR}/modulefiles/ufs_${MACHINE_ID}.${RT_COMPILER}.lua" >&2
-    exit 1
-  fi
-fi
 cp "${PATHTR}/modulefiles/ufs_common.lua" "./modulefiles/."
 
 # Get the shell file that loads the "module" command and purges modules:
@@ -155,6 +142,10 @@ case ${MACHINE_ID} in
     #module use modulefiles
     #module load modules.fv3
     #module load gcc-native/12.3
+    ;;
+  container)
+    module use modulefiles
+    module load modules.fv3.runtime
     ;;
   *)
     module use modulefiles
@@ -483,87 +474,63 @@ if [[ ${SCHEDULER} = 'none' ]]; then
   ulimit -s unlimited
   if [[ ${MACHINE_ID} = 'container' ]]; then
     MPI_LAUNCH=${MPI_LAUNCH:-mpirun}
-    if [[ "${COMMUNITY_PLATFORM:-false}" == true ]]; then
-      # Community platform: run fv3.exe directly without a container.
-      echo "NOTE: running ${TASKS} MPI tasks on community platform via ${MPI_LAUNCH}"
-      cat > fv3_run.sh << RUN_EOF
-#!/bin/bash
-set -e
-MACHINE_ID=container
-source ./module-setup.sh
-module purge
-module use ./modulefiles
-module load modules.fv3_${COMPILE_ID}
-module list
-${MPI_LAUNCH} -n ${TASKS} ./fv3.exe
-RUN_EOF
-      chmod u+x fv3_run.sh
-      redirect_out_err bash "${PWD}/fv3_run.sh"
+    # Locate container runtime on the host.
+    if command -v apptainer &>/dev/null; then
+      CONTAINERBIN=apptainer
+    elif command -v singularity &>/dev/null; then
+      CONTAINERBIN=singularity
     else
-      # Locate container runtime on the host.
-      if command -v apptainer &>/dev/null; then
-        CONTAINERBIN=apptainer
-      elif command -v singularity &>/dev/null; then
-        CONTAINERBIN=singularity
-      else
-        echo "ERROR: neither apptainer nor singularity found on this host" >&2
-        exit 1
+      echo "ERROR: neither apptainer nor singularity found on this host" >&2
+      exit 1
+    fi
+    BIND_FLAGS=""
+    if [[ -n "${CONTAINER_BIND:-}" ]]; then
+      IFS=',' read -r -a _bind_dirs <<< "${CONTAINER_BIND}"
+      for _dir in "${_bind_dirs[@]}"; do
+        BIND_FLAGS="${BIND_FLAGS} -B ${_dir}"
+      done
+    fi
+    # Pass runtime environment into the container via APPTAINER/SINGULARITY ENV_ variables.
+    CONTAINER="${CONTAINERBIN^^}"  # APPTAINER or SINGULARITY
+    export "${CONTAINER}_SHELL=/bin/bash"
+    export "${CONTAINER}ENV_FI_PROVIDER=tcp"
+    if [[ "${RT_COMPILER}" == intel ]]; then
+      [[ -n "${FI_PROVIDER_PATH:-}" ]] && export "${CONTAINER}ENV_FI_PROVIDER_PATH=${FI_PROVIDER_PATH}"
+    elif [[ "${RT_COMPILER}" == gnu ]]; then
+      export "${CONTAINER}ENV_PMIX_MCA_gds=hash"
+      export "${CONTAINER}ENV_PMIX_MCA_psec=native"
+      export "${CONTAINER}ENV_OMPI_MCA_btl=^openib"
+      if ip link show eth0 &>/dev/null; then
+        export "${CONTAINER}ENV_OMPI_MCA_btl_tcp_if_include=eth0"
+        export "${CONTAINER}ENV_OMPI_MCA_oob_tcp_if_include=eth0"
       fi
-      BIND_FLAGS=""
-      if [[ -n "${CONTAINER_BIND:-}" ]]; then
-        IFS=',' read -r -a _bind_dirs <<< "${CONTAINER_BIND}"
-        for _dir in "${_bind_dirs[@]}"; do
-          BIND_FLAGS="${BIND_FLAGS} -B ${_dir}"
-        done
-      fi
-      # Pass runtime environment into the container via APPTAINER/SINGULARITY ENV_ variables.
-      CONTAINER="${CONTAINERBIN^^}"  # APPTAINER or SINGULARITY
-      export "${CONTAINER}_SHELL=/bin/bash"
-      export "${CONTAINER}ENV_FI_PROVIDER=tcp"
-      if [[ "${RT_COMPILER}" == intel ]]; then
-        [[ -n "${FI_PROVIDER_PATH:-}" ]] && export "${CONTAINER}ENV_FI_PROVIDER_PATH=${FI_PROVIDER_PATH}"
-      elif [[ "${RT_COMPILER}" == gnu ]]; then
-        export "${CONTAINER}ENV_PMIX_MCA_gds=hash"
-        export "${CONTAINER}ENV_PMIX_MCA_psec=native"
-        export "${CONTAINER}ENV_OMPI_MCA_btl=^openib"
-        if ip link show eth0 &>/dev/null; then
-          export "${CONTAINER}ENV_OMPI_MCA_btl_tcp_if_include=eth0"
-          export "${CONTAINER}ENV_OMPI_MCA_oob_tcp_if_include=eth0"
-        fi
-        export "${CONTAINER}ENV_OMPI_MCA_pml=ob1"
-        export "${CONTAINER}ENV_OMPI_MCA_btl_vader_single_copy_mechanism=none"
-        export "${CONTAINER}ENV_OMPI_MCA_mca_base_component_show_load_errors=0"
-      fi
-      echo "NOTE: running ${TASKS} MPI tasks interactively on a single node via ${MPI_LAUNCH}"
-      # Write a wrapper script that runs inside the container.
-      # Unquoted heredoc: ${COMPILE_ID}, ${MPI_LAUNCH}, and ${TASKS} are baked in at write time.
-      # ./modulefiles is already populated by run_test.sh setup above.
-      cat > fv3_container_run.sh << RUN_EOF
+      export "${CONTAINER}ENV_OMPI_MCA_pml=ob1"
+      export "${CONTAINER}ENV_OMPI_MCA_btl_vader_single_copy_mechanism=none"
+      export "${CONTAINER}ENV_OMPI_MCA_mca_base_component_show_load_errors=0"
+    fi
+    echo "NOTE: running ${TASKS} MPI tasks interactively inside container via ${MPI_LAUNCH}"
+    # Unquoted heredoc: ${COMPILE_ID}, ${MPI_LAUNCH}, and ${TASKS} are baked in at write time.
+    cat > fv3_container_run.sh << RUN_EOF
 #!/bin/bash
 set -e
 MACHINE_ID=container
-source ./module-setup.sh
+source ${PWD}/module-setup.sh
 module purge
-module use ./modulefiles
-module load modules.fv3_${COMPILE_ID}
+module use ${PWD}/modulefiles
+module load modules.fv3
 module list
 ${MPI_LAUNCH} -n ${TASKS} ./fv3.exe
 RUN_EOF
-      chmod u+x fv3_container_run.sh
-      redirect_out_err ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" "${PWD}/fv3_container_run.sh"
-    fi
+    chmod u+x fv3_container_run.sh
+    redirect_out_err ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" "${PWD}/fv3_container_run.sh"
   elif [[ "${COMMUNITY_PLATFORM:-false}" == true ]]; then
     MPI_LAUNCH=${MPI_LAUNCH:-mpirun}
     echo "NOTE: running ${TASKS} MPI tasks on community platform via ${MPI_LAUNCH}"
-    # module reset restores the host default environment; module-setup.sh is not used.
     cat > fv3_run.sh << RUN_EOF
 #!/bin/bash
 set -e
-MACHINE_ID=${MACHINE_ID}
-module reset
-module use ./modulefiles
-module load modules.fv3_${COMPILE_ID}
-module list
+module use "${PWD}/modulefiles"
+module load modules.fv3
 ${MPI_LAUNCH} -n ${TASKS} ./fv3.exe
 RUN_EOF
     chmod u+x fv3_run.sh

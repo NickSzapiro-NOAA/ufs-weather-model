@@ -295,6 +295,13 @@ INPUTDATA_GFSv17opn=${INPUTDATA_GFSv17opn:-${INPUTDATA_ROOT}/GFSv17opn_input_dat
 # Validate prerequisites
 ###############################################################################
 
+if [[ "${MACHINE_ID}" == container && "${COMMUNITY_PLATFORM}" == true ]]; then
+    echo "ERROR: MACHINE_ID=container and -C (COMMUNITY_PLATFORM) are mutually exclusive." >&2
+    echo "       Use MACHINE_ID=container without -C for Singularity/Apptainer container runs." >&2
+    echo "       Use a custom MACHINE_ID with -C for native community platform runs." >&2
+    exit 1
+fi
+
 if [[ "${MACHINE_ID}" == container ]]; then
     if [[ ! -f "${PATHTR}/modulefiles/ufs_container.${RT_COMPILER}.lua" ]]; then
         echo "ERROR: modulefiles/ufs_container.${RT_COMPILER}.lua not found under ${PATHTR}" >&2

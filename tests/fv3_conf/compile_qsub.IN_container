@@ -50,10 +50,10 @@ cat > container_compile.sh << 'COMPILE_EOF'
 set -e
 [[ "${RTVERBOSE:-false}" == true ]] && set -x
 MACHINE_ID=container
-source ./module-setup.sh
+source ${PWD}/module-setup.sh
 module purge
-module use ./modulefiles
-module load modules.fv3_@[COMPILE_ID]
+module use ${PWD}/modulefiles
+module load modules.fv3
 module list
 "@[PATHRT]/compile.sh" "container" "@[MAKE_OPT]" "@[COMPILE_ID]" "@[RT_COMPILER]"
 COMPILE_EOF

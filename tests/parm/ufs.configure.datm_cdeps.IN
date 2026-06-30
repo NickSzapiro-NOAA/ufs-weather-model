@@ -113,6 +113,8 @@ MED_attributes::
       pio_stride = @[CMEPS_PIO_STRIDE]
       pio_rearranger = @[CMEPS_PIO_REARR]
       pio_root = @[CMEPS_PIO_ROOT]
+#      history_n_atm_inst = 1
+#      history_option_atm_inst = nsteps
 ::
 
 ALLCOMP_attributes::
@@ -130,7 +132,6 @@ ALLCOMP_attributes::
       write_restart_at_endofrun = @[WRITE_ENDOFRUN_RESTART]
       dbug_flag = @[cap_dbug_flag]
       coldair_outbreak_mod = .false.
-      flds_wiso = .false.
       flux_convergence = @[flux_convergence]
       flux_max_iteration = @[flux_iteration]
       ocn_surface_flux_scheme = @[flux_scheme]

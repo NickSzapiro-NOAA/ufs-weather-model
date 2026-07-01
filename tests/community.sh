@@ -348,8 +348,15 @@ if [[ "${COMMUNITY_PLATFORM}" = true ]]; then
     fi
 fi
 
-if [[ "${COMMUNITY_PLATFORM}" != true && ! -f "${CONTAINER_IMG}" ]]; then
-    echo "ERROR: container image not found: ${CONTAINER_IMG}" >&2
+if [[ "${MACHINE_ID}" == container ]]; then
+    if [[ ! -f "${CONTAINER_IMG}" ]]; then
+        echo "ERROR: container image not found: ${CONTAINER_IMG}" >&2
+        exit 1
+    fi
+elif [[ "${COMMUNITY_PLATFORM}" != true ]]; then
+    echo "ERROR: MACHINE_ID='${MACHINE_ID}' is not 'container' but -C was not specified." >&2
+    echo "       For native community platform runs with a custom MACHINE_ID," >&2
+    echo "       re-run with the -C option:  $(basename "$0") -C ... ${input_file}" >&2
     exit 1
 fi
 

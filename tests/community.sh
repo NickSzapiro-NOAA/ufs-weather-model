@@ -61,18 +61,20 @@ trim() {
 
 usage() {
     echo ""
-    echo "Usage: $(basename "$0") [options] [community.conf]"
+    echo "Usage: $(basename "$0") [options] <conf_file>"
+    echo ""
+    echo "  <conf_file>   Required. Path to the configuration file (e.g. community.conf)."
+    echo "                Defines the platform, scheduler, data paths, and the list of"
+    echo "                compile configurations and test cases to run."
     echo ""
     echo "Options:"
     echo "  -C            community platform mode: run natively without a container"
     echo "  -d            delete run directories after each test completes"
     echo "  -h            display this help"
-    echo "  -n <name>     run only the single test named <name>"
+    echo "  -n <name>     run only the single test named <name>;"
+    echo "                <name> must match a test case listed in <conf_file>"
     echo "  -o            compile only, skip all tests"
     echo "  -v            verbose output (set -x)"
-    echo ""
-    echo "Configuration file may also be given as a positional argument."
-    echo "Default: community.conf in the same directory as this script."
     echo ""
 }
 
@@ -87,7 +89,7 @@ RUN_SINGLE_TEST=false
 SRT_NAME=''
 export skip_check_results=true
 export RTVERBOSE=false
-TESTS_FILE="${PATHRT}/community.conf"
+TESTS_FILE=''
 
 ###############################################################################
 # Parse command-line options
@@ -115,9 +117,14 @@ while getopts ":Cdhn:ov" opt; do
 done
 shift $((OPTIND - 1))
 
-# Positional arg overrides the default conf file.
+# Conf file is a required positional argument.
 if [[ -n "${1:-}" ]]; then
     TESTS_FILE="$1"
+else
+    usage
+    echo "ERROR: configuration file is required." >&2
+    echo "       Provide the path to a community.conf-style file as the last argument." >&2
+    exit 1
 fi
 
 if [[ "${RTVERBOSE}" == true ]]; then
@@ -194,7 +201,7 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
     if [[ ${header_lines_read} -eq 1 ]]; then
         IFS='|' read -r f1 f2 f3 f4 f5 f6 _rest <<< "${line}"
         TPN=$(trim "${f1:-40}")
-        SCHEDULER=$(trim "${f2:-slurm}")
+        SCHEDULER=$(trim "${f2:-}")
         ACCNR=$(trim "${f3:-}")
         PARTITION=$(trim "${f4:-}")
         QUEUE=$(trim "${f5:-}")
@@ -205,7 +212,7 @@ while IFS= read -r line || [[ -n "${line}" ]]; do
         if [[ "${RTVERBOSE}" == true ]]; then
             echo "TPN=${TPN}  SCHEDULER=${SCHEDULER}"
             echo "ACCNR=${ACCNR}  PARTITION=${PARTITION}  QUEUE=${QUEUE}"
-            [[ "${SCHEDULER}" == none ]] && echo "MPI_LAUNCH=${MPI_LAUNCH}"
+            [[ "${SCHEDULER:-none}" == none ]] && echo "MPI_LAUNCH=${MPI_LAUNCH}"
         fi
         continue
     fi
@@ -270,6 +277,24 @@ if [[ ${#compile_ids[@]} -eq 0 ]]; then
     exit 1
 fi
 
+echo "====================================================================="
+echo "Configuration summary:"
+echo "  MACHINE_ID:     ${MACHINE_ID}"
+echo "  RT_COMPILER:    ${RT_COMPILER}"
+[[ -n "${CONTAINER_IMG}" ]]       && echo "  CONTAINER_IMG:  ${CONTAINER_IMG}"
+[[ -n "${CONTAINER_BIND}" ]]      && echo "  BIND_DIRS:      ${CONTAINER_BIND}"
+echo "  TPN:            ${TPN}"
+[[ -n "${SCHEDULER}" ]]           && echo "  SCHEDULER:      ${SCHEDULER}"
+[[ -n "${ACCNR}" ]]               && echo "  ACCNR:          ${ACCNR}"
+[[ -n "${PARTITION}" ]]           && echo "  PARTITION:      ${PARTITION}"
+[[ -n "${QUEUE}" ]]               && echo "  QUEUE:          ${QUEUE}"
+[[ -n "${MPI_LAUNCH}" ]]          && echo "  MPI_LAUNCH:     ${MPI_LAUNCH}"
+echo "  RUNDIR_ROOT:    ${RUNDIR_ROOT}"
+echo "  INPUTDATA_ROOT: ${INPUTDATA_ROOT}"
+[[ -n "${INPUTDATA_ROOT_WW3}" ]]  && echo "  INPUTDATA_ROOT_WW3:  ${INPUTDATA_ROOT_WW3}"
+[[ -n "${INPUTDATA_LM4}" ]]       && echo "  INPUTDATA_LM4:       ${INPUTDATA_LM4}"
+[[ -n "${INPUTDATA_GFSv17opn}" ]] && echo "  INPUTDATA_GFSv17opn: ${INPUTDATA_GFSv17opn}"
+echo "====================================================================="
 echo ""
 echo "Found ${#compile_ids[@]} compile configuration(s):"
 for i in "${!compile_ids[@]}"; do

@@ -470,7 +470,7 @@ fi
 # Submit test job
 ################################################################################
 export OMP_ENV=${OMP_ENV:-""}
-if [[ ${SCHEDULER} = 'none' ]]; then
+if [[ ${SCHEDULER:-none} = 'none' ]]; then
   ulimit -s unlimited
   if [[ ${MACHINE_ID} = 'container' ]]; then
     MPI_LAUNCH=${MPI_LAUNCH:-mpirun}
@@ -680,7 +680,7 @@ else
   } >> "${RT_LOG}"
 fi
 
-if [[ ${SCHEDULER} != 'none' ]]; then
+if [[ ${SCHEDULER:-none} != 'none' ]]; then
   cat "${RUNDIR}/job_timestamp.txt" >> "${LOG_DIR}/${JBNME}_timestamp.txt"
 fi
 

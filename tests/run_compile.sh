@@ -100,7 +100,7 @@ elif [[ ${SCHEDULER} = 'slurm' ]]; then
     echo "Looking for fv3_conf/compile_slurm.IN_${MACHINE_ID} but it is not found. Exiting"
     exit 1
   fi
-elif [[ ${SCHEDULER} = 'none' && ${MACHINE_ID} = 'container' ]]; then
+elif [[ ${SCHEDULER:-none} = 'none' && ${MACHINE_ID} = 'container' ]]; then
   # No job scheduler — write an inline compile script (no scheduler headers).
   # Unquoted heredoc: ${...} variables expand at write time (COMPILE_ID etc. are baked in).
   cat > job_card << COMPILE_EOF
@@ -122,7 +122,7 @@ fi
 ################################################################################
 
 if [[ ${ROCOTO} = 'false' ]]; then
-  if [[ ${SCHEDULER} = 'none' && ${MACHINE_ID} = 'container' ]]; then
+  if [[ ${SCHEDULER:-none} = 'none' && ${MACHINE_ID} = 'container' ]]; then
     echo -n "$( date +%s )," > job_timestamp.txt
     # Load the host-side runtime module from the staged copy in the run directory.
     module use modulefiles
@@ -148,7 +148,7 @@ if [[ ${ROCOTO} = 'false' ]]; then
     export "${CONTAINER}ENV_RTVERBOSE=${RTVERBOSE:-false}"
     ${CONTAINERBIN} exec -e ${BIND_FLAGS} "${CONTAINER_IMG}" "${RUNDIR}/job_card"
     echo -n " $( date +%s )," >> job_timestamp.txt
-  elif [[ ${SCHEDULER} = 'none' && "${COMMUNITY_PLATFORM:-false}" == true ]]; then
+  elif [[ ${SCHEDULER:-none} = 'none' && "${COMMUNITY_PLATFORM:-false}" == true ]]; then
     echo -n "$( date +%s )," > job_timestamp.txt
     # Community platform: call compile.sh directly; module loading is handled
     # by compile.sh's case block for this MACHINE_ID.

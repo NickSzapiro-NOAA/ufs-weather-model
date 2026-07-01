@@ -1,33 +1,40 @@
 .. _container-rt-tests:
 
-******************************************************
-Use of Software Containers for the UFS Weather Model
-******************************************************
+*************************************************************************
+Container and Community Platform Workflows for the UFS Weather Model
+*************************************************************************
 
-This chapter describes how to build and run the UFS Weather Model (:term:`WM`) using
-Singularity/Apptainer software containers that bundle the prerequisite software libraries
-and packages for the UFS WM, including compilers, MPI, and all required third-party
-libraries. The UFS Weather Model source code and its submodules are checked out from the
-standard GitHub repositories and built inside the container environment, eliminating the
-need to install :term:`spack-stack` or host-specific modules.
+This chapter describes two build-and-run workflows for the UFS Weather Model (:term:`WM`)
+driven by the standalone script ``tests/community.sh``:
+
+* **Container workflow** (default): The model is compiled and run inside a
+  Singularity/Apptainer software container that bundles the prerequisite compilers,
+  MPI, and all required third-party libraries. The UFS WM source code is checked out
+  from standard GitHub repositories and built inside the container environment,
+  eliminating the need to install :term:`spack-stack` or host-specific modules.
+
+* **Community platform workflow** (``-p`` flag): The container is bypassed entirely.
+  The model is compiled and run natively using a software stack already installed on
+  the host system and exposed through a user-provided Lmod modulefile. This mode 
+  requires natively installed software stack to already exist on a community platform.
 
 The Regression Test (:term:`RT`) framework is adopted as a convenient starting point to
 help users familiarize themselves with the UFS WM and to provide a simple build-and-run
 workflow. Users may need to modify the configuration to suit their computing platform
-standards and job scheduler (if any). It may also be necessary to adjust the locations of staged input data,
-the container image, and the runtime directory, as well as host-system modules. Users are
-encouraged to further tailor the containerized RT workflow to fit their own modeling needs
-beyond running predefined test cases.
+standards and job scheduler (if any). It may also be necessary to adjust the locations 
+of staged input data, the container image, the runtime directory, as well as host-system
+runtime modules. Users are encouraged to further tailor the workflow to fit their own
+modeling needs beyond running predefined test cases.
 
 The workflow uses a standalone driver script, ``tests/community.sh``, and a companion
-configuration file, ``tests/community.conf``. The driver compiles the model inside the
-container and then runs each listed test sequentially, waiting for each job to complete
-before starting the next. No Rocoto or ECFlow workflow manager is involved.
+configuration file, ``tests/community.conf``. The driver compiles the model and then
+runs each listed test sequentially, waiting for each job to complete before starting the
+next. No Rocoto or ECFlow workflow manager is involved.
 
 .. attention::
 
-   This chapter applies **only** to the container-based workflow driven by ``community.sh``.
-   For the standard (non-container) RT framework driven by ``rt.sh``, see
+   This chapter covers the container-based and community platform workflows driven by
+   ``community.sh``. For the standard RT framework driven by ``rt.sh``, see
    :numref:`Section %s <UsingRegressionTest>`.
 
 .. _container-rt-prereqs:
@@ -41,7 +48,9 @@ Prerequisites
 Singularity/Apptainer
 -----------------------
 
-Users must have **Singularity** or **Apptainer** software installed on their compute platform. `Singularity/Apptainer <https://en.wikipedia.org/wiki/Apptainer#History>`_ container software is widely used in HPC environments to provide portable and reproducible software environments. It provides OS-level virtualization by packaging an application, its dependencies, and selected runtime environment components into a container image.  For MPI workflows, the host HPC system typically coordinates process launch and task initialization through its scheduler and runtime services, allowing the containerized application to integrate with compute nodes, interconnects, and parallel file systems.
+Users running the workflow in container mode (the default, without the ``-p`` community
+platform flag) must have **Singularity** or **Apptainer** software installed on their
+compute platform. `Singularity/Apptainer <https://en.wikipedia.org/wiki/Apptainer#History>`_ container software is widely used in HPC environments to provide portable and reproducible software environments. It provides OS-level virtualization by packaging an application, its dependencies, and selected runtime environment components into a container image.  For MPI workflows, the host HPC system typically coordinates process launch and task initialization through its scheduler and runtime services, allowing the containerized application to integrate with compute nodes, interconnects, and parallel file systems.
 
 
 For further information of container software, see:
@@ -169,19 +178,6 @@ For example, on Hercules or Orion the Intel image is at:
 
    /work/noaa/epic/role-epic/contrib/containers/rocky9-oneapi2024.2-ss192.sif
 
-Set an environment variable for convenience:
-
-.. code-block:: console
-
-   # GNU image (Hercules, Orion, Ursa, Gaea-C6, NOAA Cloud)
-   export CONTAINER_IMG=<container-dir>/rocky9-gcc13-ss192-ompi416.sif
-   # GNU image (Derecho — OpenMPI 5.0.7)
-   export CONTAINER_IMG=<container-dir>/rocky9-gcc13-ss192-ompi507.sif
-   # Intel image (Hercules, Orion, Ursa, Gaea-C6, NOAA Cloud)
-   export CONTAINER_IMG=<container-dir>/rocky9-oneapi2024.2-ss192.sif
-
-where ``<container-dir>`` is replaced with the actual path to the container directory on the user's system.
-
 .. _container-rt-image-build:
 
 Building a Container Image on Other Systems
@@ -210,16 +206,12 @@ On most platforms where the container does not already exist, run:
    singularity build rocky9-gcc13-ss192-ompi416.sif \
        docker://noaaepic/rocky9-gcc13.3.1-spack-stack:v1.9.2-ufs-env-ompi416
 
-   export CONTAINER_IMG=${PWD}/rocky9-gcc13-ss192-ompi416.sif
-
 On **Derecho**, use the OpenMPI 5.0.7 variant instead:
 
 .. code-block:: console
 
    singularity build rocky9-gcc13-ss192-ompi507.sif \
        docker://noaaepic/rocky9-gcc13.3.1-spack-stack:v1.9.2-ufs-env-ompi507
-
-   export CONTAINER_IMG=${PWD}/rocky9-gcc13-ss192-ompi507.sif
 
 **Option 2: Build an Intel-capable container from Docker Hub**
 
@@ -282,8 +274,6 @@ The Intel oneAPI software cannot be distributed inside Docker Hub images due to 
       singularity build -B </top-level-dir> --fix-perms \
           rocky9-oneapi2024.2-ss192.sif rocky9-oneapi2024.2-ss192
 
-      export CONTAINER_IMG=${PWD}/rocky9-oneapi2024.2-ss192.sif
-
 .. _container-rt-binddirs:
 
 Bind Directories for Tier 1 Platforms
@@ -321,7 +311,10 @@ These paths should be provided as a comma-separated list in the ``BIND_DIRS`` fi
 Input and Baseline Data
 -----------------------
 
-The container RT workflow uses the same input datasets as the standard RT framework. On Level 1 and Level 2 systems these are pre-staged; see :numref:`Section %s <DataLocations>` for the ``DISKNM`` and ``INPUTDATA_ROOT`` paths for each platform. These paths are set in ``community.conf`` (see :numref:`Section %s <container-rt-conf>`).
+The container and community workflow uses the same input datasets as the standard RT framework.
+On Level 1 and Level 2 systems these are pre-staged; see :numref:`Section %s <DataLocations>` for
+the ``DISKNM`` and ``INPUTDATA_ROOT`` paths for each platform. These paths are set in
+``community.conf`` (see :numref:`Section %s <container-rt-conf>`).
 
 For Level 3–4 systems, input data is publicly available in the `UFS WM Data Bucket <https://registry.opendata.aws/noaa-ufs-regtests/>`__.
 
@@ -345,29 +338,45 @@ All further steps in this section assume the working directory is the root of th
 Required Modulefiles
 --------------------
 
-Two Lmod modulefiles must be created in ``modulefiles/`` before running the container RT tests. These files are not shipped with the repository because they are specific to the container image and host platform.
+The modulefiles required depend on the workflow selected. The container option (default)
+requires a user-adapted modulefile to load any host system modules during the runtime.
+The community platform option (``-p`` flag) requires a modulefile to load all the required
+software stack libraries on the platform. All modulefiles are placed in the
+``modulefiles/`` directory at the root of the repository.
+
+.. _container-rt-modulefiles-container:
+
+Container Option (Default)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The container workflow uses two modulefiles. Only ``ufs_container.runtime.lua``
+**must be adapted** by the user. The ``ufs_container.<compiler>.lua`` build module
+depends on the software stack inside the container image and does not
+require user changes.
 
 .. _container-rt-runtime-mod:
 
 ``ufs_container.runtime.lua`` — Host-Side Runtime Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This modulefile is loaded **on the host** by ``community.sh`` and by the compile and run job cards. Its purpose is to make the ``apptainer`` or ``singularity`` command and the host MPI libraries available in the job environment. 
+This modulefile is loaded **on the host** by ``community.sh`` and by the compile and run
+job cards. **Users must create and adapt this file** for their platform. Its content
+depends on the MPI launch method:
 
-A key requirement for the container workflow is compatibility between the MPI environment used by the containerized application and the host system’s MPI/runtime infrastructure. 
+* **Slurm** (``srun``): ``srun`` coordinates MPI rank launch across compute nodes via the
+  host Process Management Interface. The GNU-based image with OpenMPI 4.1.6 supports PMI2
+  (``--mpi=pmi2``); the image with OpenMPI 5.0.7 supports PMIx (``--mpi=pmix``). Run
+  ``srun --mpi=list`` to confirm availability. In this case no host MPI libraries are
+  required and the modulefile only needs to load the Singularity/Apptainer module.
 
-The required level of compatibility depends on the launch method. Scheduler-based launch, such as Slurm's ``srun``, requires compatibility with the host Process Management Interface (*PMI*) or *PMIx*. Host MPI launch, such as ``mpirun`` or ``mpiexec`` on PBS-based systems, requires ABI compatibility between the MPI libraries used by the containerized application and the corresponding MPI libraries on the host. 
-
-
-On Slurm-based systems, ``srun`` starts MPI ranks across the allocated compute nodes, with each rank launching one container instance. MPI communication from the containerized application then uses the host system’s communication stack.
-
-Using ``srun --mpi=pmi2`` requests PMI2 services for MPI initialization. The GNU-based image with OpenMPI 4.1.6 supports PMI2, allowing the containerized application to initialize ranks without relying on host compilers or MPI libraries inside the container. The GNU-based image with OpenMPI 5.0.7 supports PMIx. Use ``srun --mpi=pmix`` when PMIx is available on the host. PMI2 and PMIx provide process mapping and initialization data for MPI. To check availability, run ``srun --mpi=list`` and confirm that ``pmi2`` or ``pmix`` appears.
-
-To check whether PMI2 or PMIx is available on the host system, run ``srun --mpi=list`` and confirm that pmi2 or pmix appears in the output.
+* **PBS** (``mpirun``/``mpiexec``): the host MPI launcher requires ABI-compatible MPI
+  libraries on the host. Load the Singularity/Apptainer module together with compiler and
+  MPI modules that match the container’s toolchain.
 
 .. warning::
 
-   Mismatched MPI implementations, incompatible MPI versions, or incompatible PMI/PMIx support may lead to runtime failures, hangs, or incorrect behavior.
+   Mismatched MPI implementations, incompatible MPI versions, or incompatible PMI/PMIx
+   support may lead to runtime failures, hangs, or incorrect behavior.
 
 A minimal example for Hercules or Orion, where only the Singularity module needs to be loaded:
 
@@ -379,8 +388,9 @@ A minimal example for Hercules or Orion, where only the Singularity module needs
 
    load("singularity")
 
-On Derecho, Apptainer module needs to be loaded. 
-Derecho has a PBS Pro job scheduler, whicg uses a host MPI launcher such as ``mpirun`` or ``mpiexec``. This requires loading GNU and OpenMPI host modules that are ABI-compatible with the container, as well as the apptainer module:
+On Derecho, which uses a PBS Pro job scheduler with ``mpirun``/``mpiexec`` as the MPI
+launcher, GNU and OpenMPI host modules that are ABI-compatible with the container must be
+loaded alongside the Apptainer module:
 
 .. code-block:: lua
 
@@ -392,17 +402,27 @@ Derecho has a PBS Pro job scheduler, whicg uses a host MPI launcher such as ``mp
    load("gcc/14.3.0")
    load("openmpi/5.0.9")
 
-
-Adapt the module names as needed. On systems where
-Singularity/Apptainer is already in ``PATH`` (e.g., Gaea-C6, NOAA Cloud), this file
-may be left empty or only load supplementary host libraries needed by the MPI launcher.
+Adapt the module names as needed. On systems where Singularity/Apptainer is already in
+``PATH`` (e.g., Gaea-C6, NOAA Cloud), this file may be left empty or only load
+supplementary host libraries needed by the MPI launcher.
 
 .. _container-rt-build-mod:
 
 ``ufs_container.<compiler>.lua`` — Inside-Container Build Module
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This modulefile is loaded **inside the container** during both the compile and the run stages. It sets up the compiler toolchain, MPI library, and all required software libraries available within the container image.
+This modulefile is loaded **inside the container** during both the compile and run stages.
+It sets up the compiler toolchain, MPI library, and all required software libraries
+available within the container image.
+
+.. note::
+
+   This file is pre-configured to match the software stack inside the container image and
+   **does not normally require user changes**. A working example is provided in
+   ``modulefiles/ufs_container.<compiler>.lua`` within the repository. Users should only
+   modify it if they need to customize the inside-container environment (e.g., to override
+   specific library versions).
+
 
 A minimal example for an Intel-based container image:
 
@@ -426,7 +446,7 @@ container on Hercules/Orion):
 
 .. code-block:: console
 
-   singularity shell -B /work -B /work2 -B /local ${CONTAINER_IMG}
+   singularity shell -B /work -B /work2 -B /local <container-image>
    # inside the container:
    source /opt/spack-stack/spack-stack-1.9.2/.bashenv   # or equivalent init script
    module avail
@@ -434,12 +454,40 @@ container on Hercules/Orion):
    module load stack-intel-oneapi-mpi/2021.13
    module avail
 
-.. note::
+where ``<container-image>`` is the path to the container image file (``*.sif``) on the host.
 
-   If ``modulefiles/ufs_container.<compiler>.lua`` is not present, the RT driver falls back to
-   ``tests/modules.fv3_<compile_id>.lua`` if one exists for the specific compile configuration.
-   Providing the shared ``ufs_container.<compiler>.lua`` modulefile is the recommended approach
-   when one software stack covers all compile configurations.
+.. _container-rt-modulefiles-community:
+
+Community Platform Option (``-p`` flag)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When running with the ``-p`` flag, the model is built and run natively on the host — no
+container is involved. Natively installed software stack is expected to be present. 
+
+.. _container-rt-community-mod:
+
+``ufs_<MACHINE_ID>.<compiler>.lua`` — Platform Module
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Users must create and adapt this file** for their platform. It is loaded during both
+the compile and run stages and sets up the compiler toolchain, MPI library, and all
+required software libraries available on the host system.
+
+The file must be named ``modulefiles/ufs_<MACHINE_ID>.<compiler>.lua``, where
+``<MACHINE_ID>`` matches the value in header line 1 of the conf file and ``<compiler>``
+is ``intel`` or ``gnu``.
+
+An example for a GNU-based native stack:
+
+.. code-block:: lua
+
+   -- modulefiles/ufs_myplatform.gnu.lua
+   whatis("Native build/run environment for UFS-WM (GNU)")
+
+   prepend_path("MODULEPATH", "/path/to/spack-stack/envs/ufs-wm/install/modulefiles/Core")
+   load("stack-gcc/13.3.0")
+   load("stack-openmpi/4.1.6")
+   load("ufs-weather-model-env")
 
 .. _container-rt-conf:
 
@@ -447,33 +495,55 @@ container on Hercules/Orion):
 Configuring ``community.conf``
 ====================================
 
-The file ``tests/community.conf`` controls what gets compiled and tested. It begins with five mandatory header lines followed by one or more compile configuration blocks, each with a list of test cases.
+The file ``tests/community.conf`` controls what gets compiled and tested.
+It begins with four mandatory header lines followed by one or more compile configuration blocks,
+each with a list of test cases.
 
 The file uses ``|`` as a field separator and ``#`` for comments. Blank lines between configuration blocks are ignored.
 
+**Container mode example:**
+
 .. code-block:: text
 
-   # tests/community.conf — example configuration
+   # tests/community.conf — container mode example
 
-   # Header line 1: RT_COMPILER | CONTAINER_IMG | BIND_DIRS
-   intel | /work/noaa/epic/role-epic/contrib/containers/rocky9-oneapi2024.2-ss192.sif | /work,/work2,/local
+   # Header line 1: MACHINE_ID | RT_COMPILER | CONTAINER_IMG | BIND_DIRS
+   container | intel | /work/noaa/epic/role-epic/contrib/containers/rocky9-oneapi2024.2-ss192.sif | /work,/work2,/local
 
    # Header line 2: TPN | SCHEDULER | ACCNR | PARTITION | QUEUE | MPI_LAUNCH
    80 | slurm | epic | hercules | batch |
 
-   # Header line 3: DISKNM
-   /work2/noaa/epic/hercules/UFS-WM_RT
-
-   # Header line 4: INPUTDATA_ROOT
-   /work2/noaa/epic/hercules/UFS-WM_RT/NEMSfv3gfs/input-data-20251015
-
-   # Header line 5: RUNDIR_ROOT
+   # Header line 3: RUNDIR_ROOT
    /work2/noaa/epic/nperlin/hercules/UFS-WM/ufs-weather-model/tests/run_container
+
+   # Header line 4: INPUTDATA_ROOT | INPUTDATA_ROOT_WW3 | INPUTDATA_LM4 | INPUTDATA_GFSv17opn
+   /work2/noaa/epic/hercules/UFS-WM_RT/NEMSfv3gfs/input-data-20251015 | | | /work2/noaa/epic/hercules/UFS-WM_RT/NEMSfv3gfs/GFSv17opn_20251014
 
    # Compile configuration block: compile_id | MAKE_OPT
    atm | -DAPP=ATM -DCCPP_SUITES=FV3_GFS_v16,FV3_GFS_v17_p8
    control_c48
    control_p8
+
+**Community platform mode example** (``-p`` flag, no container image needed):
+
+.. code-block:: text
+
+   # tests/community.conf — community platform mode example
+
+   # Header line 1: MACHINE_ID | RT_COMPILER | CONTAINER_IMG | BIND_DIRS
+   myplatform | gnu |  |
+
+   # Header line 2: TPN | SCHEDULER | ACCNR | PARTITION | QUEUE | MPI_LAUNCH
+   96 |  |  |  |  | mpirun
+
+   # Header line 3: RUNDIR_ROOT
+   /scratch/nperlin/ufs-weather-model/tests/run_myplatform
+
+   # Header line 4: INPUTDATA_ROOT | INPUTDATA_ROOT_WW3 | INPUTDATA_LM4 | INPUTDATA_GFSv17opn
+   /data/UFS-WM_INPUT/input-data-20251015 | | | /data/UFS-WM_INPUT/GFSv17opn_20251014
+
+   atm | -DAPP=ATM -DCCPP_SUITES=FV3_GFS_v16,FV3_GFS_v17_p8
+   control_c48
 
 Header Line Fields
 ------------------
@@ -486,14 +556,20 @@ Header Line Fields
 
    * - Field
      - Description
+   * - ``MACHINE_ID``
+     - Platform identifier. Use ``container`` for the container workflow, or a custom
+       name matching the modulefile name for community platform (``-p``) runs.
+       See :numref:`Section %s <container-rt-community-mod>`.
    * - ``RT_COMPILER``
-     - Compiler toolchain used inside the container: ``intel`` or ``gnu``.
+     - Compiler toolchain: ``intel`` or ``gnu``.
    * - ``CONTAINER_IMG``
      - Absolute path to the Singularity/Apptainer image file (``*.sif``) on the host.
+       Leave blank when using the ``-p`` flag.
    * - ``BIND_DIRS``
      - Comma-separated list of host directories to bind/mount to the container.
        Include all filesystems containing the source tree, input data, and run directory.
        See :numref:`Section %s <container-rt-binddirs>` for typical values on Tier 1 platforms.
+       Leave blank when using the ``-p`` flag.
 
 **Header line 2:**
 
@@ -506,7 +582,7 @@ Header Line Fields
    * - ``TPN``
      - MPI tasks per node (default: 40).
    * - ``SCHEDULER``
-     - Job scheduler: ``slurm``, ``pbs``, or ``none`` for interactive single-node runs.
+     - Job scheduler: ``slurm``, ``pbs``, or leave blank for interactive/no-scheduler runs.
    * - ``ACCNR``
      - Scheduler account or project name (leave blank if not required).
    * - ``PARTITION``
@@ -514,32 +590,44 @@ Header Line Fields
    * - ``QUEUE``
      - Slurm QOS / PBS queue name (leave blank for interactive runs).
    * - ``MPI_LAUNCH``
-     - MPI launch command used when ``SCHEDULER=none``: ``mpirun`` or ``mpiexec``.
+     - MPI launch command used when no scheduler is set: ``mpirun`` or ``mpiexec``.
        Defaults to ``mpirun`` if omitted.
 
-**Header lines 3–5:** One filesystem path per line:
+**Header line 3:**
 
 .. list-table::
    :widths: 20 60
    :header-rows: 1
 
-   * - Line
+   * - Field
      - Description
-   * - ``DISKNM``
-     - Top-level RT data directory; also used as the baseline comparison root.
-   * - ``INPUTDATA_ROOT``
-     - Input data directory (typically ``${DISKNM}/NEMSfv3gfs/input-data-<date>``).
    * - ``RUNDIR_ROOT``
      - Top-level directory where compile and test run directories will be created.
-       This should be a user-writable path for the runtime directory with the tests (prefererably on a
-       scratch or work filesystem). If ``RUNDIR_ROOT`` differs from
-       ``${PATHRT}/run_dir``, the driver automatically creates a convenience
-       symlink ``tests/run_dir`` pointing to ``RUNDIR_ROOT``.
+       This should be a user-writable path (preferably on a scratch or work filesystem).
+       If ``RUNDIR_ROOT`` differs from ``${PATHRT}/run_dir``, the driver automatically
+       creates a convenience symlink ``tests/run_dir`` pointing to ``RUNDIR_ROOT``.
+
+**Header line 4:**
+
+.. list-table::
+   :widths: 20 60
+   :header-rows: 1
+
+   * - Field
+     - Description
+   * - ``INPUTDATA_ROOT``
+     - Input data directory (required).
+   * - ``INPUTDATA_ROOT_WW3``
+     - Input data directory for WaveWatch III data (optional; leave blank if not needed).
+   * - ``INPUTDATA_LM4``
+     - Input data directory for LM4 land model data (optional; leave blank if not needed).
+   * - ``INPUTDATA_GFSv17opn``
+     - Input data directory for GFS v17 operational data (optional; leave blank if not needed).
 
 Compile Configuration Blocks
 -----------------------------
 
-After the five header lines, each compile configuration block consists of:
+After the four header lines, each compile configuration block consists of:
 
 1. A **compile line** containing the configuration name and CMake options, separated by ``|``:
 
@@ -572,9 +660,10 @@ All tests are launched by running ``community.sh`` from the ``tests/`` directory
 .. code-block:: console
 
    cd ${WM_HOME}/tests
-   ./community.sh [options] [community.conf]
+   ./community.sh [options] <conf_file>
 
-If no configuration file is specified, ``tests/community.conf`` is used by default.
+The configuration file is a required positional argument. Provide the path to the
+``community.conf``-style file as the last argument.
 
 Command-Line Options
 --------------------
@@ -585,12 +674,15 @@ Command-Line Options
 
    * - Option
      - Description
+   * - ``-p``
+     - Community platform mode: build and run natively without a container.
+       Requires a ``ufs_<MACHINE_ID>.<compiler>.lua`` modulefile in ``modulefiles/``;
+       see :numref:`Section %s <container-rt-community-mod>`.
    * - ``-d``
      - Delete each test run directory after the test completes.
-   * - ``-l <file>``
-     - Use ``<file>`` as the configuration file instead of the default.
    * - ``-n <name>``
      - Run only the single test named ``<name>`` (the compile step that owns it still runs).
+       ``<name>`` must match a test case name listed in ``<conf_file>``.
    * - ``-o``
      - Compile only; skip all test cases.
    * - ``-v``
@@ -602,25 +694,25 @@ Command-Line Options
 Job Script Templates
 --------------------
 
-Before running, users should review the job script templates in ``tests/fv3_conf/`` to
-ensure they are appropriate for their system:
+When ``SCHEDULER`` is set to ``slurm`` or ``pbs``, the driver uses job script templates
+from ``tests/fv3_conf/``. The template name is based on the scheduler type and the
+``MACHINE_ID`` value from the conf file:
 
-- ``fv3_slurm.IN_container`` — Slurm run job card
-- ``fv3_qsub.IN_container`` — PBS run job card
-- ``compile_slurm.IN_container`` — Slurm compile job card
-- ``compile_qsub.IN_container`` — PBS compile job card
+- ``fv3_slurm.IN_<MACHINE_ID>`` — Slurm run job card
+- ``fv3_qsub.IN_<MACHINE_ID>`` — PBS run job card
+- ``compile_slurm.IN_<MACHINE_ID>`` — Slurm compile job card
+- ``compile_qsub.IN_<MACHINE_ID>`` — PBS compile job card
+
+For the container workflow (``MACHINE_ID=container``), templates are provided in the
+repository. For community platform runs with a scheduler, users must create
+platform-specific templates following the pattern of the container or Tier 1 templates
+in ``tests/fv3_conf/``. When ``SCHEDULER`` is blank, no job template is used and
+compile and run steps execute directly on the current host.
 
 These templates contain scheduler directives and environment setup that may require
-platform-specific adjustments. For example, on NOAA Cloud platforms (AWS, Azure) the
-Slurm partition directive is not used and the corresponding line must be commented out
-in the Slurm templates:
-
-.. code-block:: text
-
-   ##SBATCH --partition=@[PARTITION]
-
-Other common adjustments include wall-clock limits, node counts, and any
-platform-specific environment variables required before launching the container.
+platform-specific adjustments. Scheduler adjutments may include account/project names,
+partition or queue names, wall-clock limits, node counts, and any
+platform-specific environment variables required before launching the model.
 
 Running with a Job Scheduler (Slurm or PBS)
 --------------------------------------------
@@ -629,40 +721,47 @@ When ``SCHEDULER`` is set to ``slurm`` or ``pbs`` in ``community.conf``, set ``A
 
 .. code-block:: console
 
-   ./community.sh
+   ./community.sh [-p] community.conf
 
 The driver submits each compile and test job to the scheduler and blocks until the job finishes before submitting the next one. Progress is reported on the terminal; full output is captured in ``${RUNDIR_ROOT}/logs/``.
 
 Running Interactively (No Scheduler)
 --------------------------------------
 
-When ``SCHEDULER`` is set to ``none``, jobs run directly on the current host — suitable for an allocated compute node or single-workstation development. Request an interactive compute node allocation before running the driver.
+When ``SCHEDULER`` is blank in ``community.conf``, jobs run directly on the current host —
+suitable for an allocated compute node or single-workstation development.
 
-On **Slurm** systems the command may look similar to:
+If not allowed using a login node for runtime tests, request an interactive compute node
+allocation before running
+the driver. On **Slurm** systems the command may look similar to:
 
 .. code-block:: console
 
-   salloc -N 1 -n <cores> -A <account> -t <time> -q <qos>--partition=<partition>
+   salloc -N 1 -n <cores> -A <account> -t <time> -q <qos> --partition=<partition>
 
-On **PBS** systems:
+On **PBS** systems the command may look similar to:
 
 .. code-block:: console
 
    qsub -I -l walltime=<time> -A <account> -q <queue> -l select=1:ncpus=<cores>:mpiprocs=<cores>
 
-After the allocation is granted (and connecting via ``ssh`` to the compute node if required), run the driver:
+After the allocation is granted (and connecting via ``ssh`` to the compute node if required), run the driver.
+A command set as ``MPI_LAUNCH`` in header line 2 of the ``community.conf`` to start MPI tasks will be used.
 
 .. code-block:: console
 
    cd tests
-   ./community.sh
+   ./community.sh [-p] community.conf
 
-Set ``MPI_LAUNCH`` in header line 2 to ``mpirun`` or ``mpiexec`` (default: ``mpirun``). The driver starts the container once and then runs MPI tasks entirely inside the container, which is the correct approach for single-node interactive runs.
 
 .. note::
 
+    For a **container workflow**, the driver starts the software container first, and then runs MPI tasks
+    entirely inside it, which is the correct approach for single-node interactive runs.
+
    The ``--mpi=pmi2`` flag is a Slurm ``srun``-specific option and should **not** be used
-   with ``mpirun`` or ``mpiexec``. The ``none``-scheduler path omits it automatically.
+   with ``mpirun`` or ``mpiexec``. When no scheduler is set, ``srun`` is not used and
+   no container is launched for community platform (``-p``) runs.
 
 .. _container-rt-output:
 
@@ -670,20 +769,38 @@ Set ``MPI_LAUNCH`` in header line 2 to ``mpirun`` or ``mpiexec`` (default: ``mpi
 Run Directory
 ===================
 
-After the driver starts, it creates the following structure under ``RUNDIR_ROOT``:
+After the driver starts, it creates the following structure under ``RUNDIR_ROOT``.
+
+**Container mode** (``MACHINE_ID=container``):
 
 .. code-block:: text
 
    ${RUNDIR_ROOT}/
    ├── logs/                         # per-job log files and timestamps
    ├── compile_<compile_id>/         # compile working directory
-   │   ├── job_card                  # generated compile job script
+   │   ├── job_card                  # generated compile job script (scheduler) or absent
    │   ├── container_compile.sh      # script executed inside the container
    │   ├── modulefiles/              # modulefile staged for the build
    │   └── out / err                 # job stdout and stderr files
    └── <test_id>_<compiler>/         # test working directory
-       ├── job_card                  # generated test job script
+       ├── job_card                  # generated test job script (scheduler) or absent
        ├── fv3_container_run.sh      # wrapper executed inside the container
+       ├── modulefiles/              # modulefile staged for the run
+       └── out / err                 # job stdout and stderr files
+
+**Community platform mode** (``-p`` flag):
+
+.. code-block:: text
+
+   ${RUNDIR_ROOT}/
+   ├── logs/                         # per-job log files and timestamps
+   ├── compile_<compile_id>/         # compile working directory
+   │   ├── job_card                  # generated compile job script (if scheduler is used)
+   │   ├── modulefiles/              # modulefile staged for the build
+   │   └── out / err                 # job stdout and stderr files
+   └── <test_id>_<compiler>/         # test working directory
+       ├── job_card                  # generated test job script (if scheduler is used)
+       ├── fv3_run.sh                # native run wrapper (when no scheduler)
        ├── modulefiles/              # modulefile staged for the run
        └── out / err                 # job stdout and stderr files
 

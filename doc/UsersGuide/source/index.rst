@@ -13,7 +13,7 @@ Welcome to the UFS Weather Model User's Guide
    Introduction
    CodeOverview
    BuildingAndRunning
-   ContainerUFSWM_BuildAndRun
+   ContainerAndCommunity_BuildAndRun
    InputsOutputs
    HSD
    modules

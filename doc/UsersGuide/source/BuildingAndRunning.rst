@@ -18,10 +18,11 @@ On other systems, users will need to build the prerequisite libraries using :ter
 
 .. note::
 
-   For instructions on using software containers to build and run the UFS Weather Model
-   on any community platform, see :numref:`Chapter %s <container-rt-tests>`.
+   For instructions on using software containers or a native community software stack to
+   build and run the UFS Weather Model, see :numref:`Chapter %s <container-rt-tests>`.
    The container workflow provides a portable, reproducible software environment and
-   does not require a site-specific software stack. 
+   does not require a site-specific software stack. The community platform workflow
+   (``-p`` flag) supports systems where a native software stack is already available.
 
 =======================
 Prerequisite Libraries
@@ -156,7 +157,7 @@ The most straightforward way to run the UFS WM is to use the regression testing 
 
 .. note:: text
 
-  A container-based workflow (see :numref:`Chapter %s <container-rt-tests>`) follows a similar RT framework, and could also be adapted more easily for use on another community platform.
+  A container-based or community platform workflow (see :numref:`Chapter %s <container-rt-tests>`) follows a similar RT framework, and can be adapted more easily for use on another community platform.
 
 ----------------------------
 Loading the Required Modules

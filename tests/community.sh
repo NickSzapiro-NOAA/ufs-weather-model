@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # community.sh -
-#    UFS Weather-model test driver for container-based runs (default) or 
-#    runs with natively installed software stack on community platforms ("-C")
+#    UFS Weather-model test driver for container-based runs (default) or
+#    runs with natively installed software stack on community platforms ("-p")
 #
-# Reads a configuration file (default: community.conf in the same directory)
+# Reads a configuration file (e.g., community.conf)
 #   that include header lines with container or community platform configuration
 #   options, followed by one or more compile configurations/test blocks.  
 #   All the compile jobs and tests run sequentially
 #   NOTE: - no Rocoto or ECFlow workflow manager is involved
 #         - no baseline test created or comparison made
+# Test reported as failed if the compile or test fails, and a fail flag file is created.
 # 
 #   For each compile configuration:
 #     1. Compile the model inside the software container or on the community platform
@@ -16,24 +17,26 @@
 #
 # Users many need to adapt modulefiles before running:
 #
-# container option (MACHINE_ID=container):
-#   modulefiles/ufs_container.runtime.lua   — host-side runtime module 
-#      NOTE: no need to change a modulefile for inside-container build
+# Modulefiles in the ./modulefiles directory:
+#   container option (MACHINE_ID=container):
+#     ufs_container.runtime.lua   — host-side runtime module 
+#     NOTE: no need to change a modulefile for inside-container build
 #        and run environment, already included in the container image: 
 #        modulefiles/ufs_container.<compiler>.lua
 #
-# community platform (MACHINE_ID=<COMMUNITY>):
-#   modulefiles/ufs_<COMMUNITY>.<compiler>    — community platform module
+#   community platform with a native software stack ("-p" flag, MACHINE_ID=<COMMUNITY>):
+#     ufs_<COMMUNITY>.<compiler>.lua     — community platform module
 #
-# Job scheduler job templates for Slurm or PBS (if job scheduler is used):
+# Job scheduler job templates for Slurm or PBS (if job scheduler is used) in
+#    ./tests/fv3_conf/ directory:
 #
-#  container option (MACHINE_ID=container):
-#    fv3_conf/compile_slurm.IN_container  or  compile_qsub.IN_container
-#    fv3_conf/fv3_slurm.IN_container      or  fv3_qsub.IN_container
+#   container option (MACHINE_ID=container):
+#     compile_slurm.IN_container  or  compile_qsub.IN_container
+#     fv3_slurm.IN_container      or  fv3_qsub.IN_container
 #
-#  community platform option (MACHINE_ID=<COMMUNITY>):
-#    fv3_conf/compile_slurm.IN_<COMMUNITY>  or  compile_qsub.IN_<COMMUNITY>
-#    fv3_conf/fv3_slurm.IN_<COMMUNITY>      or  fv3_qsub.IN_<COMMUNITY>
+#   community platform option ("-p" flag, MACHINE_ID=<COMMUNITY>):
+#     compile_slurm.IN_<COMMUNITY>  or  compile_qsub.IN_<COMMUNITY>
+#     fv3_slurm.IN_<COMMUNITY>      or  fv3_qsub.IN_<COMMUNITY>
 #
 
 set -uo pipefail
@@ -68,7 +71,7 @@ usage() {
     echo "                compile configurations and test cases to run."
     echo ""
     echo "Options:"
-    echo "  -C            community platform mode: run natively without a container"
+    echo "  -p            platform mode: run without a container with a natively installed software stack"
     echo "  -d            delete run directories after each test completes"
     echo "  -h            display this help"
     echo "  -n <name>     run only the single test named <name>;"
@@ -102,9 +105,9 @@ for _arg in "$@"; do
 done
 unset _arg
 
-while getopts ":Cdhn:ov" opt; do
+while getopts ":pdhn:ov" opt; do
     case ${opt} in
-        C) COMMUNITY_PLATFORM=true ;;
+        p) COMMUNITY_PLATFORM=true ;;
         d) export delete_rundir=true ;;
         h) usage; exit 0 ;;
         n) RUN_SINGLE_TEST=true; SRT_NAME=${OPTARG} ;;
@@ -321,9 +324,9 @@ INPUTDATA_GFSv17opn=${INPUTDATA_GFSv17opn:-${INPUTDATA_ROOT}/GFSv17opn_input_dat
 ###############################################################################
 
 if [[ "${MACHINE_ID}" == container && "${COMMUNITY_PLATFORM}" == true ]]; then
-    echo "ERROR: MACHINE_ID=container and -C (COMMUNITY_PLATFORM) are mutually exclusive." >&2
-    echo "       Use MACHINE_ID=container without -C for Singularity/Apptainer container runs." >&2
-    echo "       Use a custom MACHINE_ID with -C for native community platform runs." >&2
+    echo "ERROR: MACHINE_ID=container and -p (COMMUNITY_PLATFORM) are mutually exclusive." >&2
+    echo "       Use MACHINE_ID=container without -p for Singularity/Apptainer container runs." >&2
+    echo "       Use a custom MACHINE_ID with -p for native-stack community platform runs." >&2
     exit 1
 fi
 
@@ -354,9 +357,9 @@ if [[ "${MACHINE_ID}" == container ]]; then
         exit 1
     fi
 elif [[ "${COMMUNITY_PLATFORM}" != true ]]; then
-    echo "ERROR: MACHINE_ID='${MACHINE_ID}' is not 'container' but -C was not specified." >&2
-    echo "       For native community platform runs with a custom MACHINE_ID," >&2
-    echo "       re-run with the -C option:  $(basename "$0") -C ... ${input_file}" >&2
+    echo "ERROR: MACHINE_ID='${MACHINE_ID}' is not 'container' but -p was not specified." >&2
+    echo "       For native-stack community platform runs with a custom MACHINE_ID," >&2
+    echo "       re-run with the -p option:  $(basename "$0") -p ... ${input_file}" >&2
     exit 1
 fi
 

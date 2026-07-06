@@ -1,0 +1,57 @@
+#!/bin/bash
+
+#YEAR=2022
+YEAR = @[SYEAR]
+COMBINED_FILE="ERA5_combined_${YEAR}.nc"
+FINAL_FILE="GEFS_forcing_from_ERA5_${YEAR}.nc"
+
+echo "1. Merging ERA5 files into ${COMBINED_FILE}..."
+# Copy the first file to establish the base file
+cp ERA5_10m_u_component_of_wind_${YEAR}.nc ${COMBINED_FILE}
+
+# Append (-A) the remaining files into the combined file
+ncks -A ERA5_10m_v_component_of_wind_${YEAR}.nc ${COMBINED_FILE}
+ncks -A ERA5_2m_temperature_${YEAR}.nc ${COMBINED_FILE}
+ncks -A ERA5_2m_specific_humidity_${YEAR}.nc ${COMBINED_FILE}
+ncks -A ERA5_mean_sea_level_pressure_${YEAR}.nc ${COMBINED_FILE}
+ncks -A ERA5_total_rainfall_rate_${YEAR}.nc ${COMBINED_FILE}
+ncks -A ERA5_total_snowfall_rate_${YEAR}.nc ${COMBINED_FILE}
+ncks -A ERA5_surface_solar_radiation_downwards_${YEAR}.nc ${COMBINED_FILE}
+ncks -A ERA5_surface_thermal_radiation_downwards_${YEAR}.nc ${COMBINED_FILE}
+
+echo "2. Applying GEFS datamode math and renaming via ncap2..."
+# Use ncap2 to execute the math and mapping. 
+# Note: Multiplying t2m by 0.0 is a highly efficient NCO trick to generate 
+# an array of exactly the right grid shape and time dimension filled with 10.0.
+ncap2 -O -s '
+  Sa_u10m = u10;
+  Sa_v10m = v10;
+  Sa_u = u10;
+  Sa_v = v10;
+  
+  Sa_t2m = t2m;
+  Sa_q2m = q;
+  Sa_tbot = t2m;
+  Sa_shum = q;
+  
+  Sa_pslv = msl;
+  Sa_pbot = msl;
+  
+  Sa_z = (t2m * 0.0f) + 10.0f;
+  
+  Faxa_rain = rain;
+  Faxa_snow = snow;
+  Faxa_lwdn = strd;
+  
+  Faxa_swvdr = ssrd * 0.285f;
+  Faxa_swvdf = ssrd * 0.285f;
+  Faxa_swndr = ssrd * 0.215f;
+  Faxa_swndf = ssrd * 0.215f;
+' ${COMBINED_FILE} ${FINAL_FILE}
+
+echo "3. Cleaning up to keep only GEFS variables..."
+# Extract only the newly created GEFS variables to shrink the file size
+# and discard the raw ERA5 internal variables (u10, t2m, etc.)
+ncks -O -v Sa_u10m,Sa_v10m,Sa_u,Sa_v,Sa_t2m,Sa_q2m,Sa_tbot,Sa_shum,Sa_pslv,Sa_pbot,Sa_z,Faxa_rain,Faxa_snow,Faxa_lwdn,Faxa_swvdr,Faxa_swvdf,Faxa_swndr,Faxa_swndf ${FINAL_FILE} ${FINAL_FILE}
+
+echo "Done! File ready for CDEPS: ${FINAL_FILE}"

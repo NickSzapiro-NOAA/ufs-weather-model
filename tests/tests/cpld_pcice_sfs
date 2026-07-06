@@ -1,0 +1,17 @@
+#
+#  cpld_pcice_sfs test
+#
+source ${PATHRT}/tests/cpld_control_sfs
+
+export TEST_DESCR+=" prescribed ice CICE "
+
+export CNTL_DIR=cpld_pcice_sfs
+
+export CICE_RUNTYPE=initial
+export CICE_ICE_IC=none
+export CICE_PRESCRIBED=true
+export stream_files_dice="INPUT/sst_siconc_skt.era5.20210321_20210331.nc"
+export MESH_DICE=e5.oper.an.mesh.nc
+export eps_imesh=4.0e-1
+
+export FV3_RUN="cpld_control_run.IN cpld_docn_pcice.IN"

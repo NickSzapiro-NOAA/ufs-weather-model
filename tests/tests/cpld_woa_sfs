@@ -1,0 +1,10 @@
+#
+#  cpld_woa_sfs test
+#
+source ${PATHRT}/tests/cpld_control_sfs
+
+export TEST_DESCR+=" WOA MOM6 IC "
+
+export CNTL_DIR=cpld_woa_sfs
+
+export FV3_RUN="cpld_control_run.IN ocn_woa.IN"

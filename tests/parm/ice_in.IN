@@ -394,9 +394,9 @@
 
 &ice_prescribed_nml
   prescribed_ice_mode = .@[CICE_PRESCRIBED].
-  stream_yearfirst = @[SYEAR]
-  stream_yearlast = @[SYEAR]
-  stream_yearalign = @[SYEAR]
+  stream_yearfirst = 2021
+  stream_yearlast = 2021
+  stream_yearalign = 1994
   stream_varname = "ice_cov"
   stream_meshfile = "INPUT/@[MESH_DICE]"
   stream_datafiles = "@[stream_files_dice]"

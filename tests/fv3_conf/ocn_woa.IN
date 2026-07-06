@@ -1,0 +1,4 @@
+mkdir -p INPUT
+
+# Need MOM_override and T/S data
+cp /scratch3/NCEPDEV/nems/Nick.Szapiro/tasks/datm-ocn-ice/testcase_OM4_WOA13/* INPUT

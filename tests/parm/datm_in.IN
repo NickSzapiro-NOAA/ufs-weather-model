@@ -11,4 +11,5 @@
   ny_global = @[ATM_NY_GLB]
   restfilm = "null"
   export_all = @[EXPORT_ALL]
+  skip_field_check = .true.
 /

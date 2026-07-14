@@ -28,8 +28,8 @@
   branch = develop
 [submodule "CDEPS"]
   path = CDEPS-interface/CDEPS
-  url = https://github.com/NickSzapiro-NOAA/CDEPS
-  branch = sync_escomp_202602
+  url = https://github.com/ESCOMP/CDEPS
+  branch = feature/era5_refactor
 [submodule "GOCART"]
   path = GOCART
   url = https://github.com/GEOS-ESM/GOCART

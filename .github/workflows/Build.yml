@@ -88,6 +88,13 @@ jobs:
           export CC=mpicc ; export CXX=mpic++ ; export FC=mpif90
         fi
         esmfcmakemoddir=$(spack location --install-dir esmf)/cmake
+        libcmakedir=""
+        # Only locate and inject SCOTCH_DIR if PDLIB is enabled for this matrix job
+        if [[ "${{ matrix.cmake_args }}" == *"-DPDLIB=ON"* ]]; then
+          scotch_dir=$(spack location --install-dir scotch)
+          echo "PDLIB is enabled. Injecting SCOTCH_DIR=$scotch_dir"
+          libcmakedir="-DSCOTCH_DIR=$scotch_dir"
+        fi
         cmake -S $GITHUB_WORKSPACE/ufs-weather-model -B build \
           -DAPP=${{ matrix.app }} \
           -DCCPP_SUITES=${{ matrix.ccpp_suites }} \
@@ -95,6 +102,7 @@ jobs:
           -DUSE_ESMF_STATIC_LIBS=OFF \
           -DCMAKE_MODULE_PATH=$esmfcmakemoddir \
           -DDEBUG=ON \
+          ${libcmakedir} \
           ${{ matrix.cmake_args }}
         # Save compile logs to check warnings
         mkdir -p spack-logs

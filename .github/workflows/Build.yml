@@ -15,17 +15,22 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-24.04"]
-        app: ["S2SWA", "ATM"]
+        app: ["ATM", "S2SW", "HAFS-MOM6W"]
         compiler:
           - name: "gcc"
             container: "ghcr.io/noaa-emc/ci-common-build-cache/ufs-weather-model-ubuntu-24.04-gcc-13-mpich-x@sha256:cc9bdafb43d31498fe833c1914d90e32570f8fa9f001e11ca16c4a88417128f8"
           - name: "oneapi"
             container: "ghcr.io/noaa-emc/ci-common-build-cache/ufs-weather-model-ubuntu-24.04-oneapi-2025.3-intel-oneapi-mpi-2021.17@sha256:a8d5845388f64ed95ad19583b03536b68c48c2c2d8166f66269fac92fd2a0751"
         include:
-          - app: S2SWA
-            ccpp_suites: "FV3_GFS_v17_coupled_p8,FV3_GFS_v17_coupled_p8_ugwpv1"
-          - app: ATM
-            ccpp_suites: "FV3_GFS_v16,FV3_GFS_v16_flake,FV3_GFS_v16_ras,FV3_GFS_v17_p8,FV3_GFS_v17_p8_ugwpv1"
+          - app: ATM # cover RRFS
+            ccpp_suites: "FV3_RAP,FV3_RAP_sfcdiff,FV3_HRRR,FV3_RRFS_v1beta,FV3_RRFS_v1nssl"
+            cmake_args: ""
+          - app: S2SW # cover GFS (and SFS)
+            ccpp_suites: "FV3_GFS_v17_coupled_p8_ugwpv1"
+            cmake_args: "-DPDLIB=ON -DUFS_TRACING=ON"
+          - app: HAFS-MOM6W # cover HAFS
+            ccpp_suites: "FV3_HAFS_v1_gfdlmp_tedmf,FV3_HAFS_v1_gfdlmp_tedmf_nonsst,FV3_HAFS_v1_thompson,FV3_HAFS_v1_thompson_nonsst"
+            cmake_args: ""
 
     runs-on: ${{ matrix.os }}
     # Dependencies are preinstalled in a container image.
@@ -89,7 +94,8 @@ jobs:
           -D32BIT=ON \
           -DUSE_ESMF_STATIC_LIBS=OFF \
           -DCMAKE_MODULE_PATH=$esmfcmakemoddir \
-          -DDEBUG=ON
+          -DDEBUG=ON \
+          ${{ matrix.cmake_args }}
         # Save compile logs to check warnings
         mkdir -p spack-logs
         cmake --build build --parallel 4 2>&1 | tee spack-logs/spack-build-out.txt

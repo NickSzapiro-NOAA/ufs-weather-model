@@ -88,7 +88,8 @@ jobs:
           -DCCPP_SUITES=${{ matrix.ccpp_suites }} \
           -D32BIT=ON \
           -DUSE_ESMF_STATIC_LIBS=OFF \
-          -DCMAKE_MODULE_PATH=$esmfcmakemoddir
+          -DCMAKE_MODULE_PATH=$esmfcmakemoddir \
+          -DDEBUG=ON
         # Save compile logs to check warnings
         mkdir -p spack-logs
         cmake --build build --parallel 4 2>&1 | tee spack-logs/spack-build-out.txt

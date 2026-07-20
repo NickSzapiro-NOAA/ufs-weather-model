@@ -42,6 +42,7 @@ list(APPEND cice_shared_files
   CICE/cicecore/cicedyn/general/ice_init.F90
   CICE/cicecore/cicedyn/general/ice_state.F90
   CICE/cicecore/cicedyn/general/ice_step_mod.F90
+  CICE/cicecore/cicedyn/general/ice_bound_state.F90
 
   #Infrastructure List
   CICE/cicecore/cicedyn/infrastructure/ice_blocks.F90

@@ -41,7 +41,7 @@ jobs:
     steps:
 
     - name: "Checkout"
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
       with:
         submodules: recursive
         path: ufs-weather-model
@@ -101,7 +101,7 @@ jobs:
         cmake --build build --parallel 4 2>&1 | tee spack-logs/spack-build-out.txt
     - name: "Upload Build Logs"
       if: always() # Run this even if the build fails
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       with:
         name: spack-build-logs-${{ matrix.app }}-${{ matrix.compiler.name }}
         path: spack-logs/spack-build-out.txt
@@ -120,12 +120,12 @@ jobs:
       
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0 
           
       - name: Download Build Logs
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           pattern: spack-build-logs-*
           path: ./spack-logs
@@ -146,7 +146,7 @@ jobs:
 
       - name: Upload Warnings Report
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: report-compiler-warnings
           path: all_compiler_warnings.txt

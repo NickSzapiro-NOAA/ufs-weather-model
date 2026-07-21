@@ -41,7 +41,7 @@ jobs:
     steps:
 
     - name: "Checkout"
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         submodules: recursive
         path: ufs-weather-model
@@ -101,7 +101,7 @@ jobs:
         cmake --build build --parallel 4 2>&1 | tee spack-logs/spack-build-out.txt
     - name: "Upload Build Logs"
       if: always() # Run this even if the build fails
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: spack-build-logs-${{ matrix.app }}-${{ matrix.compiler.name }}
         path: spack-logs/spack-build-out.txt
@@ -110,7 +110,7 @@ jobs:
   # Parse build logs and annotate GitHub PR with new compiler warnings
   # -------------------------------------------------------------------------
   check-warnings:
-    name: Check New Compiler Warnings
+    name: Check New and Legacy Compiler Warnings
     runs-on: ubuntu-24.04
     needs: [Spack]
     if: (success() || failure()) # Ensures this runs even if CMake compilation fails
@@ -120,18 +120,18 @@ jobs:
       
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0 
           
       - name: Download Build Logs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           pattern: spack-build-logs-*
           path: ./spack-logs
           merge-multiple: true # Consolidates all matrix logs into the single folder
           
-      - name: Run Native Warning Check
+      - name: Run Compiler Warnings Check
         env:
           GITHUB_BASE_REF: ${{ github.base_ref }}
         run: |
@@ -144,9 +144,9 @@ jobs:
           echo "Running custom Python warning parser..."
           python ${{ github.workspace }}/.github/scripts/check_build_compile_warnings.py ./spack-logs
 
-      - name: Upload Legacy Warnings Report
+      - name: Upload Warnings Report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
-          name: legacy-compiler-warnings
+          name: report-compiler-warnings
           path: all_compiler_warnings.txt

@@ -183,6 +183,18 @@ if __name__ == "__main__":
     print("--------------------------------------\n")
     
     all_warnings = parse_spack_logs(log_directory)
+
+    # Address duplicate warnings (across application builds)
+    unique_warnings = []
+    seen_signatures = set()
+    for w in all_warnings:
+        # Create a unique signature for this exact warning
+        sig = (w['file'], w['line'], w['msg'])
+        if sig not in seen_signatures:
+            seen_signatures.add(sig)
+            unique_warnings.append(w)
+    print(f"🧹 {len(unique_warnings)}/{len(all_warnings)} are unique compiler warnings.")        
+    all_warnings = unique_warnings
     
     # 1. Save the full list of legacy warnings to a file for monitoring
     with open("all_compiler_warnings.txt", "w") as f:

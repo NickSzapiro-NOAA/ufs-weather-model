@@ -161,13 +161,8 @@ def parse_spack_logs(log_dir):
                     
     return warnings
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python3 check_build_compile_warnings.py <path_to_spack_logs>")
-        sys.exit(1)
-        
-    log_directory = sys.argv[1]
-    base_branch = "develop"
+def driver_check_build_warnings(log_directory, base_branch):
+    """Driver to filter Spack build logs for legacy and new warnings."""
     
     print(f"Checking diff against origin/{base_branch}...")
     
@@ -183,18 +178,7 @@ if __name__ == "__main__":
     print("--------------------------------------\n")
     
     all_warnings = parse_spack_logs(log_directory)
-
-    # # Address duplicate warnings (across application builds)
-    # unique_warnings = []
-    # seen_signatures = set()
-    # for w in all_warnings:
-    #    # Create a unique signature for this exact warning
-    #    sig = (w['file'], w['line'], w['msg'])
-    #    if sig not in seen_signatures:
-    #        seen_signatures.add(sig)
-    #        unique_warnings.append(w)
-    # print(f"🧹 {len(unique_warnings)}/{len(all_warnings)} are unique compiler warnings.")        
-    # all_warnings = unique_warnings
+    # Possible TODO: duplicate warnings (across application builds)
     
     # 1. Save the full list of legacy warnings to a file for monitoring
     with open("all_compiler_warnings.txt", "w") as f:
@@ -231,3 +215,13 @@ if __name__ == "__main__":
         print(f"::error file={w['file']},line={w['line']}::{w['msg']}")
         
     sys.exit(1)
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: python3 check_build_compile_warnings.py <path_to_spack_logs>")
+        sys.exit(1)
+        
+    log_directory = sys.argv[1]
+    base_branch = "develop"
+
+    driver_check_build_warnings(log_directory, base_branch)

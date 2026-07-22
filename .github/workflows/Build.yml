@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-24.04"]
-        app: ["ATM", "S2SW", "HAFS-MOM6W", "NG-GODAS"]
+        app: ["ATM", "S2SW", "HAFS-MOM6W"]
         compiler:
           - name: "gcc"
             container: "ghcr.io/noaa-emc/ci-common-build-cache/ufs-weather-model-ubuntu-24.04-gcc-13-mpich-x@sha256:cc9bdafb43d31498fe833c1914d90e32570f8fa9f001e11ca16c4a88417128f8"
@@ -25,14 +25,11 @@ jobs:
           - app: ATM # cover RRFS
             ccpp_suites: "FV3_RAP,FV3_RAP_sfcdiff,FV3_HRRR,FV3_RRFS_v1beta,FV3_RRFS_v1nssl"
             cmake_args: ""
-          - app: S2SW # cover GFS (and SFS)
+          - app: S2SW # cover GFS (and SFS, RTOFS too)
             ccpp_suites: "FV3_GFS_v17_coupled_p8_ugwpv1"
             cmake_args: "-DUFS_TRACING=ON" # TODO: -DPDLIB=ON
           - app: HAFS-MOM6W # cover HAFS
             ccpp_suites: "FV3_HAFS_v1_gfdlmp_tedmf,FV3_HAFS_v1_gfdlmp_tedmf_nonsst,FV3_HAFS_v1_thompson,FV3_HAFS_v1_thompson_nonsst"
-            cmake_args: ""
-          - app: NG-GODAS # cover RTOFS
-            ccpp_suites: ""
             cmake_args: ""
 
     runs-on: ${{ matrix.os }}

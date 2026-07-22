@@ -97,14 +97,14 @@ jobs:
           -DDEBUG=ON \
           ${{ matrix.cmake_args }}
         # Save compile logs to check warnings
-        mkdir -p spack-logs
-        cmake --build build --parallel 4 2>&1 | tee spack-logs/spack-build-out-${{ matrix.app }}-${{ matrix.compiler.name }}.txt
+        mkdir -p build-logs
+        cmake --build build --parallel 4 2>&1 | tee build-logs/build-out-${{ matrix.app }}-${{ matrix.compiler.name }}.txt
     - name: "Upload Build Logs"
       if: always() # Run this even if the build fails
       uses: actions/upload-artifact@v4
       with:
-        name: spack-build-logs-${{ matrix.app }}-${{ matrix.compiler.name }}
-        path: spack-logs/spack-build-out-*.txt
+        name: build-logs-${{ matrix.app }}-${{ matrix.compiler.name }}
+        path: build-logs/build-out-*.txt
 
   # -------------------------------------------------------------------------
   # Parse build logs and annotate GitHub PR with new compiler warnings
@@ -112,7 +112,7 @@ jobs:
   check-warnings:
     name: Check New and Legacy Compiler Warnings
     runs-on: ubuntu-24.04
-    needs: [Spack]
+    needs: [Build]
     if: (success() || failure()) # Ensures this runs even if CMake compilation fails
     
     permissions:

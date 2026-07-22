@@ -109,8 +109,8 @@ def get_changed_lines(repo_path, diff_args, path_prefix=""):
 
     return changed
 
-def parse_spack_logs(log_dir):
-    """Parses Spack build logs to find warnings and strips staging paths."""
+def parse_build_logs(log_dir):
+    """Parses CI build logs to find warnings and strips staging paths."""
     warnings = []
     log_files = []
     
@@ -120,7 +120,7 @@ def parse_spack_logs(log_dir):
             if "build-out" in file:
                 log_files.append(os.path.join(root, file))
                 
-    print(f"🔍 Found {len(log_files)} Spack log files to parse.")
+    print(f"🔍 Found {len(log_files)} Build log files to parse.")
     
     for filepath in log_files:
         with open(filepath, 'r', errors='replace') as f:
@@ -162,7 +162,7 @@ def parse_spack_logs(log_dir):
     return warnings
 
 def driver_check_build_warnings(log_directory, base_branch):
-    """Driver to filter Spack build logs for legacy and new warnings."""
+    """Driver to filter CI build logs for legacy and new warnings."""
     
     print(f"Checking diff against origin/{base_branch}...")
     
@@ -177,7 +177,7 @@ def driver_check_build_warnings(log_directory, base_branch):
         print(f"  - {f} ({len(lines)} lines modified)")
     print("--------------------------------------\n")
     
-    all_warnings = parse_spack_logs(log_directory)
+    all_warnings = parse_build_logs(log_directory)
     # Possible TODO: duplicate warnings (across application builds)
     
     # 1. Save the full list of legacy warnings to a file for monitoring
@@ -218,7 +218,7 @@ def driver_check_build_warnings(log_directory, base_branch):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python3 check_build_compile_warnings.py <path_to_spack_logs>")
+        print("Usage: python3 check_build_compile_warnings.py <path_to_build_logs>")
         sys.exit(1)
         
     log_directory = sys.argv[1]

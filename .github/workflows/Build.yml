@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  Spack:
+  Build:
     strategy:
       matrix:
         os: ["ubuntu-24.04"]
@@ -127,8 +127,8 @@ jobs:
       - name: Download Build Logs
         uses: actions/download-artifact@v4
         with:
-          pattern: spack-build-logs-*
-          path: ./spack-logs
+          pattern: build-logs-*
+          path: ./build-logs
           merge-multiple: true # Consolidates all matrix logs into the single folder
           
       - name: Run Compiler Warnings Check
@@ -139,10 +139,10 @@ jobs:
           git fetch origin ${{ github.base_ref }}
 
           echo "--- Build log files downloaded for check-warnings ---"
-          find ./spack-logs -type f
+          find ./build-logs -type f
           
           echo "Running custom Python warning parser..."
-          python ${{ github.workspace }}/.github/scripts/check_build_compile_warnings.py ./spack-logs
+          python ${{ github.workspace }}/.github/scripts/check_build_compile_warnings.py ./build-logs
 
       - name: Upload Warnings Report
         if: always()

@@ -1,11 +1,20 @@
 #!/bin/bash
 set -eu
 
-#!/bin/bash
-
 # =====================================================================
 # FUNCTION: apply_cice_overrides
+# 
+# Description: 
+#   A bash utility to apply CICE set_nml options directly 
+#   to an ice_in namelist. Modifies the file in-place, including 
+#   Fortran is not case-sensitive.
+#
+# Example usage:
+#   ./CICE_override.sh ice_in < set_nml.bgc
+#   echo "kice = 2" | ./CICE_override.sh ice_in
+#   printf "kice = 2\ndt = 1800.0\n" | ./CICE_override.sh ice_in
 # =====================================================================
+
 apply_cice_overrides() {
     local ice_in="$1"
 
@@ -14,7 +23,7 @@ apply_cice_overrides() {
         return 1
     fi
 
-    # Create a safe temp file in /tmp (declare and assign separately to avoid SC2155)
+    # Create a safe temp file to store edited ice_in
     local tmp_file
     tmp_file=$(mktemp)
 
@@ -32,19 +41,19 @@ apply_cice_overrides() {
         
         [[ -z "$key" || -z "$value" ]] && continue
         
-        # STEP 1: Find how the key is actually capitalized in the file using grep -i
+        # Find how key is capitalized in ice_in using grep -i
         local exact_match
         exact_match=$(grep -i -m 1 "^[[:space:]]*${key}[[:space:]]*=" "$ice_in")
         
         if [[ -n "$exact_match" ]]; then
-            # STEP 2: Extract the exact capitalization (e.g., "kice" becomes "KICE")
+            # Extract the exact capitalization (e.g., "kice" becomes "KICE")
             local exact_key
             exact_key=$(echo "$exact_match" | cut -d'=' -f1 | awk '{print $1}')
             
-            # STEP 3: Overwrite using standard, case-sensitive sed
+            # Overwrite key,value using standard, case-sensitive sed
             sed -E "s/^[[:space:]]*${exact_key}[[:space:]]*=.*/  ${exact_key} = ${value}/" "$ice_in" > "$tmp_file"
             
-            # Dump back to original file to preserve permissions and symlinks
+            # Overwrite ice_in
             cat "$tmp_file" > "$ice_in"
         fi
 

@@ -1,0 +1,124 @@
+#!/bin/bash
+set -eu
+
+# =====================================================================
+# FUNCTION: apply_cice_overrides
+# =====================================================================
+apply_cice_overrides() {
+    local ice_in="$1"
+
+    if [[ -z "$ice_in" || ! -f "$ice_in" ]]; then
+        echo "Error: Missing or invalid ice_in file." >&2
+        return 1
+    fi
+
+    # Create a safe temp file in /tmp
+    local tmp_file=$(mktemp)
+
+    # Read overrides from standard input (stdin)
+    while read -r line; do
+        # Skip empty lines and lines starting with '#'
+        [[ -z "$line" || "$line" == "#"* ]] && continue
+        
+        # Extract the override key and value
+        local key=$(echo "$line" | cut -d'=' -f1 | awk '{print $1}')
+        local value=$(echo "$line" | cut -d'=' -f2- | sed 's/^[[:space:]]*//')
+        
+        [[ -z "$key" || -z "$value" ]] && continue
+        
+        # STEP 1: Find how the key is actually capitalized in the file using grep -i
+        local exact_match=$(grep -i -m 1 "^[[:space:]]*${key}[[:space:]]*=" "$ice_in")
+        
+        if [[ -n "$exact_match" ]]; then
+            # STEP 2: Extract the exact capitalization (e.g., "kice" becomes "KICE")
+            local exact_key=$(echo "$exact_match" | cut -d'=' -f1 | awk '{print $1}')
+            
+            # STEP 3: Overwrite using standard, case-sensitive sed (100% cross-platform)
+            sed -E "s/^[[:space:]]*${exact_key}[[:space:]]*=.*/  ${exact_key} = ${value}/" "$ice_in" > "$tmp_file"
+            
+            # Dump back to original file to preserve permissions and symlinks
+            cat "$tmp_file" > "$ice_in"
+        fi
+
+    done
+
+    # Clean up
+    rm -f "$tmp_file"
+}
+
+# =====================================================================
+# UNIT TESTS
+# =====================================================================
+run_tests() {
+    echo "Running unit tests for apply_cice_overrides..."
+    local fails=0
+    local pass=0
+
+    assert_match() {
+        local expected="$1"
+        local file="$2"
+        local test_name="$3"
+        
+        if grep -qF "$expected" "$file"; then
+            echo "[PASS] $test_name"
+            ((pass++))
+        else
+            echo "[FAIL] $test_name (Expected to find: '$expected')"
+            ((fails++))
+        fi
+    }
+
+    local mock_ice_in=$(mktemp)
+    
+    reset_mock_ice_in() {
+        echo "&setup_nml" > "$mock_ice_in"
+        echo "  days_per_year = 365" >> "$mock_ice_in"
+        echo "  use_restart   = .true." >> "$mock_ice_in"
+        echo "  KICE = 1" >> "$mock_ice_in"
+        echo "  DT = 3600.0" >> "$mock_ice_in"
+        echo "/" >> "$mock_ice_in"
+    }
+
+    # ---------------------------------------------------------
+    # TEST 1: File Redirect
+    # ---------------------------------------------------------
+    reset_mock_ice_in
+    local mock_set_nml=$(mktemp)
+    
+    echo "days_per_year = 360" > "$mock_set_nml"
+    echo "use_restart = .false." >> "$mock_set_nml"
+
+    apply_cice_overrides "$mock_ice_in" < "$mock_set_nml"
+    
+    assert_match "  days_per_year = 360" "$mock_ice_in" "Test 1: File Redirect (Integer)"
+    assert_match "  use_restart = .false." "$mock_ice_in" "Test 1: File Redirect (Logical)"
+    rm -f "$mock_set_nml"
+
+    # ---------------------------------------------------------
+    # TEST 2: Piped Multi-line (Verifying Case-Insensitivity)
+    # ---------------------------------------------------------
+    reset_mock_ice_in
+    
+    printf "dt = 1800.0\nkice = 2\n" | apply_cice_overrides "$mock_ice_in"
+
+    assert_match "  DT = 1800.0" "$mock_ice_in" "Test 2: Piped Multi-line (Float)"
+    assert_match "  KICE = 2" "$mock_ice_in" "Test 2: Case-insensitive extraction (KICE)"
+
+    # ---------------------------------------------------------
+    # TEST 3: Piped Single Line
+    # ---------------------------------------------------------
+    reset_mock_ice_in
+    
+    echo "days_per_year = 366" | apply_cice_overrides "$mock_ice_in"
+    
+    assert_match "  days_per_year = 366" "$mock_ice_in" "Test 3: Piped Single Line"
+
+    rm -f "$mock_ice_in"
+    echo "--------------------------------"
+    echo "Tests completed: $pass passed, $fails failed."
+    return $fails
+}
+
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    run_tests
+fi

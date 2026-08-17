@@ -1,6 +1,8 @@
 #!/bin/bash
 set -eu
 
+#!/bin/bash
+
 # =====================================================================
 # FUNCTION: apply_cice_overrides
 # =====================================================================
@@ -12,8 +14,9 @@ apply_cice_overrides() {
         return 1
     fi
 
-    # Create a safe temp file in /tmp
-    local tmp_file=$(mktemp)
+    # Create a safe temp file in /tmp (declare and assign separately to avoid SC2155)
+    local tmp_file
+    tmp_file=$(mktemp)
 
     # Read overrides from standard input (stdin)
     while read -r line; do
@@ -21,19 +24,24 @@ apply_cice_overrides() {
         [[ -z "$line" || "$line" == "#"* ]] && continue
         
         # Extract the override key and value
-        local key=$(echo "$line" | cut -d'=' -f1 | awk '{print $1}')
-        local value=$(echo "$line" | cut -d'=' -f2- | sed 's/^[[:space:]]*//')
+        local key
+        key=$(echo "$line" | cut -d'=' -f1 | awk '{print $1}')
+        
+        local value
+        value=$(echo "$line" | cut -d'=' -f2- | sed 's/^[[:space:]]*//')
         
         [[ -z "$key" || -z "$value" ]] && continue
         
         # STEP 1: Find how the key is actually capitalized in the file using grep -i
-        local exact_match=$(grep -i -m 1 "^[[:space:]]*${key}[[:space:]]*=" "$ice_in")
+        local exact_match
+        exact_match=$(grep -i -m 1 "^[[:space:]]*${key}[[:space:]]*=" "$ice_in")
         
         if [[ -n "$exact_match" ]]; then
             # STEP 2: Extract the exact capitalization (e.g., "kice" becomes "KICE")
-            local exact_key=$(echo "$exact_match" | cut -d'=' -f1 | awk '{print $1}')
+            local exact_key
+            exact_key=$(echo "$exact_match" | cut -d'=' -f1 | awk '{print $1}')
             
-            # STEP 3: Overwrite using standard, case-sensitive sed (100% cross-platform)
+            # STEP 3: Overwrite using standard, case-sensitive sed
             sed -E "s/^[[:space:]]*${exact_key}[[:space:]]*=.*/  ${exact_key} = ${value}/" "$ice_in" > "$tmp_file"
             
             # Dump back to original file to preserve permissions and symlinks
@@ -68,25 +76,33 @@ run_tests() {
         fi
     }
 
-    local mock_ice_in=$(mktemp)
+    local mock_ice_in
+    mock_ice_in=$(mktemp)
     
     reset_mock_ice_in() {
-        echo "&setup_nml" > "$mock_ice_in"
-        echo "  days_per_year = 365" >> "$mock_ice_in"
-        echo "  use_restart   = .true." >> "$mock_ice_in"
-        echo "  KICE = 1" >> "$mock_ice_in"
-        echo "  DT = 3600.0" >> "$mock_ice_in"
-        echo "/" >> "$mock_ice_in"
+        # Grouped commands to avoid SC2129 multiple redirects
+        {
+            echo "&setup_nml"
+            echo "  days_per_year = 365"
+            echo "  use_restart   = .true."
+            echo "  KICE = 1"
+            echo "  DT = 3600.0"
+            echo "/"
+        } > "$mock_ice_in"
     }
 
     # ---------------------------------------------------------
     # TEST 1: File Redirect
     # ---------------------------------------------------------
     reset_mock_ice_in
-    local mock_set_nml=$(mktemp)
     
-    echo "days_per_year = 360" > "$mock_set_nml"
-    echo "use_restart = .false." >> "$mock_set_nml"
+    local mock_set_nml
+    mock_set_nml=$(mktemp)
+    
+    {
+        echo "days_per_year = 360"
+        echo "use_restart = .false."
+    } > "$mock_set_nml"
 
     apply_cice_overrides "$mock_ice_in" < "$mock_set_nml"
     

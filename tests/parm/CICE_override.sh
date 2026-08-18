@@ -145,5 +145,12 @@ run_tests() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    run_tests
+    # If an argument is passed (e.g., "ice_in"), apply the overrides
+    if [[ $# -gt 0 ]]; then
+        apply_cice_overrides "$1"
+    # If no arguments are passed, run the unit tests
+    else
+        run_tests
+    fi
 fi
+

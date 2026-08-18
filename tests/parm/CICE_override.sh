@@ -43,7 +43,7 @@ apply_cice_overrides() {
         
         # Find how key is capitalized in ice_in using grep -i
         local exact_match
-        exact_match=$(grep -i -m 1 "^[[:space:]]*${key}[[:space:]]*=" "$ice_in")
+        exact_match=$(grep -i -m 1 "^[[:space:]]*${key}[[:space:]]*=" "$ice_in" || true)
         
         if [[ -n "$exact_match" ]]; then
             # Extract the exact capitalization (e.g., "kice" becomes "KICE")
@@ -78,10 +78,10 @@ run_tests() {
         
         if grep -qF "$expected" "$file"; then
             echo "[PASS] $test_name"
-            ((pass++))
+            pass=$((pass + 1))
         else
             echo "[FAIL] $test_name (Expected to find: '$expected')"
-            ((fails++))
+            fails=$((fails + 1))
         fi
     }
 

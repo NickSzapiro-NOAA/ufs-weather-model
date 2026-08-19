@@ -445,3 +445,23 @@ If you are using this log as a pull request verification, please commit 'test_ch
 Result: FAILURE
 
 ====END OF URSA REGRESSION TESTING LOG====
+
+PASS -- COMPILE 's2sw_pdlib_intel' [15:11, 13:42] ( 1032 remarks )
+PASS -- TEST 'cpld_warmstart_c24_5deg_intel' [02:36, 01:00](2206 MB)
+PASS -- TEST 'cpld_restart_c24_5deg_intel' [02:26, 00:24](1533 MB)
+
+SYNOPSIS:
+Starting Date/Time: 20260819 18:06:49
+Ending Date/Time: 20260819 18:28:22
+Total Time: 00h:21m:36s
+Compiles Completed: 1/1
+Tests Completed: 2/2
+
+NOTES:
+A file 'test_changes.list' was generated but is empty.
+If you are using this log as a pull request verification, please commit 'test_changes.list'.
+
+Result: SUCCESS
+
+
+====END OF URSA REGRESSION TESTING LOG====

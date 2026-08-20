@@ -44,18 +44,23 @@ apply_cice_overrides() {
         # Find how key is capitalized in ice_in using grep -i
         local exact_match
         exact_match=$(grep -i -m 1 "^[[:space:]]*${key}[[:space:]]*=" "$ice_in" || true)
-        
-        if [[ -n "$exact_match" ]]; then
-            # Extract the exact capitalization (e.g., "kice" becomes "KICE")
-            local exact_key
-            exact_key=$(echo "$exact_match" | cut -d'=' -f1 | awk '{print $1}')
-            
-            # Overwrite key,value using standard, case-sensitive sed
-            sed -E "s/^[[:space:]]*${exact_key}[[:space:]]*=.*/  ${exact_key} = ${value}/" "$ice_in" > "$tmp_file"
-            
-            # Overwrite ice_in
-            cat "$tmp_file" > "$ice_in"
+
+        # Error if override key isn't in ice_in
+        if [[ -z "$exact_match" ]]; then
+            echo "ERROR: Override key '${key}' not found in '${ice_in}' " >&2
+            rm -f "$tmp_file"
+            return 1
         fi
+        
+        # Extract the exact capitalization (e.g., "kice" becomes "KICE")
+        local exact_key
+        exact_key=$(echo "$exact_match" | cut -d'=' -f1 | awk '{print $1}')
+            
+        # Overwrite key,value using standard, case-sensitive sed
+        sed -E "s/^[[:space:]]*${exact_key}[[:space:]]*=.*/  ${exact_key} = ${value}/" "$ice_in" > "$tmp_file"
+            
+        # Overwrite ice_in
+        cat "$tmp_file" > "$ice_in"
 
     done
 
@@ -138,6 +143,20 @@ run_tests() {
     
     assert_match "  days_per_year = 366" "$mock_ice_in" "Test 3: Piped Single Line"
 
+    # ---------------------------------------------------------
+    # TEST 4: Fail on Missing/Misspelled Key
+    # ---------------------------------------------------------
+    reset_mock_ice_in
+
+    # We expect this to fail, so we capture the return code
+    if echo "bad_spelling = 99" | apply_cice_overrides "$mock_ice_in" 2>/dev/null; then
+        echo "[FAIL] Test 4: Missing Key (Expected script to abort)"
+        fails=$((fails + 1))
+    else
+        echo "[PASS] Test 4: Missing Key aborted successfully"
+        pass=$((pass + 1))
+    fi
+
     rm -f "$mock_ice_in"
     echo "--------------------------------"
     echo "Tests completed: $pass passed, $fails failed."
@@ -147,7 +166,7 @@ run_tests() {
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     # If an argument is passed (e.g., "ice_in"), apply the overrides
     if [[ $# -gt 0 ]]; then
-        apply_cice_overrides "$1"
+        apply_cice_overrides "$1" || exit 1
     # If no arguments are passed, run the unit tests
     else
         run_tests

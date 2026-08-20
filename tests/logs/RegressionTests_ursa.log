@@ -51,6 +51,7 @@ RT.SH OPTIONS USED:
 * (-a) - HPC PROJECT ACCOUNT: nems
 * (-e) - USE ECFLOW
 
+<<<<<<< HEAD
 PASS -- COMPILE 's2swa_32bit_intel' [15:11, 13:27] ( 1042 remarks )
 FAILED: UNABLE TO COMPLETE COMPARISON -- TEST 'cpld_control_gefs_intel' [, ]( MB)
 FAILED: UNABLE TO START TEST -- TEST 'cpld_restart_gefs_intel' [, ]( MB)
@@ -549,5 +550,6 @@ You can use './rt.sh -c -b test_changes.list' to create baselines for the failed
 If you are using this log as a pull request verification, please commit 'test_changes.list'.
 
 Result: FAILURE
+
 
 ====END OF URSA REGRESSION TESTING LOG====

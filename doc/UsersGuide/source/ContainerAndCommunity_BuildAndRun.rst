@@ -5,7 +5,7 @@ Container and Community Platform Workflows for the UFS Weather Model
 *************************************************************************
 
 This chapter describes two build-and-run workflows for the UFS Weather Model (:term:`WM`)
-driven by the standalone script ``tests/community.sh``:
+driven by the driver script ``tests/community.sh``:
 
 * **Container workflow** (default): The model is compiled and run inside a
   Singularity/Apptainer software container that bundles the prerequisite compilers,
@@ -15,27 +15,64 @@ driven by the standalone script ``tests/community.sh``:
 
 * **Community platform workflow** (``-p`` flag): The container is bypassed entirely.
   The model is compiled and run natively using a software stack already installed on
-  the host system and exposed through a user-provided Lmod modulefile. This mode 
+  the host system and exposed through a user-provided Lmod modulefile. This mode
   requires natively installed software stack to already exist on a community platform.
-
-The Regression Test (:term:`RT`) framework is adopted as a convenient starting point to
-help users familiarize themselves with the UFS WM and to provide a simple build-and-run
-workflow. Users may need to modify the configuration to suit their computing platform
-standards and job scheduler (if any). It may also be necessary to adjust the locations 
-of staged input data, the container image, the runtime directory, as well as host-system
-runtime modules. Users are encouraged to further tailor the workflow to fit their own
-modeling needs beyond running predefined test cases.
-
-The workflow uses a standalone driver script, ``tests/community.sh``, and a companion
-configuration file, ``tests/community.conf``. The driver compiles the model and then
-runs each listed test sequentially, waiting for each job to complete before starting the
-next. No Rocoto or ECFlow workflow manager is involved.
 
 .. attention::
 
    This chapter covers the container-based and community platform workflows driven by
-   ``community.sh``. For the standard RT framework driven by ``rt.sh``, see
-   :numref:`Section %s <UsingRegressionTest>`.
+   ``community.sh``. For the standard, Tier-1-oriented RT framework driven by ``rt.sh``,
+   see :numref:`Section %s <UsingRegressionTest>`.
+
+.. _container-rt-vs-rt:
+
+==========================================================
+Relationship to the Regression Test (RT) Workflow
+==========================================================
+
+``community.sh`` was intentionally designed to follow a logic and structure similar to
+the Regression Test (:term:`RT`) framework (``rt.sh``/``rt.conf``). The goal of this
+design choice is to facilitate testing and adoption of this new workflow. UFS WM
+developers already familiar with running RTs would be able to use ``community.sh``
+without learning an entirely new set of conventions. To that end, ``community.sh``
+reuses several pieces of the existing RT infrastructure:
+
+* Test cases are selected from the same test definition files under ``tests/tests``
+  that ``rt.conf``/``rt.sh`` draw from, and CMake build options follow the same
+  conventions as ``rt.conf``.
+* ``rt_utils.sh`` is reused to configure some of the shell environment variables needed
+  to run the tests.
+* Job card templates in ``tests/fv3_conf/`` follow the same naming pattern used by the
+  RT framework.
+
+That said, ``community.sh`` is a separate driver script with its own configuration
+file, ``community.conf``, and its own goal.
+
+``community.sh`` is intended for portability testing on a contributor's own platform.
+It gives the UFS-WMcommunity members and users outside the core UFS WM development team 
+a simple starting point for building and running the model. This platform may be a Tier 1
+system, another HPC center, a cloud instance, or a laptop/workstation, with or without
+container software. Running the tests successfully with ``community.sh`` confirms that
+the model has been **ported, built, and run successfully**, rather than reproducing the full
+baseline-comparison capability maintained on Tier 1.
+
+By contrast, ``rt.sh`` targets the officially supported NOAA Tier 1 RDHPC platforms
+exclusively (such as Ursa, Gaea, Orion, Hercules, Derecho, and NOAA Cloud at the moment of
+writing). It confirms that code changes preserve bit-for-bit baseline results, using
+Rocoto/ECFlow workflow management.
+
+Keeping ``community.sh`` and ``community.conf`` separate from ``rt.sh`` also means that
+container support and community-platform complexity do not burden the production
+``rt.sh`` CI/CD pipeline, and vice versa. ``community.sh`` runs sequentially — compiling each
+configuration and then running its tests in turn, with no Rocoto or ECFlow workflow
+manager involved — which keeps it simple for interactive debugging on whatever platform
+the user has available.
+
+Users are expected to modify the ``community.conf`` configuration to suit their computing
+platform standards and job scheduler (if any). The locations of staged input data, the 
+container image, the runtime directory, as well as host-system runtime modules need to be
+adjusted to fit local data paths and user's environment. Users are encouraged to further
+tailor the workflow to fit their own modeling needs beyond running predefined test cases.
 
 .. _container-rt-prereqs:
 

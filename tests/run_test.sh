@@ -96,7 +96,6 @@ if [[ ${DRY_RUN:-false} == false ]]; then
   # FV3 executable:
   cp "${PATHRT}/fv3_${COMPILE_ID}.exe" "fv3.exe"
 
-<<<<<<< HEAD
   # modulefile for FV3 prerequisites:
   mkdir -p modulefiles
   if [[ ${MACHINE_ID} == linux ]]; then

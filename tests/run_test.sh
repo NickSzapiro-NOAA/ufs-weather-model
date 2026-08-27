@@ -546,7 +546,7 @@ module list
 ${MPI_LAUNCH} -n ${TASKS} ./fv3.exe
 RUN_EOF
     chmod u+x fv3_container_run.sh
-    redirect_out_err ${CONTAINERBIN} exec ${BIND_FLAGS} "${CONTAINER_IMG}" "${PWD}/fv3_container_run.sh"
+    redirect_out_err ${CONTAINERBIN} exec "${BIND_FLAGS}" "${CONTAINER_IMG}" "${PWD}/fv3_container_run.sh"
   elif [[ "${COMMUNITY_PLATFORM:-false}" == true ]]; then
     MPI_LAUNCH=${MPI_LAUNCH:-mpirun}
     echo "NOTE: running ${TASKS} MPI tasks on community platform via ${MPI_LAUNCH}"

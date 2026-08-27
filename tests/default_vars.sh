@@ -375,26 +375,26 @@ elif [[ ${MACHINE_ID} = container || ${COMMUNITY_PLATFORM} = 'true' ]]; then
 
   # Running in a container.  TPN is provided at runtime from community.conf
   # via the job .env file; use it if already set, otherwise fall back to 80.
-  export TPN=${TPN:-80}
-  export EXCLUSIVE_NODES=.true.
+  TPN=${TPN:-80}
+  EXCLUSIVE_NODES=.true.
 
   # Decomposition defaults similar to a typical 80-task-per-node system.
-  export INPES_dflt=3
-  export JNPES_dflt=8
-  export INPES_thrd=3
-  export JNPES_thrd=4
-  export INPES_c384=6
-  export JNPES_c384=8
-  export THRD_c384=2
-  export INPES_c768=8
-  export JNPES_c768=16
-  export THRD_c768=2
+  INPES_dflt=3
+  JNPES_dflt=8
+  INPES_thrd=3
+  JNPES_thrd=4
+  INPES_c384=6
+  JNPES_c384=8
+  THRD_c384=2
+  INPES_c768=8
+  JNPES_c768=16
+  THRD_c768=2
 
-  export THRD_cpl_atmw_gdas=2
-  export INPES_cpl_atmw_gdas=6
-  export JNPES_cpl_atmw_gdas=8
-  export WPG_cpl_atmw_gdas=24
-  export WAV_tasks_atmw_gdas=248
+  THRD_cpl_atmw_gdas=2
+  INPES_cpl_atmw_gdas=6
+  JNPES_cpl_atmw_gdas=8
+  WPG_cpl_atmw_gdas=24
+  WAV_tasks_atmw_gdas=248
 
 else
 

@@ -19,10 +19,11 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MACHINES: "acorn derecho gaeac6 hera hercules orion ursa wcoss2"
   BASE_URL: https://api.github.com/repos/ufs-community/ufs-weather-model
-  PR_NUM: ${{ github.event.number }}
+  PR_NUM: ${{ github.event.pull_request.number }}
 
 jobs:
   check-logs: 
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps: 
       - name: Checkout feature branch

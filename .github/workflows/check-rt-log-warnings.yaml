@@ -3,8 +3,6 @@ name: Check for Increased Warnings/Remarks
 on:
   pull_request:
     branches: [develop]
-  push:
-    branches: ['**']
   workflow_dispatch:
 
 defaults:
@@ -23,7 +21,6 @@ env:
 
 jobs:
   check-logs: 
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps: 
       - name: Checkout feature branch

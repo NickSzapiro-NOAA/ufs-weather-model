@@ -1,0 +1,8 @@
+#  example CICE DA test
+source "${PATHRT}"/tests/datm_cdeps_gfs
+TEST_DESCR+=" CICE DA RT "
+
+# CICE code hardcodes 
+#   aice_filename = trim(restart_dir)//'/sic.nc'
+#   aice_fldname = 'sic'
+CICE_RESTART_MOD='adjust_aice'

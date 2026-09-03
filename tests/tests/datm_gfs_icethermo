@@ -9,10 +9,11 @@ CICE_DYN_MASS_MIN=0.00001d0
 # CICE_NML_OVERRIDES="${PATHRT}"/../CICE-interface/CICE/configuration/scripts/options/set_nml.pondsealvl #Need history
 CICE_NML_OVERRIDES="${PATHRT}"/../CICE-interface/CICE/icepack/configuration/scripts/options/set_nml.pondsealvl
 
-# Changing snow layers changes restart variables
+# Changing snow layers changes restart variables (like qsno for each layer)
 CICE_NML_OVERRIDES+=" ${PATHRT}"/../CICE-interface/CICE/icepack/configuration/scripts/options/set_nml.snwitdrdg
-# Can "cold start" w/o ice then chain dependent tests
+# If no restart, Can "cold start" with CICE_IC_IC none or internal. Then chain restart/... dependencies
 CICE_RUNTYPE=initial
-CICE_ICE_IC=none
+#CICE_ICE_IC=none
+CICE_ICE_IC=internal
 
 CICE_NML_OVERRIDES+=" ${PATHRT}"/../CICE-interface/CICE/icepack/configuration/scripts/options/set_nml.congel

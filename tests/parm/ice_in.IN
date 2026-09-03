@@ -190,6 +190,9 @@
     congel_freeze   = 'two-step'
     tfrz_option     = '@[CICE_TFREEZE_OPTION]'
     restart_coszen  = .true.
+    ice_data_type   = 'latsst'
+    ice_data_conc   = 'parabolic'
+    ice_data_dist   = 'uniform'
 /
 
 &domain_nml

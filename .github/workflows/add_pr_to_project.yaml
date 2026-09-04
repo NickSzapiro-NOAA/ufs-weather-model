@@ -1,6 +1,8 @@
 name: Add PR to Project
 on:
   pull_request_target:
+    branches:
+      - develop
     types:
       - opened
       - reopened

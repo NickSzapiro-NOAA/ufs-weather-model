@@ -2,9 +2,6 @@ name: Regression Resource Check
 
 on:
   pull_request:
-    branches: [develop]
-  push:
-    branches: ['**']
   workflow_dispatch:
 
 defaults:
@@ -19,7 +16,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MACHINES: "acorn derecho gaeac6 hera hercules orion ursa wcoss2"
   BASE_URL: https://api.github.com/repos/ufs-community/ufs-weather-model
-  PR_NUM: ${{ github.event.number }}
+  PR_NUM: ${{ github.event.pull_request.number }}
 
 jobs:
   get-data:  

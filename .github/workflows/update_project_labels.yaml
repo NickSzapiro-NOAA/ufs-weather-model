@@ -1,6 +1,8 @@
 name: Update Project Labels
 on:
   pull_request_target:
+    branches:
+      - develop
     types:
       - opened
       - reopened

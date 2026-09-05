@@ -5,4 +5,4 @@ TEST_DESCR+=" CICE DA RT "
 # CICE code hardcodes 
 #   aice_filename = trim(restart_dir)//'/sic.nc'
 #   aice_fldname = 'sic'
-CICE_RESTART_MOD='adjust_aice'
+CICE_RESTART_MOD='adjust_aice_test'

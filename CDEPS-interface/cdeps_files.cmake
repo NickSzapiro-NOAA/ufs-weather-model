@@ -40,6 +40,7 @@ list(APPEND cdeps_dshr_files
   CDEPS/dshr/dshr_dfield_mod.F90
   CDEPS/dshr/dshr_fldlist_mod.F90
   CDEPS/dshr/dshr_mod.F90
+  CDEPS/dshr/dshr_global_sums_mod.F90
 )
 
 list(APPEND cdeps_datm_files

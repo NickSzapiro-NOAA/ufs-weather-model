@@ -31,7 +31,7 @@
   #url = https://github.com/NOAA-EMC/CDEPS
   #branch = develop
   url = https://github.com/NickSzapiro-NOAA/CDEPS
-  branch = sync_escomp_202609
+  branch = test_datm_ufs
 [submodule "GOCART"]
   path = GOCART
   url = https://github.com/GEOS-ESM/GOCART

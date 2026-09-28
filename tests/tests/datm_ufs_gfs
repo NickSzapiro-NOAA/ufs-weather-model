@@ -1,0 +1,9 @@
+#
+#  CDEPS datm ufs test - user-configurable datamode
+#
+
+source "${PATHRT}"/tests/datm_cdeps_gfs
+
+TEST_DESCR+=" - datm ufs - "
+
+atm_datamode=UFS

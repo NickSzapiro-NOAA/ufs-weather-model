@@ -24,8 +24,8 @@
   branch = dev/emc
 [submodule "CICE"]
   path = CICE-interface/CICE
-  url = https://github.com/NOAA-EMC/CICE
-  branch = develop
+  url = https://github.com/ACCESS-NRI/CICE
+  branch = thermo_abort_location
 [submodule "CDEPS"]
   path = CDEPS-interface/CDEPS
   url = https://github.com/NOAA-EMC/CDEPS

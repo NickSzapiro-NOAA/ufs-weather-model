@@ -23,7 +23,7 @@ atm_omp_num_threads=2
 QUILTING_RESTART=.false.
 USE_MERRA2=.true.
 
-ESMF_THREADING=false
+ESMF_THREADING=true
 THRD=$atm_omp_num_threads
 ZSTANDARD_LEVEL=5
 

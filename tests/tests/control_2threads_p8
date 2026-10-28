@@ -154,7 +154,7 @@ N_SPLIT=4
 
 SATMEDMF=.true.
 
-ESMF_THREADING=false
+ESMF_THREADING=true
 THRD=$atm_omp_num_threads
 
 if [[ ${MACHINE_ID} = ursa ]]; then

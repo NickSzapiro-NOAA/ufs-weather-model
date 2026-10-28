@@ -62,7 +62,7 @@ WRTTASK_PER_GROUP=6
 RESTART_INTERVAL="6 -1"
 OUTPUT_FH='0 09 12'
 
-ESMF_THREADING=false
+ESMF_THREADING=true
 if [[ $MACHINE_ID = hercules ]] && [[ $RT_COMPILER = gnu ]]; then
   ESMF_THREADING=true
 fi
